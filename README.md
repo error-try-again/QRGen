@@ -1,4 +1,5 @@
-# fullstack-qr-generator
+# QRGen-FullStack
+
 ## This project is designed to automate and setup two Dockerized, rootless environments to provide QR code generation
 
     Backend: A Node.js server powered by Express.
