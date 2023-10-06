@@ -1,2 +1,2 @@
 # fullstack-qr-generator
-The script automates the process of setting up a Node.js backend with Express and a React frontend with TypeScript for a QR code generation application. A React frontend provides a UI for data entry/QR generation/Downloads.
+The script automates the process of setting up a Node.js backend with Express and a React frontend with TypeScript for a QR code generation application.
