@@ -21,6 +21,10 @@ sudo ./setup-deps.sh
 su docker-primary install.sh
 ```
 
+## Security Notes
+setup-deps.sh sets the default password for docker-primary to 'test'. 
+This should be changed in production environments.
+
 # Example
 
 ![image](https://github.com/error-try-again/fullstack-qr-generator/assets/19685177/1d1ef425-5ca0-402c-b2b6-914bf4c0907d)

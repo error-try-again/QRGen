@@ -16,7 +16,6 @@ NVM_VERSION="v0.39.5"
 BACKEND_PORT=3000
 NGINX_PORT=8080
 
-# Ensures the NVM directory exists
 check_nvm_dir() {
   if [[ ! -d "$NVM_DIR" ]]; then
     echo "NVM_DIR is set to an invalid directory: $NVM_DIR"
@@ -25,7 +24,22 @@ check_nvm_dir() {
   fi
 }
 
-# Checks if a port is in use and prompts for an alternative
+setup_nvm_node() {
+  check_nvm_dir
+
+  curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh" | bash
+  export NVM_DIR="$DEFAULT_NVM_DIR"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+  if ! nvm install "$NODE_VERSION"; then
+    echo "Failed to install Node version $NODE_VERSION. Exiting..."
+    exit 1
+  fi
+
+  nvm use "$NODE_VERSION"
+  npm install -g npm
+}
+
 check_and_update_port() {
   local port_variable_name=$1
   local port_value=${!port_variable_name}
@@ -39,27 +53,6 @@ check_and_update_port() {
   fi
 }
 
-# Set up NVM and Node.js
-setup_nvm_node() {
-  echo "Setting up NVM and Node.js..."
-
-  local AVAILABLE_VERSIONS
-  AVAILABLE_VERSIONS=$(curl -s https://nodejs.org/dist/index.json | jq -r '.[].version')
-
-  if ! echo "$AVAILABLE_VERSIONS" | grep -q "$NODE_VERSION"; then
-    echo "Node version $NODE_VERSION is not available. Exiting..."
-    exit 1
-  fi
-
-  curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh" | bash
-  NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  nvm install node
-  nvm use node
-  npm install -g npm
-}
-
-# Simplified docker rootless setup
 setup_docker_rootless() {
   echo "Setting up Docker in rootless mode..."
 
@@ -269,7 +262,6 @@ setup_project_directories() {
   fi
 }
 
-# Cleanup resources
 cleanup() {
   local resource
   echo "Cleaning up..."
@@ -294,11 +286,9 @@ cleanup() {
   done
 }
 
-# Main execution flow
 main() {
-  check_nvm_dir
-  setup_project_directories
   setup_nvm_node
+  setup_project_directories
   setup_docker_rootless
   setup_backend
   initialize_server_project
