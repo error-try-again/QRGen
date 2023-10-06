@@ -28,7 +28,7 @@ install_packages() {
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
   sudo apt-get update -y
-  sudo apt-get install -y ca-certificates curl git gnupg docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin uidmap
+  sudo apt-get install -y jq ca-certificates curl git gnupg docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin uidmap
 }
 
 # Create defacto docker account and user process persistence across logouts
