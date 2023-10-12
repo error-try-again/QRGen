@@ -23,7 +23,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions)); // Enable CORS with options
 
-
 app.use(express.json({limit: '1mb'}));  // Parse incoming JSON request bodies and limit to 1mb
 
 app.use('/generate', rateLimit({windowMs: 15 * 60 * 1000, max: 100})); // Limit to 100 requests per 15 minutes
@@ -36,7 +35,6 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-
 // Definitions for Validators and Required Fields
 const requiredFieldsForTab = {
     'Text': ['text'],
@@ -48,6 +46,8 @@ const requiredFieldsForTab = {
     'Event': ['event', 'venue', 'startTime', 'endTime'],
     'GeoLocation': ['latitude', 'longitude'],
     'Crypto': ['cryptoType', 'address', 'amount'],
+    'VCard': ['Firstname', 'Lastname', 'Email', 'PhoneWork'],
+    'MeCard': ['Firstname', 'Lastname', 'Phone1']
 };
 
 const cryptoValidators = {
@@ -72,7 +72,9 @@ const validators = {
     'SMS': (data) => data.phone && data.sms,
     'Text': (data) => !!data.text,
     'Url': (data) => /^https?:\/\//i.test(data.url),
-    'WiFi': (data) => data.ssid && data.encryption
+    'WiFi': (data) => data.ssid && data.encryption,
+    'VCard': (data) => !!data.firstName && !!data.lastName && !!data.phoneWork && !!data.email,
+    'MeCard': (data) => !!data.firstName && !!data.lastName && !!data.phone1
 };
 
 // Definitions for Validators and Required Fields
@@ -90,6 +92,46 @@ const createVCalendar = (venue, startTime, endTime) => {
         "END:VCALENDAR"
     ].join('\n');
 };
+
+const createVCard = (data) => {
+    return [
+        "BEGIN:VCARD",
+        `VERSION:${data.Version === '3' ? '3.0' : '2.1'}`,
+        `N:${data.lastName};${data.firstName}`,
+        data.organization ? `ORG:${data.organization}` : '',
+        data.position ? `TITLE:${data.position}` : '',
+        data.phoneWork ? `TEL;WORK:${data.phoneWork}` : '',
+        data.phonePrivate ? `TEL;HOME:${data.phonePrivate}` : '',
+        data.phoneMobile ? `TEL;CELL:${data.phoneMobile}` : '',
+        data.faxWork ? `TEL;WORK;FAX:${data.faxWork}` : '',
+        data.faxPrivate ? `TEL;HOME;FAX:${data.faxPrivate}` : '',
+        data.email ? `EMAIL:${data.email}` : '',
+        data.website ? `URL:${data.website}` : '',
+        data.street || data.zipcode || data.city || data.state || data.country ?
+            `ADR:;;${data.street || ''};${data.city || ''};${data.state || ''};${data.zipcode || ''};${data.country || ''}` : '',
+        "END:VCARD"
+    ].filter(Boolean).join('\n');
+};
+
+
+const createMeCard = (data) => {
+    return [
+        "MECARD:",
+        `N:${data.lastName},${data.firstName}`,
+        data.nickname ? `NICKNAME:${data.nickname}` : '',
+        data.phone1 ? `TEL:${data.phone1}` : '',
+        data.phone2 ? `TEL:${data.phone2}` : '',
+        data.phone3 ? `TEL:${data.phone3}` : '',
+        data.email ? `EMAIL:${data.email}` : '',
+        data.website ? `URL:${data.website}` : '',
+        data.birthday ? `BDAY:${data.birthday}` : '',
+        data.street || data.zipcode || data.city || data.state || data.country ?
+            `ADR:${data.street || ''},${data.city || ''},${data.state || ''},${data.zipcode || ''},${data.country || ''}` : '',
+        data.notes ? `NOTE:${data.notes}` : '',
+        ";"
+    ].filter(Boolean).join('');
+};
+
 
 // Sanitize input to prevent XSS
 const sanitizeInput = (input) => {
@@ -147,6 +189,14 @@ const handleDataTypeSwitching = (type, rest) => {
         return createVCalendar(sanitizeInput(rest.venue), sanitizeInput(rest.startTime), sanitizeInput(rest.endTime));
     }
 
+    function handleVCardFormat() {
+        return createVCard(sanitizeInput(rest));
+    }
+
+    function handleMeCardFormat() {
+        return createMeCard(sanitizeInput(rest));
+    }
+
     switch (type) {
         case 'Text':
             return handleTextFormat();
@@ -162,10 +212,15 @@ const handleDataTypeSwitching = (type, rest) => {
             return handleGeoLocationFormat();
         case 'WiFi':
             return handleWifiFormat();
-        case 'Crypto':
-            return handleCryptoFormat();
         case 'Event':
             return handleEventFormat();
+        case 'Crypto':
+            return handleCryptoFormat();
+        case 'VCard':
+            return handleVCardFormat();
+        case 'MeCard':
+            return handleMeCardFormat();
+
         default:
             return '';
     }
@@ -205,7 +260,6 @@ const validateBatchData = (qrCodes, response) => {
         }
     }
 };
-
 
 // Generate QR
 const generateQR = async (data, size) => {
