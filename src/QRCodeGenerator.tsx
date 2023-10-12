@@ -19,8 +19,11 @@
     const customIcon = L.icon({
         iconRetinaUrl: iconRetina,
         iconUrl: iconMarker,
-        shadowUrl: iconShadow
+        shadowUrl: iconShadow,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41], // Positions the tip of the marker at the exact location.
     });
+
 
     const INITIAL_POSITION = new LatLng(51.505, -0.09);
     const CRYPTO_TYPES = ['Bitcoin', 'Bitcoin Cash', 'Ethereum', 'Litecoin', 'Dash', "Doge"];
@@ -255,20 +258,23 @@
         type?: string,
         setError: React.Dispatch<React.SetStateAction<string | null>>,
         handleChange: (event: ChangeEvent<HTMLInputElement>, fieldName: keyof QRCodeRequest) => void
-    }> = React.memo(({keyName, value, type = 'text', handleChange, setError}) => (
-        <div style={styles.fieldContainer}>
-            <label style={styles.label} htmlFor={String(keyName)}>Enter {keyName}</label>
-            <input
-                type={type}
-                id={String(keyName)}
-                style={styles.input}
-                value={value || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, keyName)}
-                onFocus={() => setError(null)}
-                placeholder={`Enter ${keyName}`}
-            />
-        </div>
-    ));
+    }> = React.memo(({keyName, value, type = 'text', handleChange, setError}) => {
+        const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replace(/([A-Z])/g, ' $1'); // Converts "cryptoType" to "Crypto Type"
+        return (
+            <div style={styles.fieldContainer}>
+                <label style={styles.label} htmlFor={String(keyName)}>Enter {friendlyKeyName}</label>
+                <input
+                    type={type}
+                    id={String(keyName)}
+                    style={styles.input}
+                    value={value || ''}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, keyName)}
+                    onFocus={() => setError(null)}
+                    placeholder={`Enter ${friendlyKeyName}`}
+                />
+            </div>
+        );
+    });
 
     const DropdownField: React.FC<{
         keyName: keyof QRCodeRequest,
@@ -276,22 +282,26 @@
         value: any,
         setError: React.Dispatch<React.SetStateAction<string | null>>,
         handleChange: (event: ChangeEvent<HTMLSelectElement>, fieldName: keyof QRCodeRequest) => void
-    }> = React.memo(({keyName, options, value, handleChange, setError}) => (
-        <div style={styles.fieldContainer}>
-            <label style={styles.label} htmlFor={String(keyName)}>Select {keyName}</label>
-            <select
-                id={String(keyName)}
-                style={styles.dropdown}
-                value={value || ''}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                    handleChange(e, keyName);
-                }}
-                onFocus={() => setError(null)}>
-                <option value="">{`--Select ${keyName}--`}</option>
-                {options.map((option: string) => (<option key={option} value={option}>{option}</option>))}
-            </select>
-        </div>
-    ));
+    }> = React.memo(({keyName, options, value, handleChange, setError}) => {
+        const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replace(/([A-Z])/g, ' $1');
+        return (
+            <div style={styles.fieldContainer}>
+                <label style={styles.label} htmlFor={String(keyName)}>Select {friendlyKeyName}</label>
+                <select
+                    id={String(keyName)}
+                    style={styles.dropdown}
+                    value={value || ''}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                        handleChange(e, keyName);
+                    }}
+                    onFocus={() => setError(null)}>
+                    <option value="">{`-- Choose ${friendlyKeyName} --`}</option> // Updated for clarity
+                    {options.map((option: string) => (<option key={option} value={option}>{option}</option>))}
+                </select>
+            </div>
+        );
+    });
+
 
     const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = () => {
         const [state, dispatch] = useReducer(qrCodeReducer, initialState);
@@ -588,70 +598,35 @@
             </>
         ), [handleInputChange, state]);
 
-        return <div style={styles.container}>
-            <div style={styles.tabContainer}>
-                <div>
-                    <TabButton activeTab={activeTab} tab={Tabs.Text} label="Text" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.Url} label="URL" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.Email} label="Email" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.Phone} label="Phone" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.WiFi} label="WiFi" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.SMS} label="SMS" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.Event} label="Event" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.GeoLocation} label="GeoLocation" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.Crypto} label="Crypto" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.MeCard} label="MeCard" setTab={setTab}/>
-                    <TabButton activeTab={activeTab} tab={Tabs.VCard} label="VCard" setTab={setTab}/>
-                </div>
-
-                {activeTab === Tabs.Text && <section style={styles.section}>
+        const TabSections = {
+            [Tabs.Text]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Text</h2>
                     {renderInputFields(['text'])}
-                </section>}
-
-                {activeTab === Tabs.Url && <section style={styles.section}>
+                </section>
+            ),
+            [Tabs.Url]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>URL</h2>
                     {renderInputFields(['url'])}
-                </section>}
-
-                {activeTab === Tabs.Email && <section style={styles.section}>
+                </section>
+            ),
+            [Tabs.Email]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Email</h2>
-                    {renderInputFields(['email'])}
-                    <div style={styles.fieldContainer}>
-                        <label style={styles.label} htmlFor="subject">Enter Subject</label>
-                        <input
-                            id="subject"
-                            style={styles.input}
-                            value={state.subject || ''}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(e, 'subject')}
-                            placeholder="Enter subject"
-                        />
-                        <label style={styles.label} htmlFor="body">Enter Body</label>
-                        <textarea
-                            id="body"
-                            style={{...styles.input, height: '100px'}}
-                            value={state.body || ''}
-                            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => handleInputChange(e, 'body')}
-                            placeholder="Enter body"
-                        ></textarea>
-                    </div>
-                </section>}
-
-                {activeTab === Tabs.Phone && <section style={styles.section}>
+                    {renderInputFields(['email', 'subject', 'body'])}
+                </section>
+            ),
+            [Tabs.Phone]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Phone</h2>
                     {renderInputFields(['phone'])}
-                </section>}
-
-                {activeTab === Tabs.WiFi && <section style={styles.section}>
+                </section>
+            ),
+            [Tabs.WiFi]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>WiFi Configuration</h2>
-                    {['ssid', 'password'].map(key => (
-                        <InputField key={key}
-                                    keyName={key as keyof QRCodeRequest}
-                                    handleChange={handleInputChange}
-                                    value={state[key as keyof QRCodeRequest]}
-                                    setError={setError}
-                        />
-                    ))}
+                    {renderInputFields(['ssid', 'password'])}
                     <DropdownField keyName="encryption"
                                    handleChange={handleInputChange}
                                    options={['WEP', 'WPA', 'WPA2', 'WPA3']}
@@ -664,9 +639,10 @@
                                    value={state.hidden ? 'true' : 'false'}
                                    setError={setError}
                     />
-                </section>}
-
-                {activeTab === Tabs.SMS && <section style={styles.section}>
+                </section>
+            ),
+            [Tabs.SMS]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>SMS</h2>
                     <InputField
                         keyName="phone"
@@ -684,9 +660,9 @@
                             placeholder="Enter your SMS message here"
                         ></textarea>
                     </div>
-                </section>}
-
-                {activeTab === Tabs.Event && <section style={styles.section}>
+                </section>),
+            [Tabs.Event]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Event</h2>
                     {renderInputFields(['event', 'venue'])}
                     <InputField keyName="startTime"
@@ -702,19 +678,10 @@
                         type="datetime-local"
                         setError={setError}
                     />
-                </section>}
-
-                {activeTab === Tabs.MeCard && <section style={styles.section}>
-                    <h2 style={styles.sectionTitle}>MeCard</h2>
-                    {renderInputFields(['name', 'addressMecard', 'phone', 'email'])}
-                </section>}
-
-                {activeTab === Tabs.VCard && <section style={styles.section}>
-                    <h2 style={styles.sectionTitle}>VCard</h2>
-                    {renderInputFields(['firstName', 'lastName', 'organization', 'addressVcard', 'phone', 'email'])}
-                </section>}
-
-                {activeTab === Tabs.GeoLocation && <section style={styles.section}>
+                </section>
+            ),
+            [Tabs.GeoLocation]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>GeoLocation</h2>
                     {['latitude', 'longitude'].map(key => (
                         <InputField
@@ -730,10 +697,10 @@
                             <LocationPicker/>
                         </section>
                     </MapContainer>
-                </section>}
-
-
-                {activeTab === Tabs.Crypto && <section style={styles.section}>
+                </section>
+            ),
+            [Tabs.Crypto]: () => (
+                <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Crypto</h2>
                     {CRYPTO_TYPES.map(cryptoType => (
                         <div key={cryptoType}>
@@ -763,8 +730,27 @@
                             />
                         </>
                     )}
-                </section>}
+                </section>
+            ),
+        };
 
+        return <div style={styles.container}>
+            <div style={styles.tabContainer}>
+                <div>
+                    <TabButton activeTab={activeTab} tab={Tabs.Text} label="Text" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.Url} label="URL" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.Email} label="Email" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.Phone} label="Phone" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.WiFi} label="WiFi" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.SMS} label="SMS" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.Event} label="Event" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.GeoLocation} label="GeoLocation" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.Crypto} label="Crypto" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.MeCard} label="MeCard" setTab={setTab}/>
+                    <TabButton activeTab={activeTab} tab={Tabs.VCard} label="VCard" setTab={setTab}/>
+                </div>
+
+                {activeTab in TabSections && TabSections[activeTab]()}
                 {error && <div style={styles.errorContainer}>{error}</div>}
 
                 <div style={styles.fieldContainer}>
