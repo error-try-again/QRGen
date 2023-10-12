@@ -19,7 +19,7 @@ NGINX_PORT=8080
 
 is_first_run() {
   if [[ ! -f $FIRST_RUN_FILE ]]; then
-    touch $FIRST_RUN_FILE
+    touch "$FIRST_RUN_FILE"
     return 0
   else
     return 1
@@ -33,7 +33,6 @@ check_nvm_dir() {
     export NVM_DIR="$DEFAULT_NVM_DIR"
   fi
 }
-
 
 setup_nvm_node() {
   check_nvm_dir
@@ -192,6 +191,7 @@ RUN npm install --save-dev @babel/plugin-proposal-private-property-in-object vit
 
 COPY temp/App.tsx /usr/app/frontend/src
 COPY temp/QRCodeGenerator.tsx /usr/app/frontend/src
+COPY temp/hooks /usr/app/frontend/src/hooks
 
 # Build the project
 RUN npm run build
@@ -265,15 +265,12 @@ setup_project_directories() {
 
   # Check and create directories using the function
   create_directory "$SERVER_DIR"
-
   create_directory "$FRONTEND_DIR"
   create_directory "$BACKEND_DIR"
   create_directory "$TEMP_DIR"
 
-  # Copy files
-  cp "src/server.js" "$TEMP_DIR/server.js"
-  cp "src/App.tsx" "$TEMP_DIR/App.tsx"
-  cp "src/QRCodeGenerator.tsx" "$TEMP_DIR/QRCodeGenerator.tsx"
+  # Copy all the files from src to temp
+  cp -r "src"/* "$TEMP_DIR"
 
 }
 
