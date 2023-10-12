@@ -732,6 +732,18 @@
                     )}
                 </section>
             ),
+            [Tabs.MeCard]: () => (
+                <section style={styles.section}>
+                    <h2 style={styles.sectionTitle}>MeCard</h2>
+                    {renderInputFields(['name', 'addressMecard'])}
+                </section>
+            ),
+            [Tabs.VCard]: () => (
+                <section style={styles.section}>
+                    <h2 style={styles.sectionTitle}>VCard</h2>
+                    {renderInputFields(['firstName', 'lastName', 'organization', 'addressVcard'])}
+                </section>
+            ),
         };
 
         return <div style={styles.container}>
@@ -750,7 +762,7 @@
                     <TabButton activeTab={activeTab} tab={Tabs.VCard} label="VCard" setTab={setTab}/>
                 </div>
 
-                {activeTab in TabSections && TabSections[activeTab]()}
+                {TabSections[activeTab]?.()}
                 {error && <div style={styles.errorContainer}>{error}</div>}
 
                 <div style={styles.fieldContainer}>
