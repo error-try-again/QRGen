@@ -5,6 +5,7 @@ set -euo pipefail
 # Constants
 readonly NODE_VERSION="20.8.0"
 readonly PROJECT_DIR="$HOME/qr-code-generator"
+readonly FIRST_RUN_FILE="$PROJECT_DIR/.first_run"
 readonly BACKEND_DIR="$PROJECT_DIR/backend"
 readonly FRONTEND_DIR="$PROJECT_DIR/frontend"
 readonly SOURCE_DIR="$FRONTEND_DIR/src"
@@ -13,8 +14,17 @@ readonly DOCKER_DIR="/home/docker-primary"
 readonly DEFAULT_NVM_DIR="$HOME/.nvm"
 readonly TEMP_DIR="$PROJECT_DIR/temp"
 NVM_VERSION="v0.39.5"
-BACKEND_PORT=3000
+BACKEND_PORT=3001
 NGINX_PORT=8080
+
+is_first_run() {
+  if [[ ! -f $FIRST_RUN_FILE ]]; then
+    touch $FIRST_RUN_FILE
+    return 0
+  else
+    return 1
+  fi
+}
 
 check_nvm_dir() {
   if [[ ! -d "$NVM_DIR" ]]; then
@@ -23,6 +33,7 @@ check_nvm_dir() {
     export NVM_DIR="$DEFAULT_NVM_DIR"
   fi
 }
+
 
 setup_nvm_node() {
   check_nvm_dir
@@ -38,19 +49,6 @@ setup_nvm_node() {
 
   nvm use "$NODE_VERSION"
   npm install -g npm
-}
-
-check_and_update_port() {
-  local port_variable_name=$1
-  local port_value=${!port_variable_name}
-  local file_to_update=$2
-  local new_port
-
-  if netstat -tuln | grep -q ":$port_value"; then
-    read -rp "Port $port_value is already in use. Please provide an alternative port: " new_port
-    sed -i "s/$port_value/$new_port/g" "$file_to_update"
-    eval "$port_variable_name=$new_port"
-  fi
 }
 
 setup_docker_rootless() {
@@ -76,38 +74,6 @@ setup_docker_rootless() {
   else
     echo "Docker rootless mode is already set up."
   fi
-}
-
-initialize_server_project() {
-  echo "Initializing server project..."
-
-  if [[ ! -d "$PROJECT_DIR" ]]; then
-    mkdir -p "$PROJECT_DIR"
-  fi
-
-  cd "$PROJECT_DIR" || {
-    echo "Failed to change directory to $PROJECT_DIR"
-    exit 1
-  }
-
-  if [[ -d "$FRONTEND_DIR" ]]; then
-    read -rp "Frontend directory exists. Remove and recreate (Y/N)? " choice
-    if [[ $choice =~ ^[Yy] ]]; then
-      rm -rf "$FRONTEND_DIR"
-    else
-      echo "Initialization halted due to existing frontend directory."
-      exit 1
-    fi
-  fi
-
-  npx create-react-app frontend --template typescript
-
-  cd "$FRONTEND_DIR"
-  jq '. + {"proxy": "http://backend:3000"}' package.json >temp.json && mv temp.json package.json
-  cd "$PROJECT_DIR"
-
-  cp "$TEMP_DIR/App.tsx" "$SOURCE_DIR/App.tsx"
-  cp "$TEMP_DIR/QRCodeGenerator.tsx" "$SOURCE_DIR/QRCodeGenerator.tsx"
 }
 
 create_nginx_configuration() {
@@ -147,25 +113,58 @@ http {
             proxy_set_header X-Real-IP \$remote_addr;
             proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         }
+
+        location /validate {
+            proxy_pass http://backend:$BACKEND_PORT;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        }
+
+        location /batch {
+            proxy_pass http://backend:$BACKEND_PORT;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        }
     }
 }
 EOF
 }
 
-setup_backend() {
+create_server_configuration_files() {
   echo "Setting up the backend..."
-
-  cd "$BACKEND_DIR"
-
-  npm init -y
-  npm install express qrcode cors
 
   cp "$TEMP_DIR/server.js" "$BACKEND_DIR/server.js"
 
-  cat <<EOF >"$BACKEND_DIR/Dockerfile.node"
+  cat <<EOF >"$BACKEND_DIR/package.json"
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "QR Code Generator Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+    "dependencies": {
+      "express": "latest",
+      "qrcode": "latest",
+      "cors": "latest",
+      "multer": "latest",
+      "archiver": "latest",
+      "express-rate-limit": "latest",
+      "helmet": "latest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+EOF
+
+  cat <<EOF >"$BACKEND_DIR/Dockerfile"
 FROM node:$NODE_VERSION
 
-WORKDIR /usr/src/app
+WORKDIR /usr/app
 
 COPY package*.json ./
 
@@ -173,27 +172,32 @@ RUN npm install
 
 COPY . .
 
-EXPOSE ${BACKEND_PORT}
+EXPOSE $BACKEND_PORT
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
 EOF
-}
 
-create_server_configuration_files() {
-  cat <<EOF >"$FRONTEND_DIR/Dockerfile.nginx"
+  cat <<EOF >"$FRONTEND_DIR/Dockerfile"
 FROM node:$NODE_VERSION as build
 WORKDIR /usr/app
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY src ./src
-COPY public ./public
 
-RUN npm install
-RUN npm install --save-dev @babel/plugin-proposal-private-property-in-object
+# Install dependencies and create the project
+RUN npm init -y
+RUN npx create-vite frontend --template react-ts
+WORKDIR /usr/app/frontend
+
+# Install project dependencies
+RUN npm install react-leaflet leaflet @types/leaflet
+RUN npm install --save-dev @babel/plugin-proposal-private-property-in-object vite @vitejs/plugin-react vite-tsconfig-paths vite-plugin-svgr
+
+COPY temp/App.tsx /usr/app/frontend/src
+COPY temp/QRCodeGenerator.tsx /usr/app/frontend/src
+
+# Build the project
 RUN npm run build
 
 FROM nginx:alpine
-COPY --from=build /usr/app/build /usr/share/nginx/html
+COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 EXPOSE $NGINX_PORT
 CMD ["nginx", "-g", "daemon off;"]
 EOF
@@ -203,19 +207,25 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile.node
+      context: $BACKEND_DIR
+      dockerfile: Dockerfile
     ports:
       - "$BACKEND_PORT:$BACKEND_PORT"
+    volumes:
+      - ./backend:/usr/app
+      - /usr/app/node_modules
+      - ./saved_qrcodes:/usr/app/saved_qrcodes
   nginx:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.nginx
+      context: $PROJECT_DIR
+      dockerfile: $FRONTEND_DIR/Dockerfile
     ports:
       - "$NGINX_PORT:$NGINX_PORT"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./saved_qrcodes:/usr/share/nginx/html/saved_qrcodes
+     - ./frontend:/usr/app
+     - ./nginx.conf:/etc/nginx/nginx.conf
+     - ./saved_qrcodes:/usr/share/nginx/html/saved_qrcodes
+
 EOF
 }
 
@@ -243,46 +253,56 @@ build_and_run_docker() {
   docker compose ps
 }
 
-setup_project_directories() {
-  if [[ ! -d "$PROJECT_DIR" ]]; then
-    echo "Creating project directory..."
-    mkdir -p "$PROJECT_DIR"
-    mkdir -p "$SERVER_DIR"
-    mkdir -p "$SOURCE_DIR"
-    mkdir -p "$FRONTEND_DIR"
-    mkdir -p "$BACKEND_DIR"
-    mkdir -p "$TEMP_DIR"
-
-    cp "src/server.js" "$TEMP_DIR/server.js"
-    cp "src/App.tsx" "$TEMP_DIR/App.tsx"
-    cp "src/QRCodeGenerator.tsx" "$TEMP_DIR/QRCodeGenerator.tsx"
-
-  else
-    echo "Project directory already exists."
+# Function to create directories if they don't exist
+create_directory() {
+  if [ ! -d "$1" ]; then
+    mkdir -p "$1"
+    echo "$1 created."
   fi
+}
+
+setup_project_directories() {
+
+  # Check and create directories using the function
+  create_directory "$SERVER_DIR"
+
+  create_directory "$FRONTEND_DIR"
+  create_directory "$BACKEND_DIR"
+  create_directory "$TEMP_DIR"
+
+  # Copy files
+  cp "src/server.js" "$TEMP_DIR/server.js"
+  cp "src/App.tsx" "$TEMP_DIR/App.tsx"
+  cp "src/QRCodeGenerator.tsx" "$TEMP_DIR/QRCodeGenerator.tsx"
+
 }
 
 cleanup() {
   local resource
   echo "Cleaning up..."
 
+  if [[ -d "$PROJECT_DIR" ]]; then
+    rm -rf "$PROJECT_DIR"
+  fi
+
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
   fi
 
-  for resource in "Docker images, containers, and volumes" "Docker networks" "existing project directory $PROJECT_DIR"; do
+  # List of resources to clean up
+  declare -A resources_to_cleanup
+  resources_to_cleanup["Docker images, containers, and volumes"]="docker system prune -a -f --volumes"
+  resources_to_cleanup["Docker networks"]="docker network prune -f"
+  resources_to_cleanup["existing project directory $PROJECT_DIR"]="rm -rf $PROJECT_DIR"
+
+  for resource in "${!resources_to_cleanup[@]}"; do
+    # Ask the user if they want to clean up the current resource
     read -rp "Do you want to remove $resource (Y/N)? " cleanup_choice
-    case $resource in
-    "Docker images, containers, and volumes")
-      [[ $cleanup_choice =~ ^[Yy] ]] && docker system prune -a -f --volumes
-      ;;
-    "Docker networks")
-      [[ $cleanup_choice =~ ^[Yy] ]] && docker network prune -f
-      ;;
-    *)
-      [[ $cleanup_choice =~ ^[Yy] ]] && rm -rf "$PROJECT_DIR"
-      ;;
-    esac
+
+    if [[ $cleanup_choice =~ ^[Yy] ]]; then
+      # Execute the cleanup command associated with the current resource
+      eval "${resources_to_cleanup["$resource"]}"
+    fi
   done
 }
 
@@ -290,17 +310,18 @@ main() {
   setup_nvm_node
   setup_project_directories
   setup_docker_rootless
-  setup_backend
-  initialize_server_project
-  check_and_update_port NGINX_PORT "$PROJECT_DIR/nginx.conf"
-  check_and_update_port BACKEND_PORT "$PROJECT_DIR/docker-compose.yml"
   create_server_configuration_files
   create_nginx_configuration
   build_and_run_docker
 }
 
-# Entry point
-read -rp "Do you want to perform cleanup (Y/N)? " cleanup_choice
-[[ $cleanup_choice =~ ^[Yy] ]] && cleanup
+cleanup_choice="y"
+
+if is_first_run; then
+  echo "Welcome to the QR Code Generator setup script!"
+else
+  read -rp "Do you want to perform cleanup (Y/N)? " cleanup_choice
+  [[ $cleanup_choice =~ ^[Yy] ]] && cleanup
+fi
 
 main
