@@ -1,6 +1,6 @@
-// src/App.tsx
 import './App.css';
-import {QRCodeGenerator} from './QRCodeGenerator';
+import {QRCodeGenerator} from './qr-code-generator.tsx';
+
 
 function App() {
     return (

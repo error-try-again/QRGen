@@ -3,7 +3,6 @@
 set -euo pipefail
 
 # Constants
-readonly NODE_VERSION="20.8.0"
 readonly PROJECT_DIR="$HOME/qr-code-generator"
 readonly FIRST_RUN_FILE="$PROJECT_DIR/.first_run"
 readonly BACKEND_DIR="$PROJECT_DIR/backend"
@@ -12,7 +11,9 @@ readonly SOURCE_DIR="$FRONTEND_DIR/src"
 readonly SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 readonly DOCKER_DIR="/home/docker-primary"
 readonly DEFAULT_NVM_DIR="$HOME/.nvm"
-readonly TEMP_DIR="$PROJECT_DIR/temp"
+readonly TMP_DIR="$PROJECT_DIR/tmp"
+readonly NODE_VERSION="20.8.0"
+
 NVM_VERSION="v0.39.5"
 BACKEND_PORT=3001
 NGINX_PORT=8080
@@ -22,33 +23,37 @@ is_first_run() {
     touch "$FIRST_RUN_FILE"
     return 0
   else
-    return 1
-  fi
-}
-
-check_nvm_dir() {
-  if [[ ! -d "$NVM_DIR" ]]; then
-    echo "NVM_DIR is set to an invalid directory: $NVM_DIR"
-    echo "Setting default NVM_DIR..."
-    export NVM_DIR="$DEFAULT_NVM_DIR"
+    return 1 >/dev/null 2>&1
   fi
 }
 
 setup_nvm_node() {
-  check_nvm_dir
+  echo "Setting up NVM and Node.js..."
 
-  curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh" | bash
-  export NVM_DIR="$DEFAULT_NVM_DIR"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  # Checking if user docker-primary exists
+  if id "docker-primary" &>/dev/null; then
+    # Running the NVM installation as docker-primary
+    sudo -u docker-primary bash <<EOF
+    curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh" | bash
 
-  if ! nvm install "$NODE_VERSION"; then
-    echo "Failed to install Node version $NODE_VERSION. Exiting..."
+    export NVM_DIR="$DEFAULT_NVM_DIR"
+
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    if ! nvm install "$NODE_VERSION"; then
+      echo "Failed to install Node version $NODE_VERSION. Exiting..."
+      exit 1
+    fi
+
+    nvm use "$NODE_VERSION"
+    npm install -g npm
+EOF
+  else
+    echo "User docker-primary does not exist. Exiting..."
     exit 1
   fi
-
-  nvm use "$NODE_VERSION"
-  npm install -g npm
 }
+
 
 setup_docker_rootless() {
   echo "Setting up Docker in rootless mode..."
@@ -134,42 +139,18 @@ EOF
 create_server_configuration_files() {
   echo "Setting up the backend..."
 
-  cp "$TEMP_DIR/server.js" "$BACKEND_DIR/server.js"
-
-  cat <<EOF >"$BACKEND_DIR/package.json"
-{
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "QR Code Generator Backend",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-    "dependencies": {
-      "express": "latest",
-      "qrcode": "latest",
-      "cors": "latest",
-      "multer": "latest",
-      "archiver": "latest",
-      "express-rate-limit": "latest",
-      "helmet": "latest"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
-}
-EOF
-
   cat <<EOF >"$BACKEND_DIR/Dockerfile"
 FROM node:$NODE_VERSION
 
 WORKDIR /usr/app
 
-COPY package*.json ./
+RUN npm install -g typescript ts-node
+RUN npm install --save-dev typescript @types/node @types/express @types/cors @types/multer @types/archiver @types/express-rate-limit @types/helmet
+RUN tsc --init
 
-RUN npm install
-
-COPY . .
+COPY /tmp/server/server.ts /usr/app/server/server.ts
+COPY /tmp/server/util /usr/app/util
+COPY /tmp/server/ts /usr/app/ts
 
 EXPOSE $BACKEND_PORT
 
@@ -183,15 +164,25 @@ WORKDIR /usr/app
 # Install dependencies and create the project
 RUN npm init -y
 RUN npx create-vite frontend --template react-ts
+
 WORKDIR /usr/app/frontend
 
 # Install project dependencies
 RUN npm install react-leaflet leaflet @types/leaflet
 RUN npm install --save-dev @babel/plugin-proposal-private-property-in-object vite @vitejs/plugin-react vite-tsconfig-paths vite-plugin-svgr
 
-COPY temp/App.tsx /usr/app/frontend/src
-COPY temp/QRCodeGenerator.tsx /usr/app/frontend/src
-COPY temp/hooks /usr/app/frontend/src/hooks
+COPY tmp/App.tsx /usr/app/frontend/src
+COPY tmp/qr-code-generator.tsx /usr/app/frontend/src
+COPY tmp/hooks /usr/app/frontend/src/hooks
+COPY tmp/components /usr/app/frontend/src/components
+COPY tmp/assets /usr/app/frontend/src/assets
+COPY tmp/contexts /usr/app/frontend/src/contexts
+COPY tmp/wrappers /usr/app/frontend/src/wrappers
+COPY tmp/ts /usr/app/frontend/src/ts
+COPY tmp/Util /usr/app/frontend/src/Util
+COPY tmp/main.tsx /usr/app/frontend/src
+COPY tmp/tsconfig.json /usr/app/frontend
+
 
 # Build the project
 RUN npm run build
@@ -225,7 +216,6 @@ services:
      - ./frontend:/usr/app
      - ./nginx.conf:/etc/nginx/nginx.conf
      - ./saved_qrcodes:/usr/share/nginx/html/saved_qrcodes
-
 EOF
 }
 
@@ -267,10 +257,14 @@ setup_project_directories() {
   create_directory "$SERVER_DIR"
   create_directory "$FRONTEND_DIR"
   create_directory "$BACKEND_DIR"
-  create_directory "$TEMP_DIR"
+  create_directory "$TMP_DIR"
 
-  # Copy all the files from src to temp
-  cp -r "src"/* "$TEMP_DIR"
+  # Copy all the frontend files from src to tmp
+  cp -r "src"/* "$TMP_DIR"
+  cp "tsconfig.json" "$TMP_DIR"
+
+  # Copy all the backend files from src to tmp
+  cp -r "server"/ "$TMP_DIR"
 
 }
 
