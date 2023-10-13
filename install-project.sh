@@ -11,7 +11,7 @@ readonly SOURCE_DIR="$FRONTEND_DIR/src"
 readonly SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 readonly DOCKER_DIR="/home/docker-primary"
 readonly DEFAULT_NVM_DIR="$HOME/.nvm"
-readonly TMP_DIR="$PROJECT_DIR/tmp"
+readonly STAGING_DIR="$PROJECT_DIR/staging"
 readonly NODE_VERSION="20.8.0"
 
 NVM_VERSION="v0.39.5"
@@ -19,7 +19,7 @@ BACKEND_PORT=3001
 NGINX_PORT=8080
 
 is_first_run() {
-  if [[ ! -f $FIRST_RUN_FILE ]]; then
+  if [ ! -e "$FIRST_RUN_FILE" ]; then
     touch "$FIRST_RUN_FILE"
     return 0
   else
@@ -53,7 +53,6 @@ EOF
     exit 1
   fi
 }
-
 
 setup_docker_rootless() {
   echo "Setting up Docker in rootless mode..."
@@ -118,13 +117,6 @@ http {
             proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         }
 
-        location /validate {
-            proxy_pass http://backend:$BACKEND_PORT;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        }
-
         location /batch {
             proxy_pass http://backend:$BACKEND_PORT;
             proxy_set_header Host \$host;
@@ -139,57 +131,102 @@ EOF
 create_server_configuration_files() {
   echo "Setting up the backend..."
 
+cat <<EOF > "$BACKEND_DIR/tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ES2021",  // Use latest ECMAScript features
+    "module": "CommonJS",  // Use latest ECMAScript features
+    "lib": ["ES2021"],  // Target ECMAScript features
+    "outDir": "./dist",  // Output directory for compiled JS files
+    "rootDir": "./src",  // Root directory containing TS source files
+    "strict": true,  // Enable all strict type-checking options
+    "moduleResolution": "node",  // Use Node.js module resolution strategy
+    "skipLibCheck": true,  // Skip type checking of declaration files
+    "esModuleInterop": true,  // Enables CommonJS/AMD/UMD module emit interop
+    "resolveJsonModule": true,  // Include modules imported with .json extension
+    "isolatedModules": true,  // Ensure each file can be safely transpiled without considering other modules
+    "noEmitOnError": true,  // Do not emit outputs if any errors were reported
+    "forceConsistentCasingInFileNames": true,  // Disallow inconsistent casing in filenames
+    "noUnusedLocals": true,  // Report errors on unused locals
+    "noUnusedParameters": true,  // Report errors on unused parameters
+    "noImplicitReturns": true,  // Report error when not all code paths in function return a value
+    "noFallthroughCasesInSwitch": true  // Report errors for fallthrough cases in switch statement
+  },
+  "include": ["src/**/*.ts"],  // Source files to be compiled
+}
+EOF
+
   cat <<EOF >"$BACKEND_DIR/Dockerfile"
+# Use the latest version of Node.js
 FROM node:$NODE_VERSION
 
+# Set the default working directory
 WORKDIR /usr/app
 
-RUN npm install -g typescript ts-node
-RUN npm install --save-dev typescript @types/node @types/express @types/cors @types/multer @types/archiver @types/express-rate-limit @types/helmet
-RUN tsc --init
+RUN npm install -g ts-node typescript \
+ && npm install --save-dev @types/node typescript ts-node \
+ && npx tsc --init \
+ && npm install --save express cors multer archiver express-rate-limit helmet qrcode \
+ && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver @types/express-rate-limit @types/helmet @types/qrcode
 
-COPY /tmp/server/server.ts /usr/app/server/server.ts
-COPY /tmp/server/util /usr/app/util
-COPY /tmp/server/ts /usr/app/ts
+# Copy Project files to the container
+COPY backend/server/ /usr/app
+COPY backend/tsconfig.json /usr/app
 
+# Set the backend express port
 EXPOSE $BACKEND_PORT
 
-CMD ["npm", "start"]
+# Use ts-node to run the TypeScript server file
+CMD ["npx", "ts-node", "src/server.ts"]
 EOF
 
   cat <<EOF >"$FRONTEND_DIR/Dockerfile"
+# Use the latest version of Node.js
 FROM node:$NODE_VERSION as build
+
+# Set the default working directory
 WORKDIR /usr/app
 
-# Install dependencies and create the project
-RUN npm init -y
-RUN npx create-vite frontend --template react-ts
-
-WORKDIR /usr/app/frontend
-
 # Install project dependencies
-RUN npm install react-leaflet leaflet @types/leaflet
-RUN npm install --save-dev @babel/plugin-proposal-private-property-in-object vite @vitejs/plugin-react vite-tsconfig-paths vite-plugin-svgr
+RUN npm init -y \
+ && npm install react-leaflet leaflet @types/leaflet react react-dom typescript \
+ && npm install --save-dev @babel/plugin-proposal-private-property-in-object vite @vitejs/plugin-react vite-tsconfig-paths vite-plugin-svgr @types/react @types/react-dom \
+ && npx create-vite frontend --template react-ts
 
-COPY tmp/App.tsx /usr/app/frontend/src
-COPY tmp/qr-code-generator.tsx /usr/app/frontend/src
-COPY tmp/hooks /usr/app/frontend/src/hooks
-COPY tmp/components /usr/app/frontend/src/components
-COPY tmp/assets /usr/app/frontend/src/assets
-COPY tmp/contexts /usr/app/frontend/src/contexts
-COPY tmp/wrappers /usr/app/frontend/src/wrappers
-COPY tmp/ts /usr/app/frontend/src/ts
-COPY tmp/Util /usr/app/frontend/src/Util
-COPY tmp/main.tsx /usr/app/frontend/src
-COPY tmp/tsconfig.json /usr/app/frontend
+# Delete the default App.tsx/App.css file (does not use kebab case)
+RUN rm /usr/app/frontend/src/App.tsx
+RUN rm /usr/app/frontend/src/App.css
 
+# Copy Project files to the container
+COPY staging/app.tsx /usr/app/frontend/src
+COPY staging/app.css /usr/app/frontend/src
+COPY staging/qr-code-generator.tsx /usr/app/frontend/src
+COPY staging/hooks /usr/app/frontend/src/hooks
+COPY staging/components /usr/app/frontend/src/components
+COPY staging/assets /usr/app/frontend/src/assets
+COPY staging/contexts /usr/app/frontend/src/contexts
+COPY staging/wrappers /usr/app/frontend/src/wrappers
+COPY staging/ts /usr/app/frontend/src/ts
+COPY staging/util /usr/app/frontend/src/util
+COPY staging/main.tsx /usr/app/frontend/src
+COPY staging/tsconfig.json /usr/app/frontend
+
+# Move to the frontend directory before building
+WORKDIR /usr/app/frontend
 
 # Build the project
 RUN npm run build
 
+# Install nginx
 FROM nginx:alpine
+
+# Copy the build files to the nginx directory
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
+
+# Set the nginx port
 EXPOSE $NGINX_PORT
+
+# Run nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
 EOF
 
@@ -198,20 +235,18 @@ version: '3.8'
 services:
   backend:
     build:
-      context: $BACKEND_DIR
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./backend/Dockerfile
     ports:
-      - "$BACKEND_PORT:$BACKEND_PORT"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     volumes:
-      - ./backend:/usr/app
-      - /usr/app/node_modules
       - ./saved_qrcodes:/usr/app/saved_qrcodes
   nginx:
     build:
-      context: $PROJECT_DIR
-      dockerfile: $FRONTEND_DIR/Dockerfile
+      context: .
+      dockerfile: ./frontend/Dockerfile
     ports:
-      - "$NGINX_PORT:$NGINX_PORT"
+      - "${NGINX_PORT}:${NGINX_PORT}"
     volumes:
      - ./frontend:/usr/app
      - ./nginx.conf:/etc/nginx/nginx.conf
@@ -257,14 +292,14 @@ setup_project_directories() {
   create_directory "$SERVER_DIR"
   create_directory "$FRONTEND_DIR"
   create_directory "$BACKEND_DIR"
-  create_directory "$TMP_DIR"
+  create_directory "$STAGING_DIR"
 
   # Copy all the frontend files from src to tmp
-  cp -r "src"/* "$TMP_DIR"
-  cp "tsconfig.json" "$TMP_DIR"
+  cp -r "src"/* "$STAGING_DIR"
+  cp "tsconfig.json" "$STAGING_DIR"
 
   # Copy all the backend files from src to tmp
-  cp -r "server"/ "$TMP_DIR"
+  cp -r "server" "$BACKEND_DIR"
 
 }
 
@@ -272,15 +307,22 @@ cleanup() {
   local resource
   echo "Cleaning up..."
 
+  # Check if project directory exists
+  # If it does, remove it
   if [[ -d "$PROJECT_DIR" ]]; then
     rm -rf "$PROJECT_DIR"
   fi
 
+  # Check if docker-compose.yml exists
+  # If it does, use docker compose to stop the containers
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
   fi
 
-  # List of resources to clean up
+  # Create an associative array of resources to clean up
+  # The key is the resource name and the value is the command to clean up the resource
+  # The command is executed using eval to allow for variable expansion
+
   declare -A resources_to_cleanup
   resources_to_cleanup["Docker images, containers, and volumes"]="docker system prune -a -f --volumes"
   resources_to_cleanup["Docker networks"]="docker network prune -f"

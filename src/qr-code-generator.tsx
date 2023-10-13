@@ -19,7 +19,6 @@ import {convertValueToString} from "./util/convert-to-string.tsx";
 import {QRCodeGeneratorState} from "./ts/interfaces/qr-code-generator-state.tsx";
 import {areValidCcBcc} from "./util/are-valid-cc-bcc.tsx";
 
-
 const INITIAL_POSITION = new LatLng(51.505, -0.09);
 const CRYPTO_TYPES = ['Bitcoin', 'Bitcoin Cash', 'Ethereum', 'Litecoin', 'Dash', "Doge"];
 const initialState: QRCodeGeneratorState = {isLoading: false, qrCodeURL: "", size: "150"};
@@ -274,11 +273,14 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
         };
 
         try {
+
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(requestData)
             });
+
+
 
             if (!response.ok) {
                 await handleErrorResponse(response);

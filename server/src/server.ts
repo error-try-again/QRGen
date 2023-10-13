@@ -27,8 +27,13 @@ const DEFAULT_QR_SIZE = 150;
 // Middleware Setup
 app.set('trust proxy', TRUST_PROXY);
 app.use(helmet(), cors({origin: ORIGIN, optionsSuccessStatus: 200}), express.json({limit: JSON_LIMIT}));
+
+app.use(express.json());
+
 app.use('/generate', rateLimit({windowMs: 15 * 60 * 1000, limit: 100}));
 app.use('/batch', rateLimit({windowMs: 15 * 60 * 1000, limit: 10}));
+
+console.log('Server started.');
 
 // Global Error Handling
 for (const event of ['unhandledRejection', 'uncaughtException']) {
@@ -166,6 +171,9 @@ const handleDataTypeSwitching = <T extends AllRequests>(type: string, data: T): 
 };
 
 const validateData = <T extends AllRequests>(data: QRData<T>, type: string): void => {
+    if (!data || !data.customData) {
+        throw new Error(`Missing data for type: ${type}`);
+    }
     if (!validators[type as keyof RequestTypeMap](data.customData)) {
         throw new Error(`Invalid data for type: ${type}`);
     }
@@ -191,6 +199,7 @@ const generateQR = async (data: string, size: string | number): Promise<string> 
 };
 
 const processSingleQRCode = async <T extends AllRequests>(qrData: QRData<T>): Promise<ProcessedQRData<T>> => {
+    console.log("Received data:", qrData);
     validateData(qrData, qrData.type);
 
     const {type, size, customData} = qrData;
@@ -235,12 +244,15 @@ const generateQRCodesForBatch = async (qrCodes: QRData[]): Promise<ProcessedQRDa
 
 // Routes
 app.post('/generate', async (request, response) => {
+    if (!request.body || !request.body.type) {
+        return response.status(400).json({message: "Invalid request data."});
+    }
     try {
         const processedQRCode = await processSingleQRCode(request.body);
-        response.json({qrCodeURL: processedQRCode.qrCodeData});
+        return response.json({qrCodeURL: processedQRCode.qrCodeData});
     } catch (error) {
         console.error(error);
-        response.status(500).json({message: "Internal server error on QR code generation."});
+        return response.status(500).json({message: "Internal server error on QR code generation."});
     }
 });
 
@@ -307,8 +319,11 @@ app.post('/batch', async (request, response) => {
 
 
 // Friendly welcome message
-app.get('/', (response: Response) => {
-    response.send('Welcome to QR Code Generator API!');
+app.get('/', (request: any, response: any) => {
+    if (request.query.name) {
+        response.send(`Hello ${request.query.name}!`);
+    }
+    response.send('Hello World!');
 });
 
 // Start server

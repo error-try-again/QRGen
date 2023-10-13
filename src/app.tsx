@@ -1,4 +1,4 @@
-import './App.css';
+import './app.css';
 import {QRCodeGenerator} from './qr-code-generator.tsx';
 
 
