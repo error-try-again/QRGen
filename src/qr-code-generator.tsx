@@ -15,9 +15,9 @@ import {CustomIcon} from "./components/custom-map-icon.tsx";
 import {DropdownField} from "./components/dropdown-field.tsx";
 import {TabButton} from "./components/tab-button.tsx";
 import {InputField} from "./components/input-field.tsx";
-import {convertValueToString} from "./util/convert-to-string.tsx";
+import {convertValueToString} from "./utils/convert-to-string.tsx";
 import {QRCodeGeneratorState} from "./ts/interfaces/qr-code-generator-state.tsx";
-import {areValidCcBcc} from "./util/are-valid-cc-bcc.tsx";
+import {areValidCcBcc} from "./utils/are-valid-cc-bcc.tsx";
 
 const INITIAL_POSITION = new LatLng(51.505, -0.09);
 const CRYPTO_TYPES = ['Bitcoin', 'Bitcoin Cash', 'Ethereum', 'Litecoin', 'Dash', "Doge"];
@@ -82,12 +82,6 @@ const qrCodeReducer = (state: QRCodeGeneratorState, action: QRCodeGeneratorActio
     }
 };
 
-function incrementBatchCount(setQrBatchCount: React.Dispatch<React.SetStateAction<number>>) {
-    return () => {
-        setQrBatchCount((previous: number) => previous + 1);
-    };
-}
-
 function handleLocationSelect(dispatch: React.Dispatch<QRCodeGeneratorAction>, setSelectedPosition: React.Dispatch<React.SetStateAction<LatLng>>) {
     return (latlng: LatLng) => {
         dispatch({type: 'SET_FIELD', field: 'latitude', value: latlng.lat.toString()});
@@ -120,9 +114,9 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
 
 
     const addToBatch = () => {
-        const dataWithCorrectType = {...state, type: Tabs[activeTab]};
+        const dataWithCorrectType = {customData: {...state}, type: Tabs[activeTab]};
         addDataToBatch(dataWithCorrectType);
-        incrementBatchCount(setQrBatchCount);
+        setQrBatchCount((previous: number) => previous + 1);
     };
 
     const addDataToBatch = (data: QRCodeRequest) => {
@@ -130,6 +124,7 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
             console.error("Data does not have a 'type' property.");
             return;
         }
+
         setBatchData((previousBatch: QRCodeRequest[]) => [...previousBatch, data]);
     };
 
@@ -172,7 +167,6 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
         }, [map]);
 
         useEffect(() => {
-            console.log("State:", state);
             if (state.latitude && state.longitude) {
                 const updatedLatLng = new LatLng(Number.parseFloat(state.latitude), Number.parseFloat(state.longitude));
                 setSelectedPosition(updatedLatLng);
@@ -266,10 +260,15 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
         dispatch({type: 'SET_LOADING', value: true});
 
         const isBatch = qrBatchCount > 1;
-        const endpoint = isBatch ? '/batch' : '/generate';
+        const endpoint = isBatch ? '/qr/batch' : '/qr/generate';
+
+        //Form server payload
         const requestData = isBatch ? {qrCodes: batchData} : {
-            ...state,
-            type: Tabs[activeTab]
+            size: state.size,
+            type: Tabs[activeTab],
+            customData: {
+                ...state,
+            }
         };
 
         try {
@@ -279,8 +278,6 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(requestData)
             });
-
-
 
             if (!response.ok) {
                 await handleErrorResponse(response);

@@ -110,14 +110,14 @@ http {
             try_files \$uri \$uri/ /index.html;
         }
 
-        location /generate {
+        location /qr/generate {
             proxy_pass http://backend:$BACKEND_PORT;
             proxy_set_header Host \$host;
             proxy_set_header X-Real-IP \$remote_addr;
             proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         }
 
-        location /batch {
+        location /qr/batch {
             proxy_pass http://backend:$BACKEND_PORT;
             proxy_set_header Host \$host;
             proxy_set_header X-Real-IP \$remote_addr;
@@ -207,7 +207,7 @@ COPY staging/assets /usr/app/frontend/src/assets
 COPY staging/contexts /usr/app/frontend/src/contexts
 COPY staging/wrappers /usr/app/frontend/src/wrappers
 COPY staging/ts /usr/app/frontend/src/ts
-COPY staging/util /usr/app/frontend/src/util
+COPY staging/utils /usr/app/frontend/src/utils
 COPY staging/main.tsx /usr/app/frontend/src
 COPY staging/tsconfig.json /usr/app/frontend
 

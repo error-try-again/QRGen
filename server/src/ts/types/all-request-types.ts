@@ -6,7 +6,7 @@ import {
     SMSRequest,
     TextRequest,
     UrlRequest, VCardRequest, WifiRequest
-} from "../interfaces/qr-code-request-types";
+} from "../interfaces/qr-code-request-interfaces";
 
 export type AllRequests =
     | TextRequest
