@@ -7,11 +7,21 @@ import {handleArchiveError} from "../../middleware/error-handlers";
 export async function prepareAndSendArchive(qrCodesWithSanitizedData: ProcessedQRData<AllRequests>[], response: express.Response) {
     try {
         const archive = archiver('zip') as Archiver;
+        // Set headers first to avoid "Cannot set headers after they are sent to the client" error
+        setArchiveHeaders(response);
+
+        // Handle archive events
         archive.on('error', (error) => {
             throw new Error(error.message);
         });
-        setArchiveHeaders(response);
+
+        // Pipe archive data to the response
+        archive.pipe(response);
+
+        // Append QR codes to archive
         await appendQRCodesToArchive(qrCodesWithSanitizedData, archive);
+
+        // Finalize the archive
         await archive.finalize();
     } catch (error) {
         if (error instanceof Error && error.message.includes('Trouble setting headers.')) {

@@ -23,9 +23,11 @@ router.post('/generate', async (request, response) => {
 router.post('/batch', async (request: express.Request, response: express.Response) => {
     try {
         const {qrCodes} = request.body;
+
         if (!validateBatchData(qrCodes, response)) {
             return;
         }
+
         const qrCodesWithSanitizedData: ProcessedQRData<AllRequests>[] = await generateQRCodesForBatch(qrCodes);
         if (qrCodesWithSanitizedData) {
             await prepareAndSendArchive(qrCodesWithSanitizedData, response);

@@ -17,13 +17,6 @@ app.use('/batch', rateLimiters.batchQRCode);
 // Routes
 app.use('/qr', qrCodeRoutes);
 
-// Global Error Handling
-for (const event of ['unhandledRejection', 'uncaughtException']) {
-    process.on(event, (error, promise) =>
-        console.error(`${event} at:`, promise ?? error, 'reason:', error ?? promise)
-    );
-}
-
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
