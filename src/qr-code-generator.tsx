@@ -1,36 +1,59 @@
-import React, {useReducer, useState} from 'react';
+import React, { useReducer, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import {styles} from './assets/styles.tsx';
-import {useTheme} from "./hooks/use-theme.tsx";
-import {ThemeProvider} from "./contexts/theme-context.tsx";
-import {Tabs} from "./ts/enums/tabs-enum.tsx";
-import {QRCodeRequest} from "./ts/interfaces/qr-code-request-types.tsx";
-import {QRCodeGeneratorProperties} from "./ts/interfaces/util-types.tsx";
-import {ErrorBoundary} from "./wrappers/error-boundary.tsx";
-import {initialState} from "./constants/constants.tsx";
-import {qrCodeReducer} from "./reducers/qr-code-reducer.tsx";
-import {HandleInputChange} from "./callbacks/handle-input-change.tsx";
-import {handleCryptoSelect} from "./helpers/handle-crypto-select.tsx";
-import {renderMeCard} from "./renders/render-me-card.tsx";
-import {renderVCard} from "./renders/render-v-card.tsx";
-import {MapLocationPicker} from "./services/map-location-picker.tsx";
-import {ValidateInput} from "./validators/validate-input.tsx";
-import {renderAllTabs} from "./renders/render-all-tabs.tsx";
-import {RenderFieldsAsColumns} from "./renders/render-fields-as-cols.tsx";
-import {RenderInputFields} from "./renders/render-input-fields.tsx";
-import {updateBatchData} from "./services/batching/update-batch-data.tsx";
-import {updateBatchJob} from "./services/batching/update-batch-job.tsx";
-import {QRGeneration} from "./services/qr-generation.tsx";
-import {RenderContainerStyles} from "./renders/render-container-styles.tsx";
-import {HandleTabChange} from "./helpers/handle-tab-change.tsx";
-import {HandleErrorResponse} from "./responses/handle-error-response.tsx";
-import {HandleBatchResponse} from "./responses/handle-batch-response.tsx";
-import {HandleSingleResponse} from "./responses/handle-single-response.tsx";
-import {HandleFetchError} from "./helpers/handle-fetch-error.tsx";
-import {GenerateButtonsSection} from "./components/generate-buttons-section.tsx";
-import {ThemeToggle} from "./components/theme-toggle.tsx";
-import {TabSection} from "./components/tab-section.tsx";
-import {QRSection} from "./components/qr-section.tsx";
+
+// Styles
+import { styles } from './assets/styles';
+
+// Hooks
+import { useTheme } from "./hooks/use-theme";
+
+// Contexts
+import { ThemeProvider } from "./contexts/theme-context";
+
+// Enums
+import { Tabs } from "./ts/enums/tabs-enum";
+
+// Interfaces
+import { QRCodeRequest } from "./ts/interfaces/qr-code-request-types";
+import { QRCodeGeneratorProperties } from "./ts/interfaces/util-types";
+
+// Constants & Reducers
+import { initialState } from "./constants/constants";
+import { qrCodeReducer } from "./reducers/qr-code-reducer";
+
+// Helpers & Callbacks
+import {handleCryptoSelect} from "./helpers/handle-crypto-select";
+import {HandleInputChange} from "./callbacks/handle-input-change";
+import {HandleTabChange} from "./helpers/handle-tab-change";
+import {HandleFetchError} from "./helpers/handle-fetch-error";
+
+// Render methods
+import {renderMeCard} from "./renders/render-me-card";
+import {renderVCard} from "./renders/render-v-card";
+import {renderAllTabs} from "./renders/render-all-tabs";
+import {RenderFieldsAsColumns} from "./renders/render-fields-as-cols";
+import {RenderInputFields} from "./renders/render-input-fields";
+import {RenderContainerStyles} from "./renders/render-container-styles";
+
+// Services
+import {updateBatchData} from "./services/batching/update-batch-data";
+import {updateBatchJob} from "./services/batching/update-batch-job";
+import {QRGeneration} from "./services/qr-generation";
+import {MapLocationPicker} from "./services/map-location-picker";
+
+// Validators & Responses
+import {ValidateInput} from "./validators/validate-input";
+import {HandleErrorResponse} from "./responses/handle-error-response";
+import {HandleBatchResponse} from "./responses/handle-batch-response";
+import {HandleSingleResponse} from "./responses/handle-single-response";
+
+// Components
+import {GenerateButtonsSection} from "./components/generate-buttons-section";
+import {ThemeToggle} from "./components/theme-toggle";
+import {TabSection} from "./components/tab-section";
+import {QRSection} from "./components/qr-section";
+import {ErrorBoundary} from "./wrappers/error-boundary";
+
 
 const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
     const [state, dispatch] = useReducer(qrCodeReducer, initialState);
