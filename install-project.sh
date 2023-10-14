@@ -198,17 +198,7 @@ RUN rm /usr/app/frontend/src/App.tsx
 RUN rm /usr/app/frontend/src/App.css
 
 # Copy Project files to the container
-COPY staging/app.tsx /usr/app/frontend/src
-COPY staging/app.css /usr/app/frontend/src
-COPY staging/qr-code-generator.tsx /usr/app/frontend/src
-COPY staging/hooks /usr/app/frontend/src/hooks
-COPY staging/components /usr/app/frontend/src/components
-COPY staging/assets /usr/app/frontend/src/assets
-COPY staging/contexts /usr/app/frontend/src/contexts
-COPY staging/wrappers /usr/app/frontend/src/wrappers
-COPY staging/ts /usr/app/frontend/src/ts
-COPY staging/utils /usr/app/frontend/src/utils
-COPY staging/main.tsx /usr/app/frontend/src
+COPY staging/src/ /usr/app/frontend/src
 COPY staging/tsconfig.json /usr/app/frontend
 
 # Move to the frontend directory before building
@@ -295,7 +285,7 @@ setup_project_directories() {
   create_directory "$STAGING_DIR"
 
   # Copy all the frontend files from src to tmp
-  cp -r "src"/* "$STAGING_DIR"
+  cp -r "src" "$STAGING_DIR"
   cp "tsconfig.json" "$STAGING_DIR"
 
   # Copy all the backend files from src to tmp

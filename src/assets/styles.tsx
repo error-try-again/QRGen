@@ -89,7 +89,6 @@ export const styles: { [key: string]: CSSProperties } = {
     tabContainer: {
         display: 'flex',
         flexWrap: 'wrap',
-        overflowX: 'auto',
         gap: '5px',
         marginBottom: '10px',
         textAlign: 'initial'
@@ -103,5 +102,4 @@ export const styles: { [key: string]: CSSProperties } = {
         maxWidth: '400px',
         padding: '20px 0',
     },
-
 };
