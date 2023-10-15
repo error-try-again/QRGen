@@ -1,4 +1,4 @@
-import {QRCodeRequest} from "../interfaces/qr-code-request-types.tsx";
+import {QRCodeRequest} from "../interfaces/qr-code-request-interfaces.tsx";
 
 export type QRCodeGeneratorAction =
     | { type: 'SET_FIELD'; field: keyof QRCodeRequest; value: string }

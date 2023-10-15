@@ -1,4 +1,4 @@
-import {MeCardRequest, VCardRequest} from "../ts/interfaces/qr-code-request-types.tsx";
+import {MeCardRequest, VCardRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 
 export const VCardFields: (keyof VCardRequest)[] = [
     'firstName',

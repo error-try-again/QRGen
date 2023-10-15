@@ -1,6 +1,7 @@
 interface BaseQRData {
-    type: string;
+    type?: string;
     size?: number;
+    precision?: string;
 }
 
 export interface QRData<T = {

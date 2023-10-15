@@ -200,6 +200,7 @@ RUN rm /usr/app/frontend/src/App.css
 # Copy Project files to the container
 COPY staging/src/ /usr/app/frontend/src
 COPY staging/tsconfig.json /usr/app/frontend
+COPY staging/index.html /usr/app/frontend
 
 # Move to the frontend directory before building
 WORKDIR /usr/app/frontend
@@ -287,6 +288,7 @@ setup_project_directories() {
   # Copy all the frontend files from src to tmp
   cp -r "src" "$STAGING_DIR"
   cp "tsconfig.json" "$STAGING_DIR"
+  cp "index.html" "$STAGING_DIR"
 
   # Copy all the backend files from src to tmp
   cp -r "server" "$BACKEND_DIR"

@@ -1,4 +1,4 @@
-import {QRCodeRequest} from "./qr-code-request-types.tsx";
+import {QRCodeRequest} from "./qr-code-request-interfaces.tsx";
 
 export interface QRCodeGeneratorState extends QRCodeRequest {
     isLoading: boolean;

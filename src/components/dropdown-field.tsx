@@ -1,4 +1,4 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-types.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 import {styles} from "../assets/styles.tsx";
 import {ChangeEvent} from "react";
 import * as React from "react";

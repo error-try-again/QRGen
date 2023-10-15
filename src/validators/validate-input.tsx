@@ -1,6 +1,6 @@
 import {Tabs} from "../ts/enums/tabs-enum.tsx";
 import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-types.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 import React from "react";
 import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
 import {resetBatchAndLoadingState} from "../helpers/reset-loading-state.tsx";

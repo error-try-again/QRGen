@@ -1,4 +1,4 @@
-import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-types.tsx";
+import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces.tsx";
 
 export function updateBatchData(setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void) {
     return (data: QRCodeRequest) => {

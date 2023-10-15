@@ -14,8 +14,8 @@ import { ThemeProvider } from "./contexts/theme-context";
 import { Tabs } from "./ts/enums/tabs-enum";
 
 // Interfaces
-import { QRCodeRequest } from "./ts/interfaces/qr-code-request-types";
-import { QRCodeGeneratorProperties } from "./ts/interfaces/util-types";
+import { QRCodeRequest } from "./ts/interfaces/qr-code-request-interfaces.tsx";
+import { QRCodeGeneratorProperties } from "./ts/interfaces/util-interfaces.tsx";
 
 // Constants & Reducers
 import { initialState } from "./constants/constants";
@@ -50,10 +50,9 @@ import {HandleSingleResponse} from "./responses/handle-single-response";
 // Components
 import {GenerateButtonsSection} from "./components/generate-buttons-section";
 import {ThemeToggle} from "./components/theme-toggle";
-import {TabSection} from "./components/tab-section";
+import {TabNav} from "./components/tab-nav.tsx";
 import {QRSection} from "./components/qr-section";
 import {ErrorBoundary} from "./wrappers/error-boundary";
-
 
 const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
     const [state, dispatch] = useReducer(qrCodeReducer, initialState);
@@ -64,30 +63,34 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
     const [batchData, setBatchData] = useState<QRCodeRequest[]>([]);
 
     const {theme, toggleTheme} = useTheme();
-
     const containerStyles = RenderContainerStyles(theme);
+
     const updateBatch = updateBatchData(setBatchData);
     const addToBatch = updateBatchJob(state, activeTab, updateBatch, setQrBatchCount);
-    const handleCryptoChange = handleCryptoSelect(setSelectedCrypto, dispatch);
-    const handleInputChange = HandleInputChange(state, dispatch);
-    const handleTabChange = HandleTabChange(setError, setBatchData, setQrBatchCount, dispatch, setTab);
+
     const handleErrorResponse = HandleErrorResponse(setError, setBatchData, setQrBatchCount, dispatch);
     const handleBatchResponse = HandleBatchResponse(setError, setBatchData, setQrBatchCount, dispatch);
     const handleSingleResponse = HandleSingleResponse(dispatch, setError, setBatchData, setQrBatchCount);
     const handleFetchError = HandleFetchError(setError, dispatch, setBatchData, setQrBatchCount);
-    const LocationPicker = MapLocationPicker(dispatch, state);
     const validateInput = ValidateInput(activeTab, state, setError, setBatchData, setQrBatchCount, dispatch);
     const generateQRCode = QRGeneration(validateInput, dispatch, qrBatchCount, batchData, state, activeTab, handleErrorResponse, setError, setBatchData, setQrBatchCount, handleBatchResponse, handleSingleResponse, handleFetchError);
-    const renderInputFields = RenderInputFields(state, handleInputChange, setError);
+
+    const handleInputChange = HandleInputChange(state, dispatch);
+
     const renderInputFieldsInColumns = RenderFieldsAsColumns(state, handleInputChange, setError);
     const renderVCardFields = renderVCard(state, handleInputChange, renderInputFieldsInColumns);
     const renderMeCardFields = renderMeCard(renderInputFieldsInColumns);
+
+    const LocationPicker = MapLocationPicker(dispatch, state);
+    const handleCryptoChange = handleCryptoSelect(setSelectedCrypto, dispatch);
+    const handleTabChange = HandleTabChange(setError, setBatchData, setQrBatchCount, dispatch, setTab);
+    const renderInputFields = RenderInputFields(state, handleInputChange, setError);
     const TabSections = renderAllTabs(renderInputFields, state, handleInputChange, setError, LocationPicker, selectedCrypto, handleCryptoChange, renderVCardFields, renderMeCardFields);
 
     return <div style={containerStyles}>
         <div style={styles.tabContainer}>
             {ThemeToggle(toggleTheme, theme)}
-            {TabSection(activeTab, handleTabChange, setTab)}
+            {TabNav(activeTab, handleTabChange, setTab)}
             {TabSections[activeTab]?.()}
             {error && <div style={styles.errorContainer}>{error}</div>}
             {GenerateButtonsSection(addToBatch, state, generateQRCode, qrBatchCount)}

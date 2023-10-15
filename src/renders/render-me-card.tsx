@@ -1,4 +1,4 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-types.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 import React from "react";
 import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants.tsx";
 import {MeCardFields} from "../constants/fields.tsx";

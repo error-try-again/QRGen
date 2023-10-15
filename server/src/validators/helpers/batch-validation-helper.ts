@@ -20,7 +20,10 @@ export const validateBatchData = (qrCodes: QRData[], response: Response) => {
 
     for (const qrCode of qrCodes) {
         try {
-            validateData(qrCode, qrCode.type);
+            if (!qrCode.type) {
+                return false;
+            }
+            validateData(qrCode);
         } catch (error) {
             console.log(error);
             return false;

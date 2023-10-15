@@ -1,4 +1,4 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-types.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 import React, {ChangeEvent} from "react";
 import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
 import {Tabs} from "../ts/enums/tabs-enum.tsx";
@@ -123,7 +123,6 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
             </section>
         ),
         [Tabs.Crypto]: () => {
-            console.log('selectedCrypto', selectedCrypto);
             return (
                 <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Crypto</h2>

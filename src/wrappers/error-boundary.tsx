@@ -1,5 +1,5 @@
 import React from "react";
-import {ErrorBoundaryProperties} from "../ts/interfaces/util-types.tsx";
+import {ErrorBoundaryProperties} from "../ts/interfaces/util-interfaces.tsx";
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProperties> {
     state = {hasError: false};

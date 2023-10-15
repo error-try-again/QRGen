@@ -1,6 +1,6 @@
 import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
 import React from "react";
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-types.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 import {convertValueToString} from "../utils/convert-to-string.tsx";
 import {InputField} from "../components/input-field.tsx";
 
