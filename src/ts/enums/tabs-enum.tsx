@@ -10,4 +10,5 @@ export enum Tabs {
     Crypto = 'Crypto',
     MeCard = 'MeCard',
     VCard = 'VCard',
+    Zoom = 'Zoom',
 }

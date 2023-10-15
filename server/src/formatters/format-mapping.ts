@@ -6,7 +6,7 @@ import {
     PhoneRequest,
     SMSRequest,
     TextRequest,
-    UrlRequest, VCardRequest, WifiRequest
+    UrlRequest, VCardRequest, WifiRequest, ZoomRequest
 } from "../ts/interfaces/qr-code-request-interfaces";
 import {formatEmail} from "./format-email";
 import {formatEvent} from "./format-v-calender";
@@ -22,7 +22,8 @@ export const formatters: { [K in keyof RequestTypeMap]: FormatHandler<RequestTyp
     'GeoLocation': (data: GeoLocationRequest) => `geo:${data.latitude},${data.longitude}`,
     'WiFi': (data: WifiRequest) => `WIFI:T:${data.encryption};S:${data.ssid};P:${data.password};H:${data.hidden ? 1 : 0};`,
     'Event': formatEvent as FormatHandler<EventRequest>,
-    'Crypto': (data: CryptoRequest) => `${data.cryptoType}:${data.address}?amount=${data.amount ?? ''}`,
+    'Crypto': (data: CryptoRequest) => `${data.address}?amount=${data.amount ?? ''}`,
     'VCard': formatVCard as FormatHandler<VCardRequest>,
-    'MeCard': formatMeCard as FormatHandler<MeCardRequest>
+    'MeCard': formatMeCard as FormatHandler<MeCardRequest>,
+    'Zoom': (data: ZoomRequest) => `https://zoom.us/j/${data.zoomId}?pwd=${data.zoomPass}`,
 };

@@ -1,4 +1,5 @@
 import {Tabs} from "../enums/tabs-enum.tsx";
+import {QRCodeErrorCorrectionLevel} from "../types/error-correction-types.tsx";
 
 
 export interface UrlRequest {
@@ -52,7 +53,7 @@ export interface CryptoRequest {
 }
 
 export interface PayPalRequest {
-    paypalType?: 'buy_now' | 'addToCart' | 'donate';
+    paypalType?: 'Buy Now' | 'Add To Cart' | 'Donate';
     paypalEmail?: string;
     paypalItemName?: string;
     paypalItemNumber?: string;
@@ -63,22 +64,8 @@ export interface PayPalRequest {
 }
 
 export interface ZoomRequest {
-    zoomType?: 'join' | 'meet' | 'webinar';
     zoomId?: string;
     zoomPass?: string;
-    zoomStartTime?: string;
-    zoomDuration?: string;
-    zoomTopic?: string;
-}
-
-export interface SkypeRequest {
-    skypeType?: 'call' | 'chat';
-    skypeId?: string;
-}
-
-export interface WhatsAppRequest {
-    whatsappType?: 'chat' | 'call';
-    whatsappId?: string;
 }
 
 export interface VCardRequest {
@@ -119,8 +106,8 @@ export interface MeCardRequest {
     notes?: string;
 }
 
-export interface QRCodeRequest extends TextRequest, UrlRequest, WifiRequest, EmailRequest, PhoneRequest, SMSRequest, EventRequest, GeoLocationRequest, CryptoRequest, MeCardRequest, VCardRequest {
+export interface QRCodeRequest extends UrlRequest, TextRequest, WifiRequest, EmailRequest, PhoneRequest, SMSRequest, EventRequest, GeoLocationRequest, CryptoRequest, PayPalRequest, ZoomRequest, VCardRequest, MeCardRequest {
     type?: keyof typeof Tabs;
     size?: string;
-    precision?: string;
+    precision?: QRCodeErrorCorrectionLevel;
 }

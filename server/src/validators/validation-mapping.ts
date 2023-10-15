@@ -13,6 +13,7 @@ export const validators: {
     'WiFi': data => Boolean(data.ssid && data.encryption),
     'Event': data => Boolean(data.venue && data.startTime && data.endTime),
     'Crypto': data => Boolean(data.cryptoType && data.address),
-    'VCard': data => Boolean(data.firstName && data.lastName),
-    'MeCard': data => Boolean(data.firstName && data.lastName)
+    'VCard': data => Boolean(data.firstName && data.lastName && data.email && data.phoneWork),
+    'MeCard': data => Boolean(data.firstName && data.lastName && data.email && data.phone1),
+    'Zoom': data => Boolean(data.zoomId && data.zoomPass)
 };

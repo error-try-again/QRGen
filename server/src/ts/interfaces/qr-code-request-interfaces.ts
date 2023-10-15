@@ -48,34 +48,9 @@ export interface CryptoRequest {
     amount?: string;
 }
 
-export interface PayPalRequest {
-    paypalType?: 'buy_now' | 'addToCart' | 'donate';
-    paypalEmail?: string;
-    paypalItemName?: string;
-    paypalItemNumber?: string;
-    paypalAmount?: string;
-    paypalCurrency?: string;
-    paypalShipping?: string;
-    paypalTax?: string;
-}
-
 export interface ZoomRequest {
-    zoomType?: 'join' | 'meet' | 'webinar';
     zoomId?: string;
     zoomPass?: string;
-    zoomStartTime?: string;
-    zoomDuration?: string;
-    zoomTopic?: string;
-}
-
-export interface SkypeRequest {
-    skypeType?: 'call' | 'chat';
-    skypeId?: string;
-}
-
-export interface WhatsAppRequest {
-    whatsappType?: 'chat' | 'call';
-    whatsappId?: string;
 }
 
 export interface VCardRequest {

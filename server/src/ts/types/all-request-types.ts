@@ -5,7 +5,7 @@ import {
     PhoneRequest,
     SMSRequest,
     TextRequest,
-    UrlRequest, VCardRequest, WifiRequest
+    UrlRequest, VCardRequest, WifiRequest, ZoomRequest
 } from "../interfaces/qr-code-request-interfaces";
 
 export type AllRequests =
@@ -19,8 +19,8 @@ export type AllRequests =
     | EventRequest
     | CryptoRequest
     | VCardRequest
-    | MeCardRequest;
-
+    | MeCardRequest
+    | ZoomRequest;
 
 export type RequestTypeMap = {
     'Text': TextRequest,
@@ -33,5 +33,6 @@ export type RequestTypeMap = {
     'Event': EventRequest,
     'Crypto': CryptoRequest,
     'VCard': VCardRequest,
-    'MeCard': MeCardRequest
+    'MeCard': MeCardRequest,
+    'Zoom': ZoomRequest
 };

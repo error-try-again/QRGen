@@ -19,7 +19,8 @@ export function ValidateInput(activeTab: Tabs, state: QRCodeGeneratorState, setE
             [Tabs.GeoLocation]: {fields: ['latitude', 'longitude'], errorMessage: "Latitude and Longitude are required"},
             [Tabs.Crypto]: {fields: ['address'], errorMessage: "Address is required"},
             [Tabs.MeCard]: {fields: ['firstName', 'lastName', 'phone1'], errorMessage: "First Name, Last Name and Phone are required"},
-            [Tabs.VCard]: {fields: ['firstName', 'lastName', 'email', 'phoneWork'], errorMessage: "First Name, Last Name, Email and Phone are required"}
+            [Tabs.VCard]: {fields: ['firstName', 'lastName', 'email', 'phoneWork'], errorMessage: "First Name, Last Name, Email and Phone are required"},
+            [Tabs.Zoom]: {fields: ['zoomId', 'zoomPass'], errorMessage: "Zoom Meeting ID and Password are required"},
         };
 
         const requiredFields = requiredFieldsMapping[activeTab];

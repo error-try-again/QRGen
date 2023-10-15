@@ -7,12 +7,12 @@ import {handleDataTypeSwitching} from "../utils/handle-data-type-switching";
 
 export const processSingleQRCode = async <T extends AllRequests>(qrData: QRData<T>): Promise<ProcessedQRData<T>> => {
     validateData(qrData);
-    const {type, size, customData} = qrData;
+    const {type, size, precision, customData} = qrData;
     if (!type) {
         throw new Error("Invalid type provided.");
     }
-    const sanitizedData = handleDataTypeSwitching(type, customData);
-    const qrCodeData = await generateQR(sanitizedData, size ?? DEFAULT_QR_SIZE);
+    const updatedData = handleDataTypeSwitching(type, customData);
+    const qrCodeData = await generateQR(updatedData, size ?? DEFAULT_QR_SIZE, precision ?? 'M');
     return {...qrData, qrCodeData};
 };
 

@@ -168,5 +168,24 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
                 </section>
             );
         },
+        [Tabs.PayPal]: () => (
+            <section style={styles.section}>
+                <h2 style={styles.sectionTitle}>PayPal</h2>
+                <DropdownField keyName="paypalType"
+                               handleChange={handleInputChange}
+                               options={['Buy Now', 'Add To Cart', 'Donate']}
+                               value={state.paypalType || ''}
+                               setError={setError}
+                />
+                {renderInputFields(['paypalEmail', 'paypalItemName', 'paypalItemNumber', 'paypalAmount', 'paypalCurrency', 'paypalShipping', 'paypalTax'])}
+            </section>
+        ),
+        [Tabs.Zoom]: () => (
+            <section style={styles.section}>
+                <h2 style={styles.sectionTitle}>Zoom</h2>
+                {renderInputFields(['zoomId', 'zoomPass'])}
+            </section>
+        ),
+
     };
 }
