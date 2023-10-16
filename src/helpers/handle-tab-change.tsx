@@ -8,6 +8,7 @@ export function HandleTabChange(setError: (value: (((previousState: string) => s
     return (freshTab: Tabs) => {
         setError("");
         resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+
         dispatch({type: 'SET_QRCODE_URL', value: ""});
         dispatch({type: 'RESET_STATE'});
         setTab(freshTab);

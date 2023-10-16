@@ -5,7 +5,7 @@ import L, {LatLng} from "leaflet";
 import {INITIAL_POSITION} from "../constants/constants.tsx";
 import {Marker, Popup, TileLayer, useMap} from "react-leaflet";
 import {handleLocationSelect} from "../helpers/handle-location-select.tsx";
-import {CustomIcon} from "../components/custom-map-icon.tsx";
+import {CustomIcon} from "../components/icons/custom-map-icon.tsx";
 
 export function MapLocationPicker(dispatch: React.Dispatch<QRCodeGeneratorAction>, state: QRCodeGeneratorState) {
     const LocationPicker: React.FC = React.memo(() => {

@@ -1,7 +1,13 @@
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
-import {styles} from "../assets/styles.tsx";
+import {styles} from "../../assets/styles.tsx";
+import {QRCodeGeneratorState} from "../../ts/interfaces/qr-code-generator-state.tsx";
 
-export function GenerateButtonsSection(addToBatch: () => void, state: QRCodeGeneratorState, generateQRCode: () => void, qrBatchCount: number) {
+interface GenerateButtonsSectionProperties {
+    state: QRCodeGeneratorState;
+    addToBatch: () => void;
+    generateQRCode: () => void;
+    qrBatchCount: number;
+}
+export const GenerateButtonsSection = ({state, addToBatch, generateQRCode, qrBatchCount}: GenerateButtonsSectionProperties) => {
     return <div style={styles.qrButtonsContainer}>
         <button onClick={addToBatch}
                 style={styles.generateButton}
@@ -16,4 +22,4 @@ export function GenerateButtonsSection(addToBatch: () => void, state: QRCodeGene
             {qrBatchCount >= 1 ? `Generate Zip (${qrBatchCount})` : 'Generate QR Code'}
         </button>
     </div>;
-}
+};

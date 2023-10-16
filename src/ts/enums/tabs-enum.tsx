@@ -6,9 +6,9 @@ export enum Tabs {
     WiFi = 'WiFi',
     SMS = 'SMS',
     Event = 'Event',
+    Zoom = 'Zoom',
     GeoLocation = 'GeoLocation',
     Crypto = 'Crypto',
     MeCard = 'MeCard',
     VCard = 'VCard',
-    Zoom = 'Zoom',
 }

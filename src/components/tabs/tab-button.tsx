@@ -1,5 +1,5 @@
-import {Tabs} from "../ts/enums/tabs-enum.tsx";
-import {styles} from "../assets/styles.tsx";
+import {Tabs} from "../../ts/enums/tabs-enum.tsx";
+import {styles} from "../../assets/styles.tsx";
 import * as React from "react";
 
 export const TabButton: React.FC<{

@@ -4,8 +4,17 @@ import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 import {styles} from "../assets/styles.tsx";
 import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants.tsx";
 import {VCardFields} from "../constants/fields.tsx";
+import {HandleInputChange} from "../callbacks/handle-input-change.tsx";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
 
-export function renderVCard(state: QRCodeGeneratorState, handleInputChange: (event: React.ChangeEvent<HTMLElement & { value: string }>, fieldName: keyof QRCodeRequest) => void, renderInputFieldsInColumns: (fields: (keyof QRCodeRequest)[], columns: number) => React.JSX.Element) {
+export function renderVCard(
+    state: QRCodeGeneratorState,
+    dispatch: React.Dispatch<QRCodeGeneratorAction>,
+    renderInputFieldsInColumns: (fields: (keyof QRCodeRequest)[],
+                                 columns: number) => React.JSX.Element) {
+
+    const handleInputChange = HandleInputChange(state, dispatch);
+
     return () => (
         <>
             <div style={styles.fieldContainer}>

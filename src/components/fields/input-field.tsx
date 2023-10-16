@@ -1,8 +1,8 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
-import {styles} from "../assets/styles.tsx";
+import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces.tsx";
+import {styles} from "../../assets/styles.tsx";
 import * as React from "react";
 import {ChangeEvent} from "react";
-import {convertValueToString} from "../utils/convert-to-string.tsx";
+import {convertValueToString} from "../../utils/convert-to-string.tsx";
 
 export const InputField: React.FC<{
     keyName: keyof QRCodeRequest,

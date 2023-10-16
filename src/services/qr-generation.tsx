@@ -1,13 +1,35 @@
-import React from "react";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
 import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
 import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
 import {Tabs} from "../ts/enums/tabs-enum.tsx";
 import {resetBatchAndLoadingState} from "../helpers/reset-loading-state.tsx";
+import {HandleSingleResponse} from "../responses/handle-single-response.tsx";
+import {ValidateInput} from "../validators/validate-input.tsx";
+import React from "react";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
+import {HandleFetchError} from "../helpers/handle-fetch-error.tsx";
+import {HandleErrorResponse} from "../responses/handle-error-response.tsx";
+import {HandleBatchResponse} from "../responses/handle-batch-response.tsx";
 
-export function QRGeneration(validateInput: () => boolean, dispatch: React.Dispatch<QRCodeGeneratorAction>, qrBatchCount: number, batchData: QRCodeRequest[], state: QRCodeGeneratorState, activeTab: Tabs, handleErrorResponse: (response: Response) => Promise<void>, setError: (value: (((previousState: string) => string) | string)) => void, setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void, setQrBatchCount: (value: (((previousState: number) => number) | number)) => void, handleBatchResponse: (response: Response) => Promise<void>, handleSingleResponse: (response: Response) => Promise<void>, handleFetchError: (error: Error) => void) {
+
+export function QRGeneration(
+    dispatch: React.Dispatch<QRCodeGeneratorAction>,
+    qrBatchCount: number,
+    batchData: QRCodeRequest[],
+    state: QRCodeGeneratorState,
+    activeTab: Tabs,
+    setError: (value: (((previousState: string) => string) | string)) => void,
+    setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void,
+    setQrBatchCount: (value: (((previousState: number) => number) | number)) => void) {
+    const validateInput = ValidateInput(activeTab, state, setError, setBatchData, setQrBatchCount, dispatch);
+
+    const handleSingleResponse = HandleSingleResponse(dispatch, setError, setBatchData, setQrBatchCount);
+    const handleFetchError = HandleFetchError(setError, dispatch, setBatchData, setQrBatchCount);
+    const handleErrorResponse = HandleErrorResponse(setError, setBatchData, setQrBatchCount, dispatch);
+    const handleBatchResponse = HandleBatchResponse(setError, setBatchData, setQrBatchCount, dispatch);
+
     return async () => {
         if (!validateInput()) {
+            resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
             return;
         }
 
@@ -35,6 +57,7 @@ export function QRGeneration(validateInput: () => boolean, dispatch: React.Dispa
 
             if (!response.ok) {
                 await handleErrorResponse(response);
+                resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
                 return;
             }
 
@@ -49,6 +72,7 @@ export function QRGeneration(validateInput: () => boolean, dispatch: React.Dispa
         } catch (error: unknown) {
             if (error instanceof Error) {
                 handleFetchError(error);
+                resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
             } else {
                 setError("Unknown error.");
                 resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);

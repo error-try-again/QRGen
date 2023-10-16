@@ -1,5 +1,5 @@
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
-import {styles} from "../assets/styles.tsx";
+import {QRCodeGeneratorState} from "../../ts/interfaces/qr-code-generator-state.tsx";
+import {styles} from "../../assets/styles.tsx";
 import React from "react";
 
 export function QRSection(state: QRCodeGeneratorState) {

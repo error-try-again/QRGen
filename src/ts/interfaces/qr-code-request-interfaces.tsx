@@ -52,17 +52,6 @@ export interface CryptoRequest {
     amount?: string;
 }
 
-export interface PayPalRequest {
-    paypalType?: 'Buy Now' | 'Add To Cart' | 'Donate';
-    paypalEmail?: string;
-    paypalItemName?: string;
-    paypalItemNumber?: string;
-    paypalAmount?: string;
-    paypalCurrency?: string;
-    paypalShipping?: string;
-    paypalTax?: string;
-}
-
 export interface ZoomRequest {
     zoomId?: string;
     zoomPass?: string;
@@ -106,7 +95,7 @@ export interface MeCardRequest {
     notes?: string;
 }
 
-export interface QRCodeRequest extends UrlRequest, TextRequest, WifiRequest, EmailRequest, PhoneRequest, SMSRequest, EventRequest, GeoLocationRequest, CryptoRequest, PayPalRequest, ZoomRequest, VCardRequest, MeCardRequest {
+export interface QRCodeRequest extends UrlRequest, TextRequest, WifiRequest, EmailRequest, PhoneRequest, SMSRequest, EventRequest, GeoLocationRequest, CryptoRequest, ZoomRequest, VCardRequest, MeCardRequest {
     type?: keyof typeof Tabs;
     size?: string;
     precision?: QRCodeErrorCorrectionLevel;

@@ -84,10 +84,9 @@ export const styles: { [key: string]: CSSProperties } = {
     tabButton: {
         padding: '5px 10px',
         margin: '2px',
-        fontSize: '12px',
+        fontSize: '14px',
     },
     tabContainer: {
-        display: 'flex',
         flexWrap: 'wrap',
         gap: '5px',
         marginBottom: '10px',
@@ -102,4 +101,8 @@ export const styles: { [key: string]: CSSProperties } = {
         maxWidth: '400px',
         padding: '20px 0',
     },
+    divider: {
+        borderBottom: '1px solid #ccc',
+        margin: '20px 0',
+    }
 };

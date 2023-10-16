@@ -1,4 +1,4 @@
-import React, {createContext, ReactNode, useEffect, useState} from "react";
+import React, {createContext, ReactNode, useMemo, useState} from "react";
 
 export interface ThemeContextType {
     theme: string;
@@ -13,12 +13,12 @@ interface ThemeProviderProperties {
 export const ThemeProvider: React.FC<ThemeProviderProperties> = ({children}) => {
     const [theme, setTheme] = useState('light'); // default theme is light
 
-    useEffect(() => {
-        // Update the document body styles based on the theme
-        document.body.style.backgroundColor = theme === 'light' ? 'white' : 'black';
-        document.body.style.color = theme === 'light' ? 'black' : 'white';
+    useMemo(() => {
+        // Set the theme for the body element to the current theme
+        document.body.style.backgroundColor = theme === 'light' ? 'rgb(46, 48, 49)' : 'white';
+        document.body.style.color = theme === 'light' ? '#dbd6d0' : 'black';
 
-        // Override default display behavior
+        // Patch for an issue where the body is not set to display block by default
         document.body.style.display = 'block'
     }, [theme]);
 

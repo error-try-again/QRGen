@@ -1,4 +1,4 @@
-import {styles} from "../assets/styles.tsx";
+import {styles} from "../../assets/styles.tsx";
 
 export function ThemeToggle(toggleTheme: () => void, theme: string) {
     return <button

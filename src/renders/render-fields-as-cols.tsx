@@ -1,14 +1,22 @@
 import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
 import React from "react";
 import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
+import {HandleInputChange} from "../callbacks/handle-input-change.tsx";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
+import {InputField} from "../components/fields/input-field.tsx";
 import {styles} from "../assets/styles.tsx";
-import {InputField} from "../components/input-field.tsx";
 
 // Function to render the fields distributed across the specified number of columns.
 // Parameters:
 //   - fields: An array of field keys to be rendered.
 //   - columns: The number of columns in which the fields should be distributed.
-export function RenderFieldsAsColumns(state: QRCodeGeneratorState, handleInputChange: (event: React.ChangeEvent<HTMLElement & { value: string }>, fieldName: keyof QRCodeRequest) => void, setError: (value: (((previousState: string) => string) | string)) => void) {
+export function RenderFieldsAsColumns(
+    state: QRCodeGeneratorState,
+    dispatch: React.Dispatch<QRCodeGeneratorAction>,
+    setError: (value: (((previousState: string) => string) | string)) => void,
+) {
+    const handleInputChange = HandleInputChange(state, dispatch);
+
     return (fields: (keyof QRCodeRequest)[], columns: number) => {
 
         // Calculate the number of fields that should be in each column.

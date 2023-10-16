@@ -3,22 +3,47 @@ import React, {ChangeEvent} from "react";
 import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
 import {Tabs} from "../ts/enums/tabs-enum.tsx";
 import {styles} from "../assets/styles.tsx";
-import {DropdownField} from "../components/dropdown-field.tsx";
-import {InputField} from "../components/input-field.tsx";
+import {DropdownField} from "../components/fields/dropdown-field.tsx";
+import {InputField} from "../components/fields/input-field.tsx";
 import {MapContainer} from "react-leaflet";
 import {CRYPTO_TYPES} from "../constants/constants.tsx";
+import {Divider} from "../components/extras/divider.tsx";
+import {HandleInputChange} from "../callbacks/handle-input-change.tsx";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
+import {renderVCard} from "./render-v-card.tsx";
+import {renderMeCard} from "./render-me-card.tsx";
+import {RenderFieldsAsColumns} from "./render-fields-as-cols.tsx";
+import {handleCryptoSelect} from "../helpers/handle-crypto-select.tsx";
+import {RenderInputFields} from "./render-input-fields.tsx";
 
-export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[]) => React.JSX.Element, state: QRCodeGeneratorState, handleInputChange: (event: React.ChangeEvent<HTMLElement & { value: string }>, fieldName: keyof QRCodeRequest) => void, setError: (value: (((previousState: string) => string) | string)) => void, LocationPicker: React.FC, selectedCrypto: string, handleCryptoChange: (cryptoType: string) => void, renderVCardFields: () => React.JSX.Element, renderMeCardFields: () => React.JSX.Element) {
-    return {
+export const renderAllTabs = (
+    state: QRCodeGeneratorState,
+    dispatch: React.Dispatch<QRCodeGeneratorAction>,
+    setError: (value: (((previousState: string) => string) | string)) => void,
+    LocationPicker: React.FC,
+    selectedCrypto: string,
+    setSelectedCrypto: (value: (((previousState: string) => string) | string)) => void,
+) => {
+
+    const handleInputChange = HandleInputChange(state, dispatch);
+    const handleCryptoChange = handleCryptoSelect(setSelectedCrypto, dispatch);
+    const renderInputFields = RenderInputFields(state, dispatch, setError);
+    const renderInputFieldsInColumns = RenderFieldsAsColumns(state, dispatch, setError);
+    const renderVCardFields = renderVCard(state, dispatch, renderInputFieldsInColumns);
+    const renderMeCardFields = renderMeCard(renderInputFieldsInColumns);
+
+    return ({
         [Tabs.Text]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Text</h2>
+                <Divider/>
                 {renderInputFields(['text'])}
             </section>
         ),
         [Tabs.Url]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>URL</h2>
+                <Divider/>
                 {renderInputFields(['url'])}
             </section>
         ),
@@ -26,6 +51,7 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
             return (
                 <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Email</h2>
+                    <Divider/>
                     {renderInputFields(['email', 'subject', 'cc', 'bcc'])}
                     <div style={styles.fieldContainer}>
                         <label style={styles.label} htmlFor="body">Enter Email Body</label>
@@ -43,12 +69,14 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
         [Tabs.Phone]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Phone</h2>
+                <Divider/>
                 {renderInputFields(['phone'])}
             </section>
         ),
         [Tabs.WiFi]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>WiFi Configuration</h2>
+                <Divider/>
                 {renderInputFields(['ssid', 'password'])}
                 <DropdownField keyName="encryption"
                                handleChange={handleInputChange}
@@ -67,6 +95,7 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
         [Tabs.SMS]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>SMS</h2>
+                <Divider/>
                 <InputField
                     keyName="phone"
                     value={state.phone}
@@ -87,6 +116,7 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
         [Tabs.Event]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Event</h2>
+                <Divider/>
                 {renderInputFields(['event', 'venue'])}
                 <InputField keyName="startTime"
                             value={state.startTime}
@@ -106,6 +136,7 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
         [Tabs.GeoLocation]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>GeoLocation</h2>
+                <Divider/>
                 {['latitude', 'longitude'].map(key => (
                     <InputField
                         key={key}
@@ -126,6 +157,7 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
             return (
                 <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>Crypto</h2>
+                    <Divider/>
                     {CRYPTO_TYPES.map(cryptoType => (
                         <div key={cryptoType}>
                             <input type="radio"
@@ -155,37 +187,28 @@ export function renderAllTabs(renderInputFields: (keys: (keyof QRCodeRequest)[])
                     )}
                 </section>
             );
-        }, [Tabs.VCard]: () => (
+        }, [Tabs.Zoom]: () => (
+            <section style={styles.section}>
+                <h2 style={styles.sectionTitle}>Zoom</h2>
+                <Divider/>
+                {renderInputFields(['zoomId', 'zoomPass'])}
+            </section>
+        ),
+        [Tabs.VCard]: () => (
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>VCard</h2>
+                <Divider/>
                 {renderVCardFields()}
             </section>
-        ), [Tabs.MeCard]: () => {
+        ),
+        [Tabs.MeCard]: () => {
             return (
                 <section style={styles.section}>
                     <h2 style={styles.sectionTitle}>MeCard</h2>
+                    <Divider/>
                     {renderMeCardFields()}
                 </section>
             );
         },
-        [Tabs.PayPal]: () => (
-            <section style={styles.section}>
-                <h2 style={styles.sectionTitle}>PayPal</h2>
-                <DropdownField keyName="paypalType"
-                               handleChange={handleInputChange}
-                               options={['Buy Now', 'Add To Cart', 'Donate']}
-                               value={state.paypalType || ''}
-                               setError={setError}
-                />
-                {renderInputFields(['paypalEmail', 'paypalItemName', 'paypalItemNumber', 'paypalAmount', 'paypalCurrency', 'paypalShipping', 'paypalTax'])}
-            </section>
-        ),
-        [Tabs.Zoom]: () => (
-            <section style={styles.section}>
-                <h2 style={styles.sectionTitle}>Zoom</h2>
-                {renderInputFields(['zoomId', 'zoomPass'])}
-            </section>
-        ),
-
-    };
-}
+    });
+};
