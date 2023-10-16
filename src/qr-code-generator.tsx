@@ -15,11 +15,10 @@ import {QRCodeGeneratorProperties} from "./ts/interfaces/util-interfaces.tsx";
 import {HandleTabChange} from "./helpers/handle-tab-change";
 
 // Render methods
-import {renderAllTabs} from "./renders/render-all-tabs";
+import {RenderAllTabs} from "./renders/render-all-tabs";
 
 // Services
 import {QRGeneration} from "./services/qr-generation";
-import {MapLocationPicker} from "./services/map-location-picker";
 
 // Components
 import {GenerateButtonsSection} from "./components/buttons/generate-buttons-section.tsx";
@@ -51,9 +50,8 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
     const {theme, toggleTheme} = useTheme();
 
     const generateQRCode = QRGeneration(dispatch, qrBatchCount, batchData, state, activeTab, setError, setBatchData, setQrBatchCount);
-    const LocationPicker = MapLocationPicker(dispatch, state);
     const handleTabChange = HandleTabChange(setError, setBatchData, setQrBatchCount, dispatch, setActiveTab);
-    const TabSections = renderAllTabs(state, dispatch, setError, LocationPicker, selectedCrypto, setSelectedCrypto);
+    const TabSections = RenderAllTabs(state, dispatch, setError, selectedCrypto, setSelectedCrypto);
 
     return <div style={styles.themeContainer}>
         <div style={styles.tabContainer}>

@@ -15,14 +15,15 @@ import {renderMeCard} from "./render-me-card.tsx";
 import {RenderFieldsAsColumns} from "./render-fields-as-cols.tsx";
 import {handleCryptoSelect} from "../helpers/handle-crypto-select.tsx";
 import {RenderInputFields} from "./render-input-fields.tsx";
+import {MapLocationPicker} from "../services/map-location-picker.tsx";
 
-export const renderAllTabs = (
+
+export const RenderAllTabs = (
     state: QRCodeGeneratorState,
     dispatch: React.Dispatch<QRCodeGeneratorAction>,
     setError: (value: (((previousState: string) => string) | string)) => void,
-    LocationPicker: React.FC,
     selectedCrypto: string,
-    setSelectedCrypto: (value: (((previousState: string) => string) | string)) => void,
+    setSelectedCrypto: React.Dispatch<React.SetStateAction<string>>,
 ) => {
 
     const handleInputChange = HandleInputChange(state, dispatch);
@@ -31,6 +32,7 @@ export const renderAllTabs = (
     const renderInputFieldsInColumns = RenderFieldsAsColumns(state, dispatch, setError);
     const renderVCardFields = renderVCard(state, dispatch, renderInputFieldsInColumns);
     const renderMeCardFields = renderMeCard(renderInputFieldsInColumns);
+    const LocationPicker = MapLocationPicker(dispatch, state);
 
     return ({
         [Tabs.Text]: () => (

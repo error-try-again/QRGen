@@ -1,5 +1,6 @@
 import {useContext} from "react";
-import {CoreContext, CoreContextType} from "../contexts/core-context.tsx";
+import {CoreContext} from "../contexts/core-context.tsx";
+import {CoreContextType} from "../ts/interfaces/context-interfaces.tsx";
 
 export const useCore = (): CoreContextType => {
     const context = useContext(CoreContext);
