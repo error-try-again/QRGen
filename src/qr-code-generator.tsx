@@ -18,7 +18,6 @@ import {HandleTabChange} from "./helpers/handle-tab-change";
 import {renderAllTabs} from "./renders/render-all-tabs";
 
 // Services
-import {UpdateBatchJob} from "./services/batching/update-batch-job";
 import {QRGeneration} from "./services/qr-generation";
 import {MapLocationPicker} from "./services/map-location-picker";
 
@@ -31,7 +30,6 @@ import {ErrorBoundary} from "./wrappers/error-boundary";
 import {Links} from "./components/links/links.tsx";
 import {CoreProvider} from "./contexts/core-context.tsx";
 import {useCore} from "./hooks/use-core.tsx";
-
 
 const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
 
@@ -52,7 +50,6 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
 
     const {theme, toggleTheme} = useTheme();
 
-    const addToBatch = UpdateBatchJob(state, activeTab, setQrBatchCount, setBatchData);
     const generateQRCode = QRGeneration(dispatch, qrBatchCount, batchData, state, activeTab, setError, setBatchData, setQrBatchCount);
     const LocationPicker = MapLocationPicker(dispatch, state);
     const handleTabChange = HandleTabChange(setError, setBatchData, setQrBatchCount, dispatch, setActiveTab);
@@ -66,9 +63,11 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
             {error && <div style={styles.errorContainer}>{error}</div>}
             <GenerateButtonsSection
                 state={state}
-                addToBatch={addToBatch}
+                activeTab={activeTab}
                 generateQRCode={generateQRCode}
                 qrBatchCount={qrBatchCount}
+                setQrBatchCount={setQrBatchCount}
+                setBatchData={setBatchData}
             />
             {QRSection(state)}
         </div>
