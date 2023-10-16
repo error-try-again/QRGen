@@ -17,9 +17,6 @@ import {HandleTabChange} from "./helpers/handle-tab-change";
 // Render methods
 import {RenderAllTabs} from "./renders/render-all-tabs";
 
-// Services
-import {QRGeneration} from "./services/qr-generation";
-
 // Components
 import {GenerateButtonsSection} from "./components/buttons/generate-buttons-section.tsx";
 import {ThemeToggle} from "./components/theme/theme-toggle.tsx";
@@ -49,23 +46,24 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
 
     const {theme, toggleTheme} = useTheme();
 
-    const generateQRCode = QRGeneration(dispatch, qrBatchCount, batchData, state, activeTab, setError, setBatchData, setQrBatchCount);
     const handleTabChange = HandleTabChange(setError, setBatchData, setQrBatchCount, dispatch, setActiveTab);
     const TabSections = RenderAllTabs(state, dispatch, setError, selectedCrypto, setSelectedCrypto);
 
     return <div style={styles.themeContainer}>
         <div style={styles.tabContainer}>
-            {ThemeToggle(toggleTheme, theme)}
+           <ThemeToggle theme={theme} toggleTheme={toggleTheme}/>
             {TabNav(activeTab, handleTabChange, setActiveTab)}
             {TabSections[activeTab]?.()}
             {error && <div style={styles.errorContainer}>{error}</div>}
             <GenerateButtonsSection
                 state={state}
+                dispatch={dispatch}
                 activeTab={activeTab}
-                generateQRCode={generateQRCode}
                 qrBatchCount={qrBatchCount}
                 setQrBatchCount={setQrBatchCount}
+                batchData={batchData}
                 setBatchData={setBatchData}
+                setError={setError}
             />
             {QRSection(state)}
         </div>

@@ -4,26 +4,44 @@ import {UpdateBatchJob} from "../../services/batching/update-batch-job.tsx";
 import {Tabs} from "../../ts/enums/tabs-enum.tsx";
 import React from "react";
 import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces.tsx";
+import {QRGeneration} from "../../services/qr-generation.tsx";
+import {QRCodeGeneratorAction} from "../../ts/types/reducer-types.tsx";
 
 interface GenerateButtonsSectionProperties {
     state: QRCodeGeneratorState;
+    dispatch: React.Dispatch<QRCodeGeneratorAction>,
     activeTab: Tabs;
-    generateQRCode: () => void;
     qrBatchCount: number;
     setQrBatchCount: React.Dispatch<React.SetStateAction<number>>;
+    batchData: QRCodeRequest[];
     setBatchData: React.Dispatch<React.SetStateAction<QRCodeRequest[]>>;
+    setError: (value: (((previousState: string) => string) | string)) => void;
 }
 
 export const GenerateButtonsSection = ({
                                            state,
+                                           dispatch,
                                            activeTab,
-                                           generateQRCode,
                                            qrBatchCount,
                                            setQrBatchCount,
-                                           setBatchData
+                                           batchData,
+                                           setBatchData,
+                                           setError
                                        }: GenerateButtonsSectionProperties) => {
 
-    const addToBatch = UpdateBatchJob({state, activeTab, setQrBatchCount, setBatchData});
+    const generateQRCode = QRGeneration({
+        dispatch,
+        qrBatchCount,
+        batchData,
+        state,
+        activeTab,
+        setError,
+        setBatchData,
+        setQrBatchCount
+    });
+
+    const addToBatch = UpdateBatchJob(
+        {state, activeTab, setQrBatchCount, setBatchData});
 
     return <div style={styles.qrButtonsContainer}>
         <button onClick={addToBatch}

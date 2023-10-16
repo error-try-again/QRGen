@@ -10,18 +10,27 @@ import {HandleFetchError} from "../helpers/handle-fetch-error.tsx";
 import {HandleErrorResponse} from "../responses/handle-error-response.tsx";
 import {HandleBatchResponse} from "../responses/handle-batch-response.tsx";
 
-
-export function QRGeneration(
+export function QRGeneration({
+                                 dispatch,
+                                 qrBatchCount,
+                                 batchData,
+                                 state,
+                                 activeTab,
+                                 setError,
+                                 setBatchData,
+                                 setQrBatchCount
+                             }: {
     dispatch: React.Dispatch<QRCodeGeneratorAction>,
     qrBatchCount: number,
     batchData: QRCodeRequest[],
     state: QRCodeGeneratorState,
     activeTab: Tabs,
     setError: (value: (((previousState: string) => string) | string)) => void,
-    setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void,
-    setQrBatchCount: (value: (((previousState: number) => number) | number)) => void) {
-    const validateInput = ValidateInput(activeTab, state, setError, setBatchData, setQrBatchCount, dispatch);
+    setBatchData: React.Dispatch<React.SetStateAction<QRCodeRequest[]>>,
+    setQrBatchCount: React.Dispatch<React.SetStateAction<number>>
+}) {
 
+    const validateInput = ValidateInput(activeTab, state, setError, setBatchData, setQrBatchCount, dispatch);
     const handleSingleResponse = HandleSingleResponse(dispatch, setError, setBatchData, setQrBatchCount);
     const handleFetchError = HandleFetchError(setError, dispatch, setBatchData, setQrBatchCount);
     const handleErrorResponse = HandleErrorResponse(setError, setBatchData, setQrBatchCount, dispatch);
@@ -49,6 +58,7 @@ export function QRGeneration(
         };
 
         try {
+
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
