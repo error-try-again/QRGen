@@ -60,7 +60,7 @@ const hasUniqueQRCodeElements = <T extends AllRequests>({response, data}: { resp
     if (new Set(data.map((element) => JSON.stringify(element))).size === data.length) {
         return true;
     }
-    handleErrorStatus({response, errorType: ErrorType.DUPLICATE_QRCODES});
+    handleErrorStatus({response, errorType: ErrorType.DUPLICATE_QR_CODES});
     return false;
 };
 

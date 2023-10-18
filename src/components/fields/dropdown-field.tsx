@@ -1,17 +1,19 @@
-import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces.tsx";
-import {styles} from "../../assets/styles.tsx";
+import { QRCodeRequest } from "../../ts/interfaces/qr-code-request-interfaces.tsx";
+import { styles } from "../../assets/styles.tsx";
 import * as React from "react";
-import {ChangeEvent} from "react";
+import { ChangeEvent, memo } from "react";
 
-export const DropdownField: React.FC<{
+const DropdownFieldComponent: React.FC<{
+    handleChange: (event: ChangeEvent<HTMLSelectElement>, fieldName: keyof QRCodeRequest) => void,
     keyName: keyof QRCodeRequest,
     options: string[],
-    value: string | null | undefined,
     setError: React.Dispatch<React.SetStateAction<string | "">>,
-    handleChange: (event: ChangeEvent<HTMLSelectElement>, fieldName: keyof QRCodeRequest) => void
-}> = React.memo(({keyName, options, value, handleChange, setError}) => {
+    value: string | null | undefined
+}> = ({ keyName, options, value, handleChange, setError }) => {
+
     const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replaceAll(/([A-Z])/g, ' $1');
-    const {label, dropdown, fieldContainer} = styles;
+    const { label, dropdown, fieldContainer } = styles;
+
     return (
         <div style={fieldContainer}>
             <label style={label} htmlFor={String(keyName)}>Select {friendlyKeyName}</label>
@@ -24,9 +26,12 @@ export const DropdownField: React.FC<{
                 }}
                 onFocus={() => setError("")}>
                 <option value="">{`-- Choose ${friendlyKeyName} --`}</option>
-                // Updated for clarity
                 {options.map((option: string) => (<option key={option} value={option}>{option}</option>))}
             </select>
         </div>
     );
-});
+};
+
+DropdownFieldComponent.displayName = "DropdownField";
+
+export const DropdownField = memo(DropdownFieldComponent);

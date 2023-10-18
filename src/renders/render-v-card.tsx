@@ -15,7 +15,9 @@ export function renderVCard(
 
     const handleInputChange = HandleInputChange(state, dispatch);
 
-    return () => {
+
+
+    function RenderedVCard() {
         const {label, fieldContainer} = styles;
         return (
             <>
@@ -46,5 +48,9 @@ export function renderVCard(
                 }
             </>
         );
-    };
+    }
+
+    RenderedVCard.displayName = "RenderedVCard";
+
+    return RenderedVCard;
 }

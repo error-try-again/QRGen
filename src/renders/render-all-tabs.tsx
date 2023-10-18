@@ -15,7 +15,7 @@ import {renderMeCard} from "./render-me-card.tsx";
 import {RenderFieldsAsColumns} from "./render-fields-as-cols.tsx";
 import {handleCryptoSelect} from "../helpers/handle-crypto-select.tsx";
 import {RenderInputFields} from "./render-input-fields.tsx";
-import {MapLocationPicker} from "../services/map-location-picker.tsx";
+import {LocationPicker} from "../services/map-location-picker.tsx";
 
 
 export const RenderAllTabs = (
@@ -32,7 +32,6 @@ export const RenderAllTabs = (
     const renderInputFieldsInColumns = RenderFieldsAsColumns(state, dispatch, setError);
     const renderVCardFields = renderVCard(state, dispatch, renderInputFieldsInColumns);
     const renderMeCardFields = renderMeCard(renderInputFieldsInColumns);
-    const LocationPicker = MapLocationPicker(dispatch, state);
 
     return ({
         [Tabs.Crypto]: () => {
@@ -131,7 +130,10 @@ export const RenderAllTabs = (
                     ))}
                     <MapContainer center={[51.505, -0.09]} zoom={13} style={{width: '100%', height: '300px'}}>
                         <section style={section}>
-                            <LocationPicker/>
+                            <LocationPicker
+                                state={state}
+                                dispatch={dispatch}
+                            />
                         </section>
                     </MapContainer>
                 </section>

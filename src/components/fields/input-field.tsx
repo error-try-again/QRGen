@@ -4,18 +4,18 @@ import * as React from "react";
 import {ChangeEvent} from "react";
 import {convertValueToString} from "../../utils/convert-to-string.tsx";
 
-export const InputField: React.FC<{
+export const InputFieldComponent: React.FC<{
     keyName: keyof QRCodeRequest,
     value: string | boolean | null | undefined,
     type?: string,
     setError: React.Dispatch<React.SetStateAction<string | "">>,
     handleChange: (event: ChangeEvent<HTMLInputElement>, fieldName: keyof QRCodeRequest) => void
-}> = React.memo(({keyName, value, type = 'text', handleChange, setError}) => {
+}> = (({keyName, value, type = 'text', handleChange, setError}) => {
 
     const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replaceAll(/([A-Z])/g, ' $1'); // Converts "cryptoType" to "Crypto Type"
     const convertedValue = convertValueToString(value);
-
     const {input, label, fieldContainer} = styles;
+
     return (
         <div style={fieldContainer}>
             <label style={label} htmlFor={String(keyName)}>Enter {friendlyKeyName}</label>
@@ -31,3 +31,6 @@ export const InputField: React.FC<{
         </div>
     );
 });
+
+InputFieldComponent.displayName = "InputField";
+export const InputField = React.memo(InputFieldComponent);

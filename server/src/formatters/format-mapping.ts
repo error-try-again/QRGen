@@ -2,11 +2,17 @@ import {RequestTypeMap} from "../ts/types/all-request-types";
 import {FormatHandler} from "../ts/types/helper-types";
 import {
     CryptoRequest,
-    EmailRequest, EventRequest, GeoLocationRequest, MeCardRequest,
+    EmailRequest,
+    EventRequest,
+    GeoLocationRequest,
+    MeCardRequest,
     PhoneRequest,
     SMSRequest,
     TextRequest,
-    UrlRequest, VCardRequest, WifiRequest, ZoomRequest
+    UrlRequest,
+    VCardRequest,
+    WifiRequest,
+    ZoomRequest
 } from "../ts/interfaces/qr-code-request-interfaces";
 import {formatEmail} from "./format-email";
 import {formatEvent} from "./format-v-calender";

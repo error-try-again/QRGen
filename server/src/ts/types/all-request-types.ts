@@ -1,11 +1,16 @@
 import {
     CryptoRequest,
-    EmailRequest, EventRequest,
-    GeoLocationRequest, MeCardRequest,
+    EmailRequest,
+    EventRequest,
+    GeoLocationRequest,
+    MeCardRequest,
     PhoneRequest,
     SMSRequest,
     TextRequest,
-    UrlRequest, VCardRequest, WifiRequest, ZoomRequest
+    UrlRequest,
+    VCardRequest,
+    WifiRequest,
+    ZoomRequest
 } from "../interfaces/qr-code-request-interfaces";
 
 export type AllRequests =

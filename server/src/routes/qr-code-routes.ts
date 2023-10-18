@@ -1,11 +1,8 @@
-import express, { Request, Response, Router } from "express";
-import {
-    generateQRCodesForBatch,
-    processSingleQRCode
-} from "../controllers/qr-code-controller";
+import express, {Request, Response, Router} from "express";
+import {generateQRCodesForBatch, processSingleQRCode} from "../controllers/qr-code-controller";
 import {ProcessedQRData} from "../ts/interfaces/helper-interfaces";
-import { AllRequests } from "../ts/types/all-request-types";
-import { prepareAndSendArchive } from "./helpers/archival-helpers";
+import {AllRequests} from "../ts/types/all-request-types";
+import {prepareAndSendArchive} from "./helpers/archival-helpers";
 import {validateRequestBody} from "../validators/validate-request-body";
 import {handleErrorStatus} from "./helpers/handle-error-status";
 import {ErrorType} from "../ts/error-enum";
@@ -26,7 +23,6 @@ router.post('/generate', async (request: Request, response: Response) => {
 
 // Route to generate QR codes in batch
 router.post('/batch', async (request: Request, response: Response) => {
-    console.log('PASS 0:', request.body);
     validateRequestBody(request, response, async () => {
         try {
             const qrCodesWithSanitizedData: ProcessedQRData<AllRequests>[] = await generateQRCodesForBatch(response, request.body);

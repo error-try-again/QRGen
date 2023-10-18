@@ -11,8 +11,10 @@ export function RenderInputFields(
     state: QRCodeGeneratorState,
     dispatch: React.Dispatch<QRCodeGeneratorAction>,
     setError: (value: (((previousState: string) => string) | string)) => void) {
+
     const handleInputChange = HandleInputChange(state, dispatch);
-    return (keys: (keyof QRCodeRequest)[]) => {
+
+    function RenderedInputFields(keys: (keyof QRCodeRequest)[]) {
         return <>
             {keys.map(key => {
                 const convertedValue = convertValueToString(state[key]);
@@ -26,5 +28,9 @@ export function RenderInputFields(
             })}
             {() => setError("")}
         </>;
-    };
+    }
+
+    RenderedInputFields.displayName = "RenderedInputFields";
+
+    return RenderedInputFields;
 }

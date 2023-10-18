@@ -3,7 +3,6 @@ import React from "react";
 import {TabButton} from "./tab-button.tsx";
 
 export const TabNav = (activeTab: Tabs, handleTabChange: (tab: Tabs) => void, setTab: React.Dispatch<React.SetStateAction<Tabs>>) => {
-
     return <>
         {Object.values(Tabs).map((tab: Tabs) => (
             <TabButton
