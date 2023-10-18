@@ -3,10 +3,11 @@ import {styles} from "../../assets/styles.tsx";
 import React from "react";
 
 export function QRSection(state: QRCodeGeneratorState) {
+    const {qrCodeContainer} = styles;
     return <>
         {
             state.qrCodeURL &&
-            <div style={styles.qrCodeContainer}>
+            <div style={qrCodeContainer}>
                 <img src={state.qrCodeURL}
                      alt="Generated QR Code"
                      style={{width: `${state.size}px`, height: `${state.size}px`}}

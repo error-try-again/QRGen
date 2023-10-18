@@ -15,33 +15,36 @@ export function renderVCard(
 
     const handleInputChange = HandleInputChange(state, dispatch);
 
-    return () => (
-        <>
-            <div style={styles.fieldContainer}>
-                <p style={styles.label}>vCard Version</p>
+    return () => {
+        const {label, fieldContainer} = styles;
+        return (
+            <>
+                <div style={fieldContainer}>
+                    <p style={label}>vCard Version</p>
+                    {
+                        // Render radio buttons for each vCard version.
+                        ['2.1', '3.0', '4.0'].map(version => (
+                            <div key={version}>
+                                <input type="radio"
+                                       id={`version_${version}`}
+                                       name="version"
+                                       value={version}
+                                       checked={state.version === version}
+                                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleInputChange(event, 'version')}
+                                />
+                                <label htmlFor={`version_${version}`}> {version}</label>
+                            </div>
+                        ))
+                    }
+                </div>
                 {
-                    // Render radio buttons for each vCard version.
-                    ['2.1', '3.0', '4.0'].map(version => (
-                        <div key={version}>
-                            <input type="radio"
-                                   id={`version_${version}`}
-                                   name="version"
-                                   value={version}
-                                   checked={state.version === version}
-                                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleInputChange(event, 'version')}
-                            />
-                            <label htmlFor={`version_${version}`}> {version}</label>
-                        </div>
-                    ))
+                    // Check the current viewport width.
+                    // If it's larger or equal to the DESKTOP_MEDIA_QUERY_THRESHOLD, use 2 columns, otherwise use 1 column.
+                    window.innerWidth >= DESKTOP_MEDIA_QUERY_THRESHOLD
+                        ? renderInputFieldsInColumns(VCardFields, 2) // For wider screens (desktop)
+                        : renderInputFieldsInColumns(VCardFields, 1) // For narrower screens (mobile)
                 }
-            </div>
-            {
-                // Check the current viewport width.
-                // If it's larger or equal to the DESKTOP_MEDIA_QUERY_THRESHOLD, use 2 columns, otherwise use 1 column.
-                window.innerWidth >= DESKTOP_MEDIA_QUERY_THRESHOLD
-                    ? renderInputFieldsInColumns(VCardFields, 2) // For wider screens (desktop)
-                    : renderInputFieldsInColumns(VCardFields, 1) // For narrower screens (mobile)
-            }
-        </>
-    );
+            </>
+        );
+    };
 }

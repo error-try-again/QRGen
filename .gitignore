@@ -30,3 +30,5 @@ vite-env.d.ts
 /src/index.css
 /src/index.html
 /src/main.ts
+!/vite.config.ts
+!/vite-env.d.ts

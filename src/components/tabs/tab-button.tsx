@@ -9,9 +9,10 @@ export const TabButton: React.FC<{
     handleTabChange: (freshTab: Tabs) => void,
     setTab: React.Dispatch<React.SetStateAction<Tabs>>
 }> = React.memo(({activeTab, tab, label, handleTabChange}) => {
+    const {tabButton} = styles;
     return (
         <button onClick={() => handleTabChange(tab)}
-                style={{...styles.tabButton, borderBottom: activeTab === tab ? '2px solid blue' : 'none'}}>
+                style={{...tabButton, borderBottom: activeTab === tab ? '2px solid rgb(129, 214, 255)' : 'none'}}>
             {label}
         </button>
     );

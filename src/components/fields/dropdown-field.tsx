@@ -1,7 +1,7 @@
 import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces.tsx";
 import {styles} from "../../assets/styles.tsx";
-import {ChangeEvent} from "react";
 import * as React from "react";
+import {ChangeEvent} from "react";
 
 export const DropdownField: React.FC<{
     keyName: keyof QRCodeRequest,
@@ -11,12 +11,13 @@ export const DropdownField: React.FC<{
     handleChange: (event: ChangeEvent<HTMLSelectElement>, fieldName: keyof QRCodeRequest) => void
 }> = React.memo(({keyName, options, value, handleChange, setError}) => {
     const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replaceAll(/([A-Z])/g, ' $1');
+    const {label, dropdown, fieldContainer} = styles;
     return (
-        <div style={styles.fieldContainer}>
-            <label style={styles.label} htmlFor={String(keyName)}>Select {friendlyKeyName}</label>
+        <div style={fieldContainer}>
+            <label style={label} htmlFor={String(keyName)}>Select {friendlyKeyName}</label>
             <select
                 id={String(keyName)}
-                style={styles.dropdown}
+                style={dropdown}
                 value={value || ''}
                 onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
                     handleChange(event, keyName);

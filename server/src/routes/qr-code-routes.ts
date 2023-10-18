@@ -1,50 +1,51 @@
-import express from "express";
-import {generateQRCodesForBatch, processSingleQRCode} from "../controllers/qr-code-controller";
-import {validateBatchData} from "../validators/helpers/batch-validation-helper";
+import express, { Request, Response, Router } from "express";
+import {
+    generateQRCodesForBatch,
+    processSingleQRCode
+} from "../controllers/qr-code-controller";
 import {ProcessedQRData} from "../ts/interfaces/helper-interfaces";
-import {AllRequests} from "../ts/types/all-request-types";
-import {prepareAndSendArchive} from "./helpers/archival-helpers";
+import { AllRequests } from "../ts/types/all-request-types";
+import { prepareAndSendArchive } from "./helpers/archival-helpers";
+import {validateRequestBody} from "../validators/validate-request-body";
+import {handleErrorStatus} from "./helpers/handle-error-status";
+import {ErrorType} from "../ts/error-enum";
 
-const router = express.Router();
+const router: Router = express.Router();
 
-router.post('/generate', async (request, response) => {
-    if (!request.body || !request.body.type) {
-        return response.status(400).json({message: "Invalid request data."});
-    }
-    try {
-        const processedQRCode = await processSingleQRCode(request.body);
-        return response.json({qrCodeURL: processedQRCode.qrCodeData});
-    } catch (error) {
-        console.error(error);
-        return response.status(500).json({message: "Internal server error on QR code generation."});
-    }
-});
-
-router.post('/batch', async (request: express.Request, response: express.Response) => {
-    try {
-        const {qrCodes} = request.body;
-
-        if (!validateBatchData(qrCodes, response)) {
-            return;
+// Route to generate a single QR code
+router.post('/generate', async (request: Request, response: Response) => {
+    validateRequestBody(request, response, async () => {
+        try {
+            const processedQRCode = await processSingleQRCode(response, request.body);
+            response.json({ qrCodeURL: processedQRCode.qrCodeData });
+        } catch {
+            handleErrorStatus({response, statusCode: 500, errorType: ErrorType.SOMETHING_WENT_WRONG});
         }
+    });
+});
 
-        const qrCodesWithSanitizedData: ProcessedQRData<AllRequests>[] = await generateQRCodesForBatch(qrCodes);
-        if (qrCodesWithSanitizedData) {
-            await prepareAndSendArchive(qrCodesWithSanitizedData, response);
-        } else {
-            response.status(500).json({message: 'Internal server error on batch generation.'});
+// Route to generate QR codes in batch
+router.post('/batch', async (request: Request, response: Response) => {
+    console.log('PASS 0:', request.body);
+    validateRequestBody(request, response, async () => {
+        try {
+            const qrCodesWithSanitizedData: ProcessedQRData<AllRequests>[] = await generateQRCodesForBatch(response, request.body);
+            if (qrCodesWithSanitizedData) {
+                await prepareAndSendArchive(qrCodesWithSanitizedData, response);
+            } else {
+                handleErrorStatus({response, statusCode: 500, errorType: ErrorType.COULD_NOT_GENERATE_ARCHIVE});
+            }
+        } catch {
+            handleErrorStatus({response, statusCode: 500, errorType: ErrorType.SOMETHING_WENT_WRONG});
         }
-    } catch {
-        response.status(500).json({message: 'Internal server error on batch generation.'});
+    });
+});
+
+// Route for the welcome message
+router.get('/', (_request: Request, response: Response) => {
+    if (!response.headersSent) {
+        response.send('Welcome to the QR code generator API.');
     }
 });
 
-// Friendly welcome message
-router.get('/', (_request, response) => {
-    if (response.headersSent) {
-        return;
-    }
-    response.send('Welcome to the QR code generator API.');
-});
-
-export {router as qrCodeRoutes};
+export { router as qrCodeRoutes };

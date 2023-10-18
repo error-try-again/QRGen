@@ -15,13 +15,14 @@ export const InputField: React.FC<{
     const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replaceAll(/([A-Z])/g, ' $1'); // Converts "cryptoType" to "Crypto Type"
     const convertedValue = convertValueToString(value);
 
+    const {input, label, fieldContainer} = styles;
     return (
-        <div style={styles.fieldContainer}>
-            <label style={styles.label} htmlFor={String(keyName)}>Enter {friendlyKeyName}</label>
+        <div style={fieldContainer}>
+            <label style={label} htmlFor={String(keyName)}>Enter {friendlyKeyName}</label>
             <input
                 type={type}
                 id={String(keyName)}
-                style={styles.input}
+                style={input}
                 value={convertedValue}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => handleChange(event, keyName)}
                 onFocus={() => setError("")}

@@ -36,9 +36,10 @@ export function RenderFieldsAsColumns(
         );
 
         // Return a JSX structure that represents the columns.
+        const {renderBizCardsContainer} = styles;
         return (
             // Flex container to layout child divs (columns) in a row.
-            <div style={styles.renderBizCardsContainer}>
+            <div style={renderBizCardsContainer}>
                 {
                     // For each column (represented by colFields), render the fields.
                     cols.map((colFields, index) => (

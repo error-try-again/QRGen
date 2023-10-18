@@ -18,14 +18,7 @@ NVM_VERSION="v0.39.5"
 BACKEND_PORT=3001
 NGINX_PORT=8080
 
-is_first_run() {
-  if [ ! -e "$FIRST_RUN_FILE" ]; then
-    touch "$FIRST_RUN_FILE"
-    return 0
-  else
-    return 1 >/dev/null 2>&1
-  fi
-}
+
 
 setup_nvm_node() {
   echo "Setting up NVM and Node.js..."
@@ -164,10 +157,10 @@ FROM node:$NODE_VERSION
 WORKDIR /usr/app
 
 RUN npm install -g ts-node typescript \
- && npm install --save-dev @types/node typescript ts-node \
+ && npm install --save-dev @types/node typescript ts-node jest ts-jest \
  && npx tsc --init \
  && npm install --save express cors multer archiver express-rate-limit helmet qrcode \
- && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver @types/express-rate-limit @types/helmet @types/qrcode
+ && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver @types/express-rate-limit @types/helmet @types/qrcode @types/jest
 
 # Copy Project files to the container
 COPY backend/server/ /usr/app
@@ -279,6 +272,10 @@ create_directory() {
 
 setup_project_directories() {
 
+  echo "Staging project directories..."
+
+  ls && pwd
+
   # Check and create directories using the function
   create_directory "$SERVER_DIR"
   create_directory "$FRONTEND_DIR"
@@ -293,6 +290,25 @@ setup_project_directories() {
   # Copy all the backend files from src to tmp
   cp -r "server" "$BACKEND_DIR"
 
+}
+
+reload_project() {
+  echo "Reloading the project..."
+
+  # Re-setup the project directories
+  setup_project_directories
+
+  # Stop running containers
+  if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
+    docker compose -f "$PROJECT_DIR/docker-compose.yml" down
+  fi
+
+  # Re-create server and nginx configurations
+  create_server_configuration_files
+  create_nginx_configuration
+
+  # Re-build and run the Docker setup
+  build_and_run_docker
 }
 
 cleanup() {
@@ -340,13 +356,32 @@ main() {
   build_and_run_docker
 }
 
-cleanup_choice="y"
-
 if is_first_run; then
   echo "Welcome to the QR Code Generator setup script!"
+  main
 else
-  read -rp "Do you want to perform cleanup (Y/N)? " cleanup_choice
-  [[ $cleanup_choice =~ ^[Yy] ]] && cleanup
+  PS3="Choose an option (1/2/3): "
+  options=("Run Setup" "Cleanup" "Reload/Refresh")
+  select opt in "${options[@]}"
+  do
+    case $opt in
+      "Run Setup")
+        main
+        break
+        ;;
+      "Cleanup")
+        cleanup
+        break
+        ;;
+      "Reload/Refresh")
+        reload_project
+        break
+        ;;
+      *)
+        echo "Invalid option"
+        ;;
+    esac
+  done
 fi
 
 main

@@ -43,14 +43,15 @@ export const GenerateButtonsSection = ({
     const addToBatch = UpdateBatchJob(
         {state, activeTab, setQrBatchCount, setBatchData});
 
-    return <div style={styles.qrButtonsContainer}>
+    const {generateButton, qrButtonsContainer} = styles;
+    return <div style={qrButtonsContainer}>
         <button onClick={addToBatch}
-                style={styles.generateButton}
+                style={generateButton}
                 aria-label="Add To Bulk"
                 aria-busy={state.isLoading}>
             Add To Bulk
         </button>
-        <button style={styles.generateButton}
+        <button style={generateButton}
                 onClick={generateQRCode}
                 aria-label="Generate QR Code"
                 aria-busy={state.isLoading}>

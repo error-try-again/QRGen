@@ -7,7 +7,6 @@ import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
 import {InputField} from "../components/fields/input-field.tsx";
 import {convertValueToString} from "../utils/convert-to-string.tsx";
 
-
 export function RenderInputFields(
     state: QRCodeGeneratorState,
     dispatch: React.Dispatch<QRCodeGeneratorAction>,

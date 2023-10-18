@@ -5,8 +5,8 @@ import {resetBatchAndLoadingState} from "../helpers/reset-loading-state.tsx";
 
 export function HandleErrorResponse(setError: (value: (((previousState: string) => string) | string)) => void, setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void, setQrBatchCount: (value: (((previousState: number) => number) | number)) => void, dispatch: React.Dispatch<QRCodeGeneratorAction>) {
     return async (response: Response) => {
-        const result = await response.json();
-        setError(result.message || 'Unknown error.');
+        const result: string = await response.text();
+        setError(result);
         resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
     };
 }

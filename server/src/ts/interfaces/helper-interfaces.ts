@@ -1,8 +1,8 @@
 import {QRCodeErrorCorrectionLevel} from "qrcode";
 
 interface BaseQRData {
-    type?: string;
-    size?: number;
+    type: string;
+    size: number;
     precision?: QRCodeErrorCorrectionLevel;
 }
 

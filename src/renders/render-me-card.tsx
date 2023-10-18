@@ -8,7 +8,8 @@ export function renderMeCard(renderInputFieldsInColumns: (fields: (keyof QRCodeR
         <>
             {
                 // Check the current viewport width.
-                // If it's larger or equal to the DESKTOP_MEDIA_QUERY_THRESHOLD, use 2 columns, otherwise use 1 column.
+                // If it's larger or equal to the DESKTOP_MEDIA_QUERY_THRESHOLD, use two columns,
+                // otherwise use one column.
                 window.innerWidth >= DESKTOP_MEDIA_QUERY_THRESHOLD
                     ? renderInputFieldsInColumns(MeCardFields, 2) // For wider screens (desktop)
                     : renderInputFieldsInColumns(MeCardFields, 1) // For narrower screens (mobile)
