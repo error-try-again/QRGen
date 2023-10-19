@@ -9,17 +9,22 @@ The entire project is self-hostable and has been built over a weekend. While it 
 
 ## Installation Instructions:
 
-*Run setup-deps to ensure that the host system has all the required dependencies*
+*Run depends to ensure that the host system has all the required dependencies*
 
-```
-chmod +x setup-deps.sh
-sudo ./setup-deps.sh
+```bash
+chmod +x depends.sh
+sudo ./depends.sh
 ```
 
 *Run the Project as the docker-primary user to build and install the core project*
 
+```bash
+machinectl shell docker-primary@ $HOME/fullstack-qr-generator/install.sh $HOME/fullstack-qr-generator/         
 ```
-su docker-primary -c "./install.sh docker-primary"
+
+*Uninstall the project*
+```bash
+sudo ./depends.sh uninstall
 ```
 
 ## Security Notes
