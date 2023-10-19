@@ -1,11 +1,10 @@
 #!/bin/bash
-
 set -euo pipefail
 
-# Ensure we're in the project directory of the script
+# Change the current working directory to the script's location.
 cd "$(dirname "$0")"
 
-# Constants
+# Define project-related constants and directory paths.
 readonly PROJECT_DIR="$HOME/qr-code-generator"
 readonly BACKEND_DIR="$PROJECT_DIR/backend"
 readonly FRONTEND_DIR="$PROJECT_DIR/frontend"
@@ -15,7 +14,8 @@ BACKEND_PORT=3001
 NGINX_PORT=8080
 NODE_VERSION=20.8.0
 
-# Directory Setup Functions
+# Creates the specified directory if it does not already exist.
+# Outputs a message upon directory creation.
 create_directory() {
   if [ ! -d "$1" ]; then
     mkdir -p "$1"
@@ -23,20 +23,18 @@ create_directory() {
   fi
 }
 
+# Organizes and initializes the project directories.
+# Copies necessary files from the source location to the staging directory.
 setup_project_directories() {
-
   echo "Staging project directories..."
 
-  # Check and create directories using the function
+  # Ensure required directories exist.
   create_directory "$SERVER_DIR"
   create_directory "$FRONTEND_DIR"
   create_directory "$BACKEND_DIR"
   create_directory "$STAGING_DIR"
 
-  # Using a fixed path for the src directory
   local SRC_DIR="/home/void/Desktop/fullstack-qr-generator/src"
-
-  # Check if the source directory exists before attempting to copy
   if [[ -d "$SRC_DIR" ]]; then
     cp -r "$SRC_DIR" "$STAGING_DIR"
     cp "tsconfig.json" "$STAGING_DIR"
@@ -46,29 +44,37 @@ setup_project_directories() {
     exit 1
   fi
 
-  # Copy all the backend files from src to tmp
+  # Move backend files to their dedicated directory.
   cp -r "server" "$BACKEND_DIR"
 }
 
+# Validates and sets Docker-related environment variables.
+ensure_docker_env() {
+  # Update or set XDG_RUNTIME_DIR.
+  if [ -z "${XDG_RUNTIME_DIR:-}" ] || [ "${XDG_RUNTIME_DIR:-}" != "/run/user/$(id -u)" ]; then
+    export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+    echo "Set XDG_RUNTIME_DIR to ${XDG_RUNTIME_DIR}"
+  fi
+
+  # Update or set DOCKER_HOST.
+  expected_docker_host="unix:///run/user/$(id -u)/docker.sock"
+  if [ -z "${DOCKER_HOST:-}" ] || [ "${DOCKER_HOST:-}" != "${expected_docker_host}" ]; then
+    export DOCKER_HOST="${expected_docker_host}"
+    echo "Set DOCKER_HOST to ${DOCKER_HOST}"
+  fi
+}
+
+# Configures Docker to operate in rootless mode, updating user's bashrc as required.
 setup_docker_rootless() {
-
-  # Function to add a line to ~/.bashrc if it doesn't exist
-  add_to_bashrc() {
-    local line="$1"
-    if ! grep -q "^${line}$" ~/.bashrc; then
-      echo "$line" >>~/.bashrc
-    fi
-  }
-
   echo "Setting up Docker in rootless mode..."
 
-  # Check for Docker
+  # Validate Docker installation.
   if ! command -v docker &>/dev/null; then
     echo "Docker is not installed. Please install Docker to continue."
     exit 1
   fi
 
-  # Check if dockerd-rootless-setuptool.sh exists before running it
+  # Ensure rootless setup tool is available before attempting setup.
   if ! command -v dockerd-rootless-setuptool.sh >/dev/null 2>&1; then
     echo "dockerd-rootless-setuptool.sh not found. Exiting."
     return 1
@@ -76,22 +82,30 @@ setup_docker_rootless() {
     dockerd-rootless-setuptool.sh install
   fi
 
-  export PATH=/usr/bin:$PATH
-  export XDG_RUNTIME_DIR=/run/user/$(id -u)
-  export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
+  ensure_docker_env
 
+  # Append environment settings to the user's bashrc.
+  add_to_bashrc() {
+    local line="$1"
+    if ! grep -q "^${line}$" ~/.bashrc; then
+      echo "$line" >>~/.bashrc
+    fi
+  }
   add_to_bashrc "export PATH=/usr/bin:$PATH"
   add_to_bashrc "export XDG_RUNTIME_DIR=/run/user/$(id -u)"
   add_to_bashrc "DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock"
 
+  # Manage Docker's systemd services.
   systemctl --user status docker.service
   systemctl --user start docker.service
   systemctl --user enable docker.service
-
 }
 
+# Uses Docker Compose to build and launch the Docker containers for the project.
 build_and_run_docker() {
   echo "Building and running Docker setup..."
+
+  # Move to the project directory before invoking Docker commands.
   cd "$PROJECT_DIR" || {
     echo "Failed to change directory to $PROJECT_DIR"
     exit 1
@@ -107,6 +121,7 @@ build_and_run_docker() {
   docker compose ps
 }
 
+# Generates an NGINX configuration file tailored to serve static content and proxy requests.
 create_nginx_configuration() {
   cat <<EOF >"$PROJECT_DIR/nginx.conf"
 worker_processes 1;
@@ -156,6 +171,7 @@ http {
 EOF
 }
 
+# Produces server-side configuration files essential for backend and frontend operations.
 create_server_configuration_files() {
   echo "Setting up the backend..."
 
@@ -273,8 +289,10 @@ services:
 EOF
 }
 
-# Project Operations
+# Redoes the project setup.
+# Cleans current Docker Compose setup, arranges directories, and reinitiates Docker services.
 reload_project() {
+  ensure_docker_env
   echo "Reloading the project..."
   setup_project_directories
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
@@ -285,7 +303,10 @@ reload_project() {
   build_and_run_docker
 }
 
+# Cleans up the project setup.
+# It shuts down any running Docker containers associated with the project and deletes the entire project directory.
 cleanup() {
+  ensure_docker_env
   echo "Cleaning up..."
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
@@ -295,7 +316,8 @@ cleanup() {
   fi
 }
 
-# Main Execution Flow
+# The main function to set up the entire project.
+# It sets up the directories, configures Docker in rootless mode, generates necessary configuration files, and runs the Docker setup.
 main() {
   setup_project_directories
   setup_docker_rootless
@@ -304,6 +326,8 @@ main() {
   build_and_run_docker
 }
 
+# Provides an interactive prompt to the user to select an action.
+# Users can choose between setting up the project, cleaning up, or reloading the project.
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
 
