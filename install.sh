@@ -2,52 +2,64 @@
 
 set -euo pipefail
 
+# Ensure we're in the project directory of the script
+cd "$(dirname "$0")"
+
 # Constants
 readonly PROJECT_DIR="$HOME/qr-code-generator"
-readonly FIRST_RUN_FILE="$PROJECT_DIR/.first_run"
 readonly BACKEND_DIR="$PROJECT_DIR/backend"
 readonly FRONTEND_DIR="$PROJECT_DIR/frontend"
-readonly SOURCE_DIR="$FRONTEND_DIR/src"
 readonly SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
-readonly DOCKER_DIR="/home/docker-primary"
-readonly DEFAULT_NVM_DIR="$HOME/.nvm"
 readonly STAGING_DIR="$PROJECT_DIR/staging"
-readonly NODE_VERSION="20.8.0"
-
-NVM_VERSION="v0.39.5"
 BACKEND_PORT=3001
 NGINX_PORT=8080
+NODE_VERSION=20.8.0
 
-
-
-setup_nvm_node() {
-  echo "Setting up NVM and Node.js..."
-
-  # Checking if user docker-primary exists
-  if id "docker-primary" &>/dev/null; then
-    # Running the NVM installation as docker-primary
-    sudo -u docker-primary bash <<EOF
-    curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh" | bash
-
-    export NVM_DIR="$DEFAULT_NVM_DIR"
-
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-    if ! nvm install "$NODE_VERSION"; then
-      echo "Failed to install Node version $NODE_VERSION. Exiting..."
-      exit 1
-    fi
-
-    nvm use "$NODE_VERSION"
-    npm install -g npm
-EOF
-  else
-    echo "User docker-primary does not exist. Exiting..."
-    exit 1
+# Directory Setup Functions
+create_directory() {
+  if [ ! -d "$1" ]; then
+    mkdir -p "$1"
+    echo "$1 created."
   fi
 }
 
+setup_project_directories() {
+
+  echo "Staging project directories..."
+
+  # Check and create directories using the function
+  create_directory "$SERVER_DIR"
+  create_directory "$FRONTEND_DIR"
+  create_directory "$BACKEND_DIR"
+  create_directory "$STAGING_DIR"
+
+  # Using a fixed path for the src directory
+  local SRC_DIR="/home/void/Desktop/fullstack-qr-generator/src"
+
+  # Check if the source directory exists before attempting to copy
+  if [[ -d "$SRC_DIR" ]]; then
+    cp -r "$SRC_DIR" "$STAGING_DIR"
+    cp "tsconfig.json" "$STAGING_DIR"
+    cp "index.html" "$STAGING_DIR"
+  else
+    echo "Error: Source directory $SRC_DIR does not exist!"
+    exit 1
+  fi
+
+  # Copy all the backend files from src to tmp
+  cp -r "server" "$BACKEND_DIR"
+}
+
 setup_docker_rootless() {
+
+  # Function to add a line to ~/.bashrc if it doesn't exist
+  add_to_bashrc() {
+    local line="$1"
+    if ! grep -q "^${line}$" ~/.bashrc; then
+      echo "$line" >>~/.bashrc
+    fi
+  }
+
   echo "Setting up Docker in rootless mode..."
 
   # Check for Docker
@@ -56,20 +68,49 @@ setup_docker_rootless() {
     exit 1
   fi
 
-  # Fixing ownership for docker-primary directories if needed
-  [[ "$(stat -c '%U' "$DOCKER_DIR")" != "docker-primary" ]] && sudo chown -R docker-primary:docker-primary "$DOCKER_DIR"
-
-  # Setup docker rootless mode if needed
-  if ! command -v dockerd-rootless-setuptool.sh &>/dev/null; then
-    dockerd-rootless-setuptool.sh install
-    {
-      echo "export PATH=$DOCKER_DIR/bin:$PATH"
-      echo "export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock"
-      echo "export XDG_RUNTIME_DIR=/run/user/$(id -u)"
-    } >>~/.bashrc
+  # Check if dockerd-rootless-setuptool.sh exists before running it
+  if ! command -v dockerd-rootless-setuptool.sh >/dev/null 2>&1; then
+    echo "dockerd-rootless-setuptool.sh not found. Exiting."
+    return 1
   else
-    echo "Docker rootless mode is already set up."
+    dockerd-rootless-setuptool.sh install
   fi
+
+  local XDG_RUNTIME_DIR
+  local DOCKER_HOST
+
+  XDG_RUNTIME_DIR=/run/user/$(id -u)
+  DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
+
+  export PATH=/usr/bin:$PATH
+  export XDG_RUNTIME_DIR
+  export DOCKER_HOST
+
+  add_to_bashrc "export PATH=/usr/bin:$PATH"
+  add_to_bashrc "export XDG_RUNTIME_DIR=/run/user/$(id -u)"
+  add_to_bashrc "DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock"
+
+  systemctl --user status docker.service
+  systemctl --user start docker.service
+  systemctl --user enable docker.service
+
+}
+
+build_and_run_docker() {
+  echo "Building and running Docker setup..."
+  cd "$PROJECT_DIR" || {
+    echo "Failed to change directory to $PROJECT_DIR"
+    exit 1
+  }
+  docker compose build || {
+    echo "Failed to build Docker image using Docker Compose"
+    exit 1
+  }
+  docker compose up -d || {
+    echo "Failed to run Docker Compose"
+    exit 1
+  }
+  docker compose ps
 }
 
 create_nginx_configuration() {
@@ -124,7 +165,7 @@ EOF
 create_server_configuration_files() {
   echo "Setting up the backend..."
 
-cat <<EOF > "$BACKEND_DIR/tsconfig.json"
+  cat <<EOF >"$BACKEND_DIR/tsconfig.json"
 {
   "compilerOptions": {
     "target": "ES2021",  // Use latest ECMAScript features
@@ -238,117 +279,30 @@ services:
 EOF
 }
 
-build_and_run_docker() {
-  echo "Building and running Docker setup..."
-
-  cd "$PROJECT_DIR" || {
-    echo "Failed to change directory to $PROJECT_DIR"
-    exit 1
-  }
-
-  # Using docker compose to build the image
-  docker compose build || {
-    echo "Failed to build Docker image using Docker Compose"
-    exit 1
-  }
-
-  # Using docker compose to run the container
-  docker compose up -d || {
-    echo "Failed to run Docker Compose"
-    exit 1
-  }
-
-  # Listing only the containers started by docker compose
-  docker compose ps
-}
-
-# Function to create directories if they don't exist
-create_directory() {
-  if [ ! -d "$1" ]; then
-    mkdir -p "$1"
-    echo "$1 created."
-  fi
-}
-
-setup_project_directories() {
-
-  echo "Staging project directories..."
-
-  ls && pwd
-
-  # Check and create directories using the function
-  create_directory "$SERVER_DIR"
-  create_directory "$FRONTEND_DIR"
-  create_directory "$BACKEND_DIR"
-  create_directory "$STAGING_DIR"
-
-  # Copy all the frontend files from src to tmp
-  cp -r "src" "$STAGING_DIR"
-  cp "tsconfig.json" "$STAGING_DIR"
-  cp "index.html" "$STAGING_DIR"
-
-  # Copy all the backend files from src to tmp
-  cp -r "server" "$BACKEND_DIR"
-
-}
-
+# Project Operations
 reload_project() {
   echo "Reloading the project..."
-
-  # Re-setup the project directories
   setup_project_directories
-
-  # Stop running containers
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
   fi
-
-  # Re-create server and nginx configurations
   create_server_configuration_files
   create_nginx_configuration
-
-  # Re-build and run the Docker setup
   build_and_run_docker
 }
 
 cleanup() {
-  local resource
   echo "Cleaning up..."
-
-  # Check if project directory exists
-  # If it does, remove it
-  if [[ -d "$PROJECT_DIR" ]]; then
-    rm -rf "$PROJECT_DIR"
-  fi
-
-  # Check if docker-compose.yml exists
-  # If it does, use docker compose to stop the containers
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
   fi
-
-  # Create an associative array of resources to clean up
-  # The key is the resource name and the value is the command to clean up the resource
-  # The command is executed using eval to allow for variable expansion
-
-  declare -A resources_to_cleanup
-  resources_to_cleanup["Docker images, containers, and volumes"]="docker system prune -a -f --volumes"
-  resources_to_cleanup["Docker networks"]="docker network prune -f"
-  resources_to_cleanup["existing project directory $PROJECT_DIR"]="rm -rf $PROJECT_DIR"
-
-  for resource in "${!resources_to_cleanup[@]}"; do
-    # Ask the user if they want to clean up the current resource
-    read -rp "Do you want to remove $resource (Y/N)? " cleanup_choice
-
-    if [[ $cleanup_choice =~ ^[Yy] ]]; then
-      # Execute the cleanup command associated with the current resource
-      eval "${resources_to_cleanup["$resource"]}"
-    fi
-  done
+  if [[ -d "$PROJECT_DIR" ]]; then
+    rm -rf "$PROJECT_DIR"
+  fi
 }
 
+# Main Execution Flow
 main() {
-  setup_nvm_node
   setup_project_directories
   setup_docker_rootless
   create_server_configuration_files
@@ -356,32 +310,34 @@ main() {
   build_and_run_docker
 }
 
-if is_first_run; then
+user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
-  main
-else
+
   PS3="Choose an option (1/2/3): "
-  options=("Run Setup" "Cleanup" "Reload/Refresh")
-  select opt in "${options[@]}"
-  do
+  local options=("Run Setup" "Cleanup" "Reload/Refresh")
+  local opt
+
+  select opt in "${options[@]}"; do
     case $opt in
-      "Run Setup")
-        main
-        break
-        ;;
-      "Cleanup")
-        cleanup
-        break
-        ;;
-      "Reload/Refresh")
-        reload_project
-        break
-        ;;
-      *)
-        echo "Invalid option"
-        ;;
+    "Run Setup")
+      main
+      break
+      ;;
+    "Cleanup")
+      cleanup
+      break
+      ;;
+    "Reload/Refresh")
+      reload_project
+      break
+      ;;
+    *)
+      echo "Invalid option"
+      ;;
     esac
   done
-fi
+}
 
-main
+USER_ARG=$1
+
+user_prompt

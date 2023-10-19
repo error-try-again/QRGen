@@ -19,11 +19,11 @@ sudo ./setup-deps.sh
 *Run the Project as the docker-primary user to build and install the core project*
 
 ```
-su docker-primary install.sh
+su docker-primary -c "./install.sh docker-primary"
 ```
 
 ## Security Notes
-setup-deps.sh sets the default password for docker-primary to 'test'. 
+setup-deps.sh sets the default password for docker-primary to 'test'.
 This should be changed in production environments.
 
 # Example
