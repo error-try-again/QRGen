@@ -76,15 +76,9 @@ setup_docker_rootless() {
     dockerd-rootless-setuptool.sh install
   fi
 
-  local XDG_RUNTIME_DIR
-  local DOCKER_HOST
-
-  XDG_RUNTIME_DIR=/run/user/$(id -u)
-  DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
-
   export PATH=/usr/bin:$PATH
-  export XDG_RUNTIME_DIR
-  export DOCKER_HOST
+  export XDG_RUNTIME_DIR=/run/user/$(id -u)
+  export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
 
   add_to_bashrc "export PATH=/usr/bin:$PATH"
   add_to_bashrc "export XDG_RUNTIME_DIR=/run/user/$(id -u)"
