@@ -35,13 +35,25 @@ setup_project_directories() {
   create_directory "$STAGING_DIR"
 
   local SRC_DIR="$HOME/QRGen-FullStack/src"
+
   if [[ -d "$SRC_DIR" ]]; then
     cp -r "$SRC_DIR" "$STAGING_DIR"
     cp "tsconfig.json" "$STAGING_DIR"
     cp "index.html" "$STAGING_DIR"
   else
-    echo "Error: Source directory $SRC_DIR does not exist!"
-    exit 1
+    echo "Error: Source directory $SRC_DIR does not exist. Attempting to create.."
+
+    # Create the source directory if possible, otherwise exit with an error.
+    if ! mkdir -p "$SRC_DIR"; then
+      echo "Error: Failed to create source directory $SRC_DIR"
+      exit 1
+    else
+      echo "Source directory $SRC_DIR created."
+      cp -r "$SRC_DIR" "$STAGING_DIR"
+      cp "tsconfig.json" "$STAGING_DIR"
+      cp "index.html" "$STAGING_DIR"
+    fi
+
   fi
 
   # Move backend files to their dedicated directory.
@@ -238,6 +250,12 @@ RUN npm init -y \
  && npm install --save-dev @babel/plugin-proposal-private-property-in-object vite @vitejs/plugin-react vite-tsconfig-paths vite-plugin-svgr @types/react @types/react-dom \
  && npx create-vite frontend --template react-ts
 
+# Move to the frontend directory before building
+WORKDIR /usr/app/frontend
+
+# Build the project
+RUN npm run build
+
 # Delete the default App.tsx/App.css file (does not use kebab case)
 RUN rm /usr/app/frontend/src/App.tsx
 RUN rm /usr/app/frontend/src/App.css
@@ -246,12 +264,6 @@ RUN rm /usr/app/frontend/src/App.css
 COPY staging/src/ /usr/app/frontend/src
 COPY staging/tsconfig.json /usr/app/frontend
 COPY staging/index.html /usr/app/frontend
-
-# Move to the frontend directory before building
-WORKDIR /usr/app/frontend
-
-# Build the project
-RUN npm run build
 
 # Install nginx
 FROM nginx:alpine
@@ -295,7 +307,7 @@ dump_logs() {
   ensure_docker_env
   echo "Dumping Docker logs..."
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
-    docker compose -f "$PROJECT_DIR/docker-compose.yml" logs > "$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
+    docker compose -f "$PROJECT_DIR/docker-compose.yml" logs >"$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
     echo "Logs dumped to $PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
     echo "Contents:"
     cat "$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
