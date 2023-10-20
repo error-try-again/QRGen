@@ -1,5 +1,9 @@
+interface ConvertValueToStringParameters {
+    value: unknown;
+}
+
 // Convert value to string to ensure type safety and prevent errors
-export function convertValueToString(value: unknown): string {
+export function convertValueToString({value}: ConvertValueToStringParameters): string {
     if (typeof value === 'string') {
         return value;
     }
