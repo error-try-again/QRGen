@@ -52,7 +52,7 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
     const {themeContainer, tabContainer, errorContainer} = styles;
     return <div style={themeContainer}>
         <div style={tabContainer}>
-           <ThemeToggle theme={theme} toggleTheme={toggleTheme}/>
+            {ThemeToggle({toggleTheme, theme})}
             {TabNav(activeTab, handleTabChange, setActiveTab)}
             {TabSections[activeTab]?.()}
             {error && <div style={errorContainer}>{error}</div>}
