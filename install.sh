@@ -37,7 +37,8 @@ setup_project_directories() {
   local SRC_DIR="$HOME/QRGen-FullStack/src"
 
   if [[ -d "$SRC_DIR" ]]; then
-    cp -r "$SRC_DIR" "$STAGING_DIR"
+    cp -r "src" "$STAGING_DIR"
+    cp -r "server" "$BACKEND_DIR"
     cp "tsconfig.json" "$STAGING_DIR"
     cp "index.html" "$STAGING_DIR"
   else
@@ -49,7 +50,8 @@ setup_project_directories() {
       exit 1
     else
       echo "Source directory $SRC_DIR created."
-      cp -r "$SRC_DIR" "$STAGING_DIR"
+      cp -r "src" "$STAGING_DIR"
+      cp -r "server" "$BACKEND_DIR"
       cp "tsconfig.json" "$STAGING_DIR"
       cp "index.html" "$STAGING_DIR"
     fi
@@ -250,12 +252,6 @@ RUN npm init -y \
  && npm install --save-dev @babel/plugin-proposal-private-property-in-object vite @vitejs/plugin-react vite-tsconfig-paths vite-plugin-svgr @types/react @types/react-dom \
  && npx create-vite frontend --template react-ts
 
-# Move to the frontend directory before building
-WORKDIR /usr/app/frontend
-
-# Build the project
-RUN npm run build
-
 # Delete the default App.tsx/App.css file (does not use kebab case)
 RUN rm /usr/app/frontend/src/App.tsx
 RUN rm /usr/app/frontend/src/App.css
@@ -264,6 +260,12 @@ RUN rm /usr/app/frontend/src/App.css
 COPY staging/src/ /usr/app/frontend/src
 COPY staging/tsconfig.json /usr/app/frontend
 COPY staging/index.html /usr/app/frontend
+
+# Move to the frontend directory before building
+WORKDIR /usr/app/frontend
+
+# Build the project
+RUN npm run build
 
 # Install nginx
 FROM nginx:alpine
