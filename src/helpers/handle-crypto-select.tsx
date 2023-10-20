@@ -1,7 +1,12 @@
 import React from "react";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
 
-export function handleCryptoSelect(setSelectedCrypto: (value: (((previousState: string) => string) | string)) => void, dispatch: React.Dispatch<QRCodeGeneratorAction>) {
+interface HandleCryptoSelectParameters {
+    setSelectedCrypto: (value: (((previousState: string) => string) | string)) => void;
+    dispatch: React.Dispatch<QRCodeGeneratorAction>;
+}
+
+export function handleCryptoSelect({setSelectedCrypto, dispatch}: HandleCryptoSelectParameters) {
     return (cryptoType: string) => {
         setSelectedCrypto(cryptoType);
         dispatch({type: 'SET_FIELD', field: 'cryptoType', value: cryptoType});

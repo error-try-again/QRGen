@@ -1,21 +1,23 @@
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
+import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
 import React from "react";
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
-import {HandleInputChange} from "../callbacks/handle-input-change.tsx";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
-import {InputField} from "../components/fields/input-field.tsx";
-import {styles} from "../assets/styles.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
+import {HandleInputChange} from "../callbacks/handle-input-change";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
+import {InputField} from "../components/fields/input-field";
+import {styles} from "../assets/styles";
+
+
+interface FieldsAsColumns {
+    state: QRCodeGeneratorState;
+    dispatch: React.Dispatch<QRCodeGeneratorAction>;
+    setError: (value: (((previousState: string) => string) | string)) => void;
+}
 
 // Function to render the fields distributed across the specified number of columns.
-// Parameters:
-//   - fields: An array of field keys to be rendered.
-//   - columns: The number of columns in which the fields should be distributed.
 export function RenderFieldsAsColumns(
-    state: QRCodeGeneratorState,
-    dispatch: React.Dispatch<QRCodeGeneratorAction>,
-    setError: (value: (((previousState: string) => string) | string)) => void,
+    {state, dispatch, setError}: FieldsAsColumns,
 ) {
-    const handleInputChange = HandleInputChange(state, dispatch);
+    const handleInputChange = HandleInputChange({state : state, dispatch : dispatch});
 
     function RenderedInputColumns(fields: (keyof QRCodeRequest)[], columns: number) {
 

@@ -39,7 +39,6 @@ export const styles: { [key: string]: CSSProperties } = {
         padding: '8px 15px',
     },
     input: {
-        border: '1px solid #ccc',
         borderRadius: '4px',
         fontSize: '16px',
         padding: '5px'

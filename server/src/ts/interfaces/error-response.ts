@@ -1,5 +1,5 @@
 import {Response} from "express";
-import {ErrorType} from "../error-enum";
+import {ErrorType} from "../enums/error-enum";
 
 export interface ErrorResponse {
     response: Response;

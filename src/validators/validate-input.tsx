@@ -1,12 +1,21 @@
-import {Tabs} from "../ts/enums/tabs-enum.tsx";
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
+import {Tabs} from "../ts/enums/tabs-enum";
+import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
 import React from "react";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
-import {resetBatchAndLoadingState} from "../helpers/reset-loading-state.tsx";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
+import {resetBatchAndLoadingState} from "../helpers/reset-loading-state";
 import {areValidCcBcc} from "../utils/are-valid-cc-bcc.tsx";
 
-export function ValidateInput(activeTab: Tabs, state: QRCodeGeneratorState, setError: (value: (((previousState: string) => string) | string)) => void, setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void, setQrBatchCount: (value: (((previousState: number) => number) | number)) => void, dispatch: React.Dispatch<QRCodeGeneratorAction>) {
+export interface Input {
+    activeTab: Tabs;
+    state: QRCodeGeneratorState;
+    setError: (value: (((previousState: string) => string) | string)) => void;
+    setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void;
+    setQrBatchCount: (value: (((previousState: number) => number) | number)) => void;
+    dispatch: React.Dispatch<QRCodeGeneratorAction>;
+}
+
+export function ValidateInput({activeTab, state, setError, setBatchData, setQrBatchCount, dispatch}: Input) {
     return () => {
         const requiredFieldsMapping = {
             [Tabs.Text]: {fields: ['text'], errorMessage: "Text is required"},
@@ -29,19 +38,19 @@ export function ValidateInput(activeTab: Tabs, state: QRCodeGeneratorState, setE
             for (const field of requiredFields.fields) {
                 if (!state[field as keyof typeof state]) {
                     setError(requiredFields.errorMessage);
-                    resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+                    resetBatchAndLoadingState({dispatch: dispatch, setBatchData: setBatchData, setQrBatchCount: setQrBatchCount});
                     return false;
                 }
             }
             if (activeTab === Tabs.Email) {
-                if (state.cc && !areValidCcBcc(state.cc)) {
+                if (state.cc && !areValidCcBcc({emails : state.cc})) {
                     setError("One or more CC emails are invalid");
-                    resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+                    resetBatchAndLoadingState({dispatch: dispatch, setBatchData: setBatchData, setQrBatchCount: setQrBatchCount});
                     return false;
                 }
-                if (state.bcc && !areValidCcBcc(state.bcc)) {
+                if (state.bcc && !areValidCcBcc({emails : state.bcc})) {
                     setError("One or more BCC emails are invalid");
-                    resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+                    resetBatchAndLoadingState({dispatch: dispatch, setBatchData: setBatchData, setQrBatchCount: setQrBatchCount});
                     return false;
                 }
             }

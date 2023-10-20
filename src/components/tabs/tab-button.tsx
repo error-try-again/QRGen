@@ -1,5 +1,5 @@
-import {Tabs} from "../../ts/enums/tabs-enum.tsx";
-import {styles} from "../../assets/styles.tsx";
+import {Tabs} from "../../ts/enums/tabs-enum";
+import {styles} from "../../assets/styles";
 import * as React from "react";
 import {memo} from "react";
 

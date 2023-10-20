@@ -1,20 +1,38 @@
 import {Request, Response} from "express";
 import {handleErrorStatus} from "../routes/helpers/handle-error-status";
-import {ErrorType} from "../ts/error-enum";
+import {ErrorType} from "../ts/enums/error-enum";
+import {validateBatchQRData, validateQRData} from "./data-validation-helper";
 
-export const validateRequestBody = (request: Request, response: Response, next: () => void): void => {
-    // Smoke test for if the request body exists
-    // If it does, check if it's an array or an object
-    if (request) {
-        if (Array.isArray(request.body.qrCodes)) {
-            console.log('PASS 3:', request.body);
-            next();
-        } else if (request.body.type) {
+export const validateRequest = (request: Request, response: Response, next: () => void): void => {
+    try {
+        const {body} = request;
+        const {type} = body;
+        if (type) {
+            validateQRData(body);
             next();
         } else {
-            handleErrorStatus({response, statusCode: 400, errorType: ErrorType.MISSING_REQUEST_TYPE});
+            handleErrorStatus({errorType: ErrorType.MISSING_REQUEST_TYPE, response, statusCode: 400});
         }
-    } else {
-        handleErrorStatus({response, statusCode: 400, errorType: ErrorType.MISSING_REQUEST_BODY});
+    } catch (error) {
+        if (error instanceof Error) {
+            handleErrorStatus({errorType: error.message as ErrorType, response});
+        }
+    }
+};
+
+export const validateBatchRequest = (request: Request, response: Response, next: () => void): void => {
+    try {
+        const {body} = request;
+        const {qrCodes} = body;
+        if (Array.isArray(qrCodes)) {
+            validateBatchQRData({qrData: qrCodes});
+            next();
+        } else {
+            handleErrorStatus({errorType: ErrorType.MISSING_REQUEST_TYPE, response, statusCode: 400});
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            handleErrorStatus({errorType: error.message as ErrorType, response});
+        }
     }
 };

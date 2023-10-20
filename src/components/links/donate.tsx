@@ -1,5 +1,5 @@
 import React from "react";
-import {styles} from "../../assets/styles.tsx";
+import {styles} from "../../assets/styles";
 
 export const Donate: React.FC = () => {
     const {donateText, generateButton, donateContainer} = styles;

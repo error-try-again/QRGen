@@ -1,8 +1,8 @@
 import React from "react";
-import {Divider} from "../extras/divider.tsx";
-import {WriteUpLink} from "./write-up-link.tsx";
-import {Donate} from "./donate.tsx";
-import {GithubLink} from "./github-link.tsx";
+import {Divider} from "../extras/divider";
+import {WriteUpLink} from "./write-up-link";
+import {Donate} from "./donate";
+import {GithubLink} from "./github-link";
 
 export const Links: React.FC = () => {
     return <div>

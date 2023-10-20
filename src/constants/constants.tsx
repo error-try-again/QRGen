@@ -1,4 +1,4 @@
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
+import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
 import {LatLng} from "leaflet";
 
 export const initialState: QRCodeGeneratorState = {isLoading: false, qrCodeURL: "", size: "150", precision: "H"};

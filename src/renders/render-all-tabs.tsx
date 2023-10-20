@@ -1,37 +1,32 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
-import React, {ChangeEvent} from "react";
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
-import {Tabs} from "../ts/enums/tabs-enum.tsx";
-import {styles} from "../assets/styles.tsx";
-import {DropdownField} from "../components/fields/dropdown-field.tsx";
-import {InputField} from "../components/fields/input-field.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
+import {ChangeEvent} from "react";
+import {Tabs} from "../ts/enums/tabs-enum";
+import {styles} from "../assets/styles";
+import {DropdownField} from "../components/fields/dropdown-field";
+import {InputField} from "../components/fields/input-field";
 import {MapContainer} from "react-leaflet";
-import {CRYPTO_TYPES} from "../constants/constants.tsx";
-import {Divider} from "../components/extras/divider.tsx";
-import {HandleInputChange} from "../callbacks/handle-input-change.tsx";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
-import {renderVCard} from "./render-v-card.tsx";
-import {renderMeCard} from "./render-me-card.tsx";
-import {RenderFieldsAsColumns} from "./render-fields-as-cols.tsx";
-import {handleCryptoSelect} from "../helpers/handle-crypto-select.tsx";
-import {RenderInputFields} from "./render-input-fields.tsx";
-import {LocationPicker} from "../services/map-location-picker.tsx";
+import {CRYPTO_TYPES} from "../constants/constants";
+import {Divider} from "../components/extras/divider";
+import {HandleInputChange} from "../callbacks/handle-input-change";
+import {renderVCard} from "./render-v-card";
+import {renderMeCard} from "./render-me-card";
+import {RenderFieldsAsColumns} from "./render-fields-as-cols";
+import {handleCryptoSelect} from "../helpers/handle-crypto-select";
+import {RenderInputFields} from "./render-input-fields";
+import {LocationPicker} from "../services/map-location-picker";
+import {AllTabs} from "../ts/interfaces/all-tabs-interface.tsx";
 
 
 export const RenderAllTabs = (
-    state: QRCodeGeneratorState,
-    dispatch: React.Dispatch<QRCodeGeneratorAction>,
-    setError: (value: (((previousState: string) => string) | string)) => void,
-    selectedCrypto: string,
-    setSelectedCrypto: React.Dispatch<React.SetStateAction<string>>,
+    {state, dispatch, setError, selectedCrypto, setSelectedCrypto}: AllTabs,
 ) => {
 
-    const handleInputChange = HandleInputChange(state, dispatch);
-    const handleCryptoChange = handleCryptoSelect(setSelectedCrypto, dispatch);
-    const renderInputFields = RenderInputFields(state, dispatch, setError);
-    const renderInputFieldsInColumns = RenderFieldsAsColumns(state, dispatch, setError);
-    const renderVCardFields = renderVCard(state, dispatch, renderInputFieldsInColumns);
-    const renderMeCardFields = renderMeCard(renderInputFieldsInColumns);
+    const handleInputChange = HandleInputChange({dispatch: dispatch, state: state});
+    const handleCryptoChange = handleCryptoSelect({dispatch: dispatch, setSelectedCrypto: setSelectedCrypto});
+    const renderInputFields = RenderInputFields({state : state, dispatch : dispatch, setError : setError});
+    const renderInputFieldsInColumns = RenderFieldsAsColumns({state : state, dispatch : dispatch, setError : setError});
+    const renderVCardFields = renderVCard({state : state, dispatch : dispatch, renderInputFieldsInColumns : renderInputFieldsInColumns});
+    const renderMeCardFields = renderMeCard({renderInputFieldsInColumns : renderInputFieldsInColumns});
 
     return ({
         [Tabs.Crypto]: () => {

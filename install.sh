@@ -289,6 +289,21 @@ services:
 EOF
 }
 
+# Dumps logs of all containers orchestrated by the Docker Compose file.
+dump_logs() {
+  ensure_docker_env
+  echo "Dumping Docker logs..."
+  if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
+    docker compose -f "$PROJECT_DIR/docker-compose.yml" logs > "$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
+    echo "Logs dumped to $PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
+    echo "Contents:"
+    cat "$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
+    echo "Done."
+  else
+    echo "Error: Docker Compose configuration not found!"
+  fi
+}
+
 # Redoes the project setup.
 # Cleans current Docker Compose setup, arranges directories, and reinitiates Docker services.
 reload_project() {
@@ -301,6 +316,7 @@ reload_project() {
   create_server_configuration_files
   create_nginx_configuration
   build_and_run_docker
+  dump_logs
 }
 
 # Cleans up the project setup.
@@ -327,12 +343,12 @@ main() {
 }
 
 # Provides an interactive prompt to the user to select an action.
-# Users can choose between setting up the project, cleaning up, or reloading the project.
+# Users can choose between setting up the project, cleaning up, reloading the project, or dumping Docker logs.
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
 
-  PS3="Choose an option (1/2/3): "
-  local options=("Run Setup" "Cleanup" "Reload/Refresh")
+  PS3="Choose an option (1/2/3/4): "
+  local options=("Run Setup" "Cleanup" "Reload/Refresh" "Dump Docker Logs")
   local opt
 
   select opt in "${options[@]}"; do
@@ -347,6 +363,10 @@ user_prompt() {
       ;;
     "Reload/Refresh")
       reload_project
+      break
+      ;;
+    "Dump Docker Logs")
+      dump_logs
       break
       ;;
     *)

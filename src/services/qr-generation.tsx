@@ -1,14 +1,25 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
-import {Tabs} from "../ts/enums/tabs-enum.tsx";
-import {resetBatchAndLoadingState} from "../helpers/reset-loading-state.tsx";
-import {HandleSingleResponse} from "../responses/handle-single-response.tsx";
-import {ValidateInput} from "../validators/validate-input.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
+import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
+import {Tabs} from "../ts/enums/tabs-enum";
+import {resetBatchAndLoadingState} from "../helpers/reset-loading-state";
+import {HandleSingleResponse} from "../responses/handle-single-response";
+import {ValidateInput} from "../validators/validate-input";
 import React from "react";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
-import {HandleFetchError} from "../helpers/handle-fetch-error.tsx";
-import {HandleErrorResponse} from "../responses/handle-error-response.tsx";
-import {HandleBatchResponse} from "../responses/handle-batch-response.tsx";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
+import {HandleFetchError} from "../helpers/handle-fetch-error";
+import {HandleErrorResponse} from "../responses/handle-error-response";
+import {HandleBatchResponse} from "../responses/handle-batch-response";
+
+interface QRGenerationProperties {
+    dispatch: React.Dispatch<QRCodeGeneratorAction>,
+    qrBatchCount: number,
+    batchData: QRCodeRequest[],
+    state: QRCodeGeneratorState,
+    activeTab: Tabs,
+    setError: (value: (((previousState: string) => string) | string)) => void,
+    setBatchData: React.Dispatch<React.SetStateAction<QRCodeRequest[]>>,
+    setQrBatchCount: React.Dispatch<React.SetStateAction<number>>
+}
 
 export function QRGeneration({
                                  dispatch,
@@ -19,26 +30,17 @@ export function QRGeneration({
                                  setError,
                                  setBatchData,
                                  setQrBatchCount
-                             }: {
-    dispatch: React.Dispatch<QRCodeGeneratorAction>,
-    qrBatchCount: number,
-    batchData: QRCodeRequest[],
-    state: QRCodeGeneratorState,
-    activeTab: Tabs,
-    setError: (value: (((previousState: string) => string) | string)) => void,
-    setBatchData: React.Dispatch<React.SetStateAction<QRCodeRequest[]>>,
-    setQrBatchCount: React.Dispatch<React.SetStateAction<number>>
-}) {
+                             }: QRGenerationProperties) {
 
-    const validateInput = ValidateInput(activeTab, state, setError, setBatchData, setQrBatchCount, dispatch);
-    const handleSingleResponse = HandleSingleResponse(dispatch, setError, setBatchData, setQrBatchCount);
-    const handleFetchError = HandleFetchError(setError, dispatch, setBatchData, setQrBatchCount);
+    const validateInput = ValidateInput({activeTab : activeTab, state : state, setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
+    const handleSingleResponse = HandleSingleResponse({dispatch : dispatch, setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount});
+    const handleFetchError = HandleFetchError({setError : setError, dispatch : dispatch, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount});
     const handleErrorResponse = HandleErrorResponse(setError, setBatchData, setQrBatchCount, dispatch);
-    const handleBatchResponse = HandleBatchResponse(setError, setBatchData, setQrBatchCount, dispatch);
+    const handleBatchResponse = HandleBatchResponse({setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
 
     return async () => {
         if (!validateInput()) {
-            resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+            resetBatchAndLoadingState({setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
             return;
         }
 
@@ -67,13 +69,13 @@ export function QRGeneration({
 
             if (!response.ok) {
                 await handleErrorResponse(response);
-                resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+                resetBatchAndLoadingState({setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
                 return;
             }
 
             if (response.status === 429) {
                 setError('You have exceeded the rate limit. Please try again later.');
-                resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+                resetBatchAndLoadingState({setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
                 return;
             }
 
@@ -81,11 +83,11 @@ export function QRGeneration({
 
         } catch (error: unknown) {
             if (error instanceof Error) {
-                handleFetchError(error);
-                resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+                handleFetchError();
+                resetBatchAndLoadingState({setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
             } else {
                 setError("Unknown error.");
-                resetBatchAndLoadingState(setBatchData, setQrBatchCount, dispatch);
+                resetBatchAndLoadingState({setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
             }
         }
     };

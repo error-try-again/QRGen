@@ -1,8 +1,8 @@
-import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces.tsx";
-import {styles} from "../../assets/styles.tsx";
+import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces";
+import {styles} from "../../assets/styles";
 import * as React from "react";
 import {ChangeEvent} from "react";
-import {convertValueToString} from "../../utils/convert-to-string.tsx";
+import {convertValueToString} from "../../utils/convert-to-string";
 
 export const InputFieldComponent: React.FC<{
     keyName: keyof QRCodeRequest,
@@ -13,7 +13,7 @@ export const InputFieldComponent: React.FC<{
 }> = (({keyName, value, type = 'text', handleChange, setError}) => {
 
     const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replaceAll(/([A-Z])/g, ' $1'); // Converts "cryptoType" to "Crypto Type"
-    const convertedValue = convertValueToString(value);
+    const convertedValue = convertValueToString({value : value});
     const {input, label, fieldContainer} = styles;
 
     return (

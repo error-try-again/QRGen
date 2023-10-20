@@ -1,4 +1,4 @@
-import {styles} from "../../assets/styles.tsx";
+import {styles} from "../../assets/styles";
 
 interface ThemeToggleProperties {
     toggleTheme: () => void;
@@ -9,7 +9,7 @@ export const ThemeToggle = ({toggleTheme, theme}: ThemeToggleProperties) => {
     return <button
         style={{...tabButton}}
         onClick={toggleTheme}>
-        {theme === 'light' ? <span role="img" aria-label="dark mode">Dark Mode 🌙</span> :
-            <span role="img" aria-label="light mode">Light Mode ☀️</span>}
+        {theme === 'light' ? <span role="img" aria-label="dark mode">Dark 🌙</span> :
+            <span role="img" aria-label="light mode">Light ☀️</span>}
     </button>;
 };

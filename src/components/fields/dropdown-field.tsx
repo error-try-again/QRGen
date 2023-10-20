@@ -1,5 +1,5 @@
-import { QRCodeRequest } from "../../ts/interfaces/qr-code-request-interfaces.tsx";
-import { styles } from "../../assets/styles.tsx";
+import { QRCodeRequest } from "../../ts/interfaces/qr-code-request-interfaces";
+import { styles } from "../../assets/styles";
 import * as React from "react";
 import { ChangeEvent, memo } from "react";
 

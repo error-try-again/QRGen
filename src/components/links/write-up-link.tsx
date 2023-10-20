@@ -1,5 +1,5 @@
 import React from "react";
-import {styles} from "../../assets/styles.tsx";
+import {styles} from "../../assets/styles";
 
 export const WriteUpLink: React.FC = () => {
     const {link} = styles;

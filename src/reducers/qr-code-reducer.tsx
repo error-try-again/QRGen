@@ -1,6 +1,6 @@
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
-import {initialState} from "../constants/constants.tsx";
+import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
+import {initialState} from "../constants/constants";
 
 export const qrCodeReducer = (state: QRCodeGeneratorState, action: QRCodeGeneratorAction): QRCodeGeneratorState => {
     switch (action.type) {

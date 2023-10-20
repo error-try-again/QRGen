@@ -9,7 +9,7 @@ import {useTheme} from "./hooks/use-theme";
 
 // Contexts
 import {ThemeProvider} from "./contexts/theme-context";
-import {QRCodeGeneratorProperties} from "./ts/interfaces/util-interfaces.tsx";
+import {QRCodeGeneratorProperties} from "./ts/interfaces/util-interfaces";
 
 // Helpers & Callbacks
 import {HandleTabChange} from "./helpers/handle-tab-change";
@@ -18,14 +18,14 @@ import {HandleTabChange} from "./helpers/handle-tab-change";
 import {RenderAllTabs} from "./renders/render-all-tabs";
 
 // Components
-import {GenerateButtonsSection} from "./components/buttons/generate-buttons-section.tsx";
-import {ThemeToggle} from "./components/theme/theme-toggle.tsx";
-import {TabNav} from "./components/tabs/tab-nav.tsx";
-import {QRSection} from "./components/qr/qr-section.tsx";
+import {GenerateButtonsSection} from "./components/buttons/generate-buttons-section";
+import {ThemeToggle} from "./components/theme/theme-toggle";
+import {TabNav} from "./components/tabs/tab-nav";
+import {QRSection} from "./components/qr/qr-section";
 import {ErrorBoundary} from "./wrappers/error-boundary";
-import {Links} from "./components/links/links.tsx";
-import {CoreProvider} from "./contexts/core-context.tsx";
-import {useCore} from "./hooks/use-core.tsx";
+import {Links} from "./components/links/links";
+import {CoreProvider} from "./contexts/core-context";
+import {useCore} from "./hooks/use-core";
 
 const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
 
@@ -46,8 +46,8 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
 
     const {theme, toggleTheme} = useTheme();
 
-    const handleTabChange = HandleTabChange(setError, setBatchData, setQrBatchCount, dispatch, setActiveTab);
-    const TabSections = RenderAllTabs(state, dispatch, setError, selectedCrypto, setSelectedCrypto);
+    const handleTabChange = HandleTabChange({setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch, setTab : setActiveTab});
+    const TabSections = RenderAllTabs({state : state, dispatch : dispatch, setError : setError, selectedCrypto : selectedCrypto, setSelectedCrypto : setSelectedCrypto});
 
     const {themeContainer, tabContainer, errorContainer} = styles;
     return <div style={themeContainer}>

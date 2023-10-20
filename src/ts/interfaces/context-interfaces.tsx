@@ -1,8 +1,8 @@
-import {initialState} from "../../constants/constants.tsx";
+import {initialState} from "../../constants/constants";
 import React, {ReactNode} from "react";
-import {QRCodeGeneratorAction} from "../types/reducer-types.tsx";
-import {Tabs} from "../enums/tabs-enum.tsx";
-import {QRCodeRequest} from "./qr-code-request-interfaces.tsx";
+import {QRCodeGeneratorAction} from "../types/reducer-types";
+import {Tabs} from "../enums/tabs-enum";
+import {QRCodeRequest} from "./qr-code-request-interfaces";
 
 export interface CoreContextType {
     state: typeof initialState;

@@ -1,10 +1,10 @@
 // Define the context type
-import {initialState} from "../constants/constants.tsx";
-import {Tabs} from "../ts/enums/tabs-enum.tsx";
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
+import {initialState} from "../constants/constants";
+import {Tabs} from "../ts/enums/tabs-enum";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
 import React, {createContext, useReducer, useState} from "react";
-import {qrCodeReducer} from "../reducers/qr-code-reducer.tsx";
-import {CoreContextType, CoreProviderProperties} from "../ts/interfaces/context-interfaces.tsx";
+import {qrCodeReducer} from "../reducers/qr-code-reducer";
+import {CoreContextType, CoreProviderProperties} from "../ts/interfaces/context-interfaces";
 
 export const CoreProvider: React.FC<CoreProviderProperties> = ({children}) => {
     const [state, dispatch] = useReducer(qrCodeReducer, initialState);

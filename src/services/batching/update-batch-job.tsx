@@ -1,8 +1,8 @@
 
-import {Tabs} from "../../ts/enums/tabs-enum.tsx";
+import {Tabs} from "../../ts/enums/tabs-enum";
 import React from "react";
-import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces.tsx";
-import {QRCodeGeneratorState} from "../../ts/interfaces/qr-code-generator-state.tsx";
+import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces";
+import {QRCodeGeneratorState} from "../../ts/interfaces/qr-code-generator-state";
 
 interface UpdateBatchJobProperties {
     state: QRCodeGeneratorState;

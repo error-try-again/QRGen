@@ -1,21 +1,22 @@
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state.tsx";
+import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
 import React from "react";
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces.tsx";
-import {styles} from "../assets/styles.tsx";
-import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants.tsx";
-import {VCardFields} from "../constants/fields.tsx";
-import {HandleInputChange} from "../callbacks/handle-input-change.tsx";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types.tsx";
+import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
+import {styles} from "../assets/styles";
+import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants";
+import {VCardFields} from "../constants/fields";
+import {HandleInputChange} from "../callbacks/handle-input-change";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
+
+interface VCard {
+    state: QRCodeGeneratorState;
+    dispatch: React.Dispatch<QRCodeGeneratorAction>;
+    renderInputFieldsInColumns: (fields: (keyof QRCodeRequest)[], columns: number) => React.JSX.Element;
+}
 
 export function renderVCard(
-    state: QRCodeGeneratorState,
-    dispatch: React.Dispatch<QRCodeGeneratorAction>,
-    renderInputFieldsInColumns: (fields: (keyof QRCodeRequest)[],
-                                 columns: number) => React.JSX.Element) {
+    {state, dispatch, renderInputFieldsInColumns}: VCard) {
 
-    const handleInputChange = HandleInputChange(state, dispatch);
-
-
+    const handleInputChange = HandleInputChange({state : state, dispatch : dispatch});
 
     function RenderedVCard() {
         const {label, fieldContainer} = styles;

@@ -1,5 +1,5 @@
-import {Tabs} from "../enums/tabs-enum.tsx";
-import {QRCodeErrorCorrectionLevel} from "../types/error-correction-types.tsx";
+import {Tabs} from "../enums/tabs-enum";
+import {QRCodeErrorCorrectionLevel} from "../types/error-correction-types";
 
 
 export interface UrlRequest {

@@ -1,6 +1,5 @@
 import './app.css';
-import {QRCodeGenerator} from './qr-code-generator.tsx';
-
+import {QRCodeGenerator} from './qr-code-generator';
 
 function App() {
     return (
