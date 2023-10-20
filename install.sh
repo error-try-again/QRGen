@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 # Define project-related constants and directory paths.
-readonly PROJECT_DIR="$HOME/qr-code-generator"
+readonly PROJECT_DIR="$HOME/QRGen-FullStack"
 readonly BACKEND_DIR="$PROJECT_DIR/backend"
 readonly FRONTEND_DIR="$PROJECT_DIR/frontend"
 readonly SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
@@ -50,6 +50,7 @@ setup_project_directories() {
 
 # Validates and sets Docker-related environment variables.
 ensure_docker_env() {
+
   # Update or set XDG_RUNTIME_DIR.
   if [ -z "${XDG_RUNTIME_DIR:-}" ] || [ "${XDG_RUNTIME_DIR:-}" != "/run/user/$(id -u)" ]; then
     export XDG_RUNTIME_DIR="/run/user/$(id -u)"

@@ -22,7 +22,7 @@ export const ThemeProvider: React.FC<ThemeProviderProperties> = ({children}) => 
         document.body.style.display = 'block'
     }, [theme]);
 
-    const toggleTheme = () => {
+    const toggleTheme: () => void = () => {
         if (theme === 'light') {
             setTheme('dark');
         } else {
