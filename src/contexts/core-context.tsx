@@ -13,6 +13,7 @@ export const CoreProvider: React.FC<CoreProviderProperties> = ({children}) => {
     const [error, setError] = useState<string>("");
     const [qrBatchCount, setQrBatchCount] = useState<number>(0); // Add state to keep track of batch count
     const [batchData, setBatchData] = useState<QRCodeRequest[]>([]);
+    const [selectedVersion, setSelectedVersion] = useState<string>('4.0');
 
     // Provide all state and setters to context consumers
     const value: CoreContextType = {
@@ -27,7 +28,9 @@ export const CoreProvider: React.FC<CoreProviderProperties> = ({children}) => {
         qrBatchCount,
         setQrBatchCount,
         batchData,
-        setBatchData
+        setBatchData,
+        selectedVersion,
+        setSelectedVersion
     };
 
     return (

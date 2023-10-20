@@ -1,13 +1,15 @@
-import React from "react";
 import {styles} from "../assets/styles";
-import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants";
+import {DESKTOP_MEDIA_QUERY_THRESHOLD, V_CARD_VERSION_LIST} from "../constants/constants";
 import {VCardFields} from "../constants/fields";
-import {HandleInputChange} from "../callbacks/handle-input-change";
 import {VCardParameters} from "../ts/interfaces/component-interfaces.tsx";
+import {handleVersionSelect} from "../helpers/handle-version-select.tsx";
 
-export function renderVCard({state, dispatch, renderInputFieldsInColumns}: VCardParameters) {
+export function RenderVCard({ dispatch, renderInputFieldsInColumns, selectedVersion, setSelectedVersion}: VCardParameters) {
 
-    const handleInputChange = HandleInputChange({state : state, dispatch : dispatch});
+    const handleVersionChange = handleVersionSelect({
+        dispatch: dispatch,
+        setSelectedVersion: setSelectedVersion
+    });
 
     function RenderedVCard() {
         const {label, fieldContainer} = styles;
@@ -16,17 +18,19 @@ export function renderVCard({state, dispatch, renderInputFieldsInColumns}: VCard
                 <div style={fieldContainer}>
                     <p style={label}>vCard Version</p>
                     {
-                        // Render radio buttons for each vCard version.
-                        ['2.1', '3.0', '4.0'].map(version => (
+                        V_CARD_VERSION_LIST.map(version => (
                             <div key={version}>
-                                <input type="radio"
-                                       id={`version_${version}`}
-                                       name="version"
-                                       value={version}
-                                       checked={state.version === version}
-                                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleInputChange(event, 'version')}
+                                <input
+                                    type="radio"
+                                    id={`version_${version}`}
+                                    name="version"
+                                    value={version}
+                                    checked={selectedVersion === version}
+                                    onChange={() => {
+                                        handleVersionChange({version});
+                                    }}
                                 />
-                                <label htmlFor={`version_${version}`}> {version}</label>
+                                <label htmlFor={`version_${version}`}>{version}</label>
                             </div>
                         ))
                     }

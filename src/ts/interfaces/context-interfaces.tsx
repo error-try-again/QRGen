@@ -5,18 +5,20 @@ import {Tabs} from "../enums/tabs-enum";
 import {QRCodeRequest} from "./qr-code-request-interfaces";
 
 export interface CoreContextType {
-    state: typeof initialState;
-    dispatch: React.Dispatch<QRCodeGeneratorAction>;
     activeTab: Tabs;
-    setActiveTab: React.Dispatch<React.SetStateAction<Tabs>>;
-    selectedCrypto: string;
-    setSelectedCrypto: React.Dispatch<React.SetStateAction<string>>;
-    error: string;
-    setError: React.Dispatch<React.SetStateAction<string>>;
-    qrBatchCount: number;
-    setQrBatchCount: React.Dispatch<React.SetStateAction<number>>;
     batchData: QRCodeRequest[];
+    dispatch: React.Dispatch<QRCodeGeneratorAction>;
+    error: string;
+    qrBatchCount: number;
+    selectedCrypto: string;
+    selectedVersion: string;
+    setActiveTab: React.Dispatch<React.SetStateAction<Tabs>>;
     setBatchData: React.Dispatch<React.SetStateAction<QRCodeRequest[]>>;
+    setError: React.Dispatch<React.SetStateAction<string>>;
+    setQrBatchCount: React.Dispatch<React.SetStateAction<number>>;
+    setSelectedCrypto: React.Dispatch<React.SetStateAction<string>>;
+    setSelectedVersion: React.Dispatch<React.SetStateAction<string>>;
+    state: typeof initialState;
 }
 
 export interface CoreProviderProperties {

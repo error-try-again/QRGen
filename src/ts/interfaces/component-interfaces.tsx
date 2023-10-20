@@ -7,8 +7,10 @@ import {QRCodeGeneratorAction} from "../types/reducer-types.tsx";
 export interface AllTabsParameters {
     dispatch: React.Dispatch<QRCodeGeneratorAction>;
     selectedCrypto: string;
+    selectedVersion: string;
     setError: (value: (((previousState: string) => string) | string)) => void;
     setSelectedCrypto: React.Dispatch<React.SetStateAction<string>>;
+    setSelectedVersion: React.Dispatch<React.SetStateAction<string>>;
     state: QRCodeGeneratorState;
     tab: Tabs;
 }
@@ -69,11 +71,22 @@ export interface HandleInputChangeParameters {
 export interface VCardParameters {
     dispatch: React.Dispatch<QRCodeGeneratorAction>;
     renderInputFieldsInColumns: (fields: (keyof QRCodeRequest)[], columns: number) => React.JSX.Element;
-    state: QRCodeGeneratorState;
+    selectedVersion: string;
+    setSelectedVersion: (value: (((previousState: string) => string) | string)) => void;
 }
 
 export interface MeCardParameters {
     renderInputFieldsInColumns: (fields: (keyof QRCodeRequest)[], columns: number) => React.JSX.Element;
+}
+
+export interface HandleCryptoSelectParameters {
+    setSelectedCrypto: (value: (((previousState: string) => string) | string)) => void;
+    dispatch: React.Dispatch<QRCodeGeneratorAction>;
+}
+
+export interface HandleVersionSelectParameters {
+    setSelectedVersion: (value: (((previousState: string) => string) | string)) => void;
+    dispatch: React.Dispatch<QRCodeGeneratorAction>;
 }
 
 export interface GenerateButtonsSectionParameters {

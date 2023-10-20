@@ -55,6 +55,7 @@ export const GenerateButtonsSection: React.FC<GenerateButtonsSectionParameters> 
                 size: state.size,
                 type: Tabs[activeTab]
             };
+        console.log('requestData', requestData);
 
         try {
             const response = await fetch(endpoint, {

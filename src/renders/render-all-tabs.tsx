@@ -8,7 +8,7 @@ import {MapContainer} from "react-leaflet";
 import {CRYPTO_TYPES} from "../constants/constants";
 import {Divider} from "../components/extras/divider";
 import {HandleInputChange} from "../callbacks/handle-input-change";
-import {renderVCard} from "./render-v-card";
+import {RenderVCard} from "./render-v-card";
 import {renderMeCard} from "./render-me-card";
 import {RenderFieldsAsColumns} from "./render-fields-as-cols";
 import {handleCryptoSelect} from "../helpers/handle-crypto-select";
@@ -17,7 +17,16 @@ import {LocationPicker} from "../services/map-location-picker";
 import {AllTabsParameters} from "../ts/interfaces/component-interfaces.tsx";
 import {requiredFieldsMapping} from "../validators/validation-mapping.tsx";
 
-export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, setSelectedCrypto}: AllTabsParameters) => {
+export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, setSelectedCrypto, selectedVersion, setSelectedVersion}: AllTabsParameters) => {
+
+    const {
+        input,
+        sectionTitle,
+        label,
+        section,
+        fieldContainer
+    } = styles;
+
     const isFieldRequired = (tab: Tabs, fieldName: string): boolean => {
         const requiredFields = requiredFieldsMapping[tab]?.fields || [];
         return requiredFields.includes(fieldName);
@@ -34,23 +43,29 @@ export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, s
     });
 
     const renderInputFields = RenderInputFields({
-        tab,
-        state: state,
         dispatch: dispatch,
-        setError: setError
+        setError: setError,
+        state: state,
+        tab
     });
 
     const renderInputFieldsInColumns = RenderFieldsAsColumns({
-        tab,
-        state: state,
         dispatch: dispatch,
-        setError: setError
+        setError: setError,
+        state: state,
+        tab
     });
 
-    const renderVCardFields = renderVCard({state: state, dispatch: dispatch, renderInputFieldsInColumns: renderInputFieldsInColumns});
-    const renderMeCardFields = renderMeCard({renderInputFieldsInColumns: renderInputFieldsInColumns});
+    const renderVCardFields = RenderVCard({
+        dispatch: dispatch,
+        renderInputFieldsInColumns: renderInputFieldsInColumns,
+        selectedVersion: selectedVersion,
+        setSelectedVersion: setSelectedVersion,
+    });
 
-    const {input, sectionTitle, label, section, fieldContainer} = styles;
+    const renderMeCardFields = renderMeCard({
+        renderInputFieldsInColumns: renderInputFieldsInColumns
+    });
 
     return ({
         [Tabs.Crypto]: () => {
@@ -66,7 +81,9 @@ export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, s
                                 name="cryptoType"
                                 value={cryptoType}
                                 checked={selectedCrypto === cryptoType}
-                                onChange={() => handleCryptoChange(cryptoType)}
+                                onChange={() => {
+                                    handleCryptoChange({cryptoType});
+                                }}
                                 defaultChecked={cryptoType === 'bitcoin'}
                             />
                             <label htmlFor={cryptoType}> {cryptoType}</label><br/>
@@ -104,9 +121,11 @@ export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, s
                             id="body"
                             style={{...input, height: '100px'}}
                             value={state.body || ''}
-                            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => handleInputChange(event, 'body')}
+                            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+                                handleInputChange(event, 'body');
+                            }}
                             placeholder="Enter your email body here"
-                        ></textarea>
+                        />
                     </div>
                 </section>
             );
@@ -172,6 +191,15 @@ export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, s
                 </section>
             );
         },
+        [Tabs.VCard]: () => {
+            return (
+                <section style={section}>
+                    <h2 style={sectionTitle}>VCard</h2>
+                    <Divider/>
+                    {renderVCardFields()}
+                </section>
+            );
+        },
         [Tabs.Phone]: () => {
             return (
                 <section style={section}>
@@ -202,7 +230,7 @@ export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, s
                             value={state.sms || ''}
                             onChange={(event: ChangeEvent<HTMLTextAreaElement>) => handleInputChange(event, 'sms')}
                             placeholder="Enter your SMS message here"
-                        ></textarea>
+                        />
                     </div>
                 </section>);
         },
@@ -222,14 +250,6 @@ export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, s
                     <h2 style={sectionTitle}>URL</h2>
                     <Divider/>
                     {renderInputFields(['url'])}
-                </section>
-            );
-        }, [Tabs.VCard]: () => {
-            return (
-                <section style={section}>
-                    <h2 style={sectionTitle}>VCard</h2>
-                    <Divider/>
-                    {renderVCardFields()}
                 </section>
             );
         },

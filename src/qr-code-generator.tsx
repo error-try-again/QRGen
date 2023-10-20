@@ -29,19 +29,37 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
         selectedCrypto,
         setSelectedCrypto,
         activeTab,
-        setActiveTab
+        setActiveTab,
+        selectedVersion,
+        setSelectedVersion
     } = useCore();
 
     const {theme, toggleTheme} = useTheme();
 
     const handleTabChange = HandleTabChange({
-        dispatch: dispatch, setBatchData: setBatchData, setError: setError, setQrBatchCount: setQrBatchCount, setTab: setActiveTab
-    });
-    const TabSections = RenderAllTabs({
-        dispatch: dispatch, selectedCrypto: selectedCrypto, setError: setError, setSelectedCrypto: setSelectedCrypto, state: state, tab: activeTab
+        dispatch: dispatch,
+        setBatchData: setBatchData,
+        setError: setError,
+        setQrBatchCount: setQrBatchCount,
+        setTab: setActiveTab
     });
 
-    const {themeContainer, tabContainer, errorContainer} = styles;
+    const TabSections = RenderAllTabs({
+        dispatch: dispatch,
+        selectedCrypto: selectedCrypto,
+        setError: setError,
+        setSelectedCrypto: setSelectedCrypto,
+        state: state,
+        tab: activeTab,
+        selectedVersion: selectedVersion,
+        setSelectedVersion: setSelectedVersion
+    });
+
+    const {
+        themeContainer,
+        tabContainer,
+        errorContainer
+    } = styles;
 
     return <div style={themeContainer}>
         <div style={tabContainer}>
