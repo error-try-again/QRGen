@@ -14,45 +14,72 @@ import {RenderFieldsAsColumns} from "./render-fields-as-cols";
 import {handleCryptoSelect} from "../helpers/handle-crypto-select";
 import {RenderInputFields} from "./render-input-fields";
 import {LocationPicker} from "../services/map-location-picker";
-import {AllTabs} from "../ts/interfaces/component-interfaces.tsx";
+import {AllTabsParameters} from "../ts/interfaces/component-interfaces.tsx";
+import {requiredFieldsMapping} from "../validators/validation-mapping.tsx";
 
+export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, setSelectedCrypto}: AllTabsParameters) => {
+    const isFieldRequired = (tab: Tabs, fieldName: string): boolean => {
+        const requiredFields = requiredFieldsMapping[tab]?.fields || [];
+        return requiredFields.includes(fieldName);
+    };
 
-export const RenderAllTabs = (
-    {state, dispatch, setError, selectedCrypto, setSelectedCrypto}: AllTabs,
-) => {
+    const handleInputChange = HandleInputChange({
+        dispatch: dispatch,
+        state: state
+    });
 
-    const handleInputChange = HandleInputChange({dispatch: dispatch, state: state});
-    const handleCryptoChange = handleCryptoSelect({dispatch: dispatch, setSelectedCrypto: setSelectedCrypto});
-    const renderInputFields = RenderInputFields({state : state, dispatch : dispatch, setError : setError});
-    const renderInputFieldsInColumns = RenderFieldsAsColumns({state : state, dispatch : dispatch, setError : setError});
-    const renderVCardFields = renderVCard({state : state, dispatch : dispatch, renderInputFieldsInColumns : renderInputFieldsInColumns});
-    const renderMeCardFields = renderMeCard({renderInputFieldsInColumns : renderInputFieldsInColumns});
+    const handleCryptoChange = handleCryptoSelect({
+        dispatch: dispatch,
+        setSelectedCrypto: setSelectedCrypto
+    });
+
+    const renderInputFields = RenderInputFields({
+        tab,
+        state: state,
+        dispatch: dispatch,
+        setError: setError
+    });
+
+    const renderInputFieldsInColumns = RenderFieldsAsColumns({
+        tab,
+        state: state,
+        dispatch: dispatch,
+        setError: setError
+    });
+
+    const renderVCardFields = renderVCard({state: state, dispatch: dispatch, renderInputFieldsInColumns: renderInputFieldsInColumns});
+    const renderMeCardFields = renderMeCard({renderInputFieldsInColumns: renderInputFieldsInColumns});
+
+    const {input, sectionTitle, label, section, fieldContainer} = styles;
 
     return ({
         [Tabs.Crypto]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>Crypto</h2>
                     <Divider/>
                     {CRYPTO_TYPES.map(cryptoType => (
                         <div key={cryptoType}>
-                            <input type="radio"
-                                   id={cryptoType}
-                                   name="cryptoType"
-                                   value={cryptoType}
-                                   checked={selectedCrypto === cryptoType}
-                                   onChange={() => handleCryptoChange(cryptoType)}
+                            <input
+                                type="radio"
+                                id={cryptoType}
+                                name="cryptoType"
+                                value={cryptoType}
+                                checked={selectedCrypto === cryptoType}
+                                onChange={() => handleCryptoChange(cryptoType)}
+                                defaultChecked={cryptoType === 'bitcoin'}
                             />
                             <label htmlFor={cryptoType}> {cryptoType}</label><br/>
                         </div>
                     ))}
                     {selectedCrypto && (
                         <>
-                            <InputField keyName="address"
-                                        value={state.address}
-                                        handleChange={handleInputChange}
-                                        setError={setError}
+                            <InputField
+                                isRequired={isFieldRequired(Tabs.Crypto, 'address')}
+                                keyName="address"
+                                value={state.address}
+                                handleChange={handleInputChange}
+                                setError={setError}
                             />
                             <InputField
                                 keyName="amount"
@@ -66,7 +93,6 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.Email]: () => {
-            const {input, sectionTitle, label, section, fieldContainer} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>Email</h2>
@@ -86,17 +112,17 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.Event]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>Event</h2>
                     <Divider/>
                     {renderInputFields(['event', 'venue'])}
-                    <InputField keyName="startTime"
-                                value={state.startTime}
-                                handleChange={handleInputChange}
-                                type="datetime-local"
-                                setError={setError}
+                    <InputField
+                        keyName="startTime"
+                        value={state.startTime}
+                        handleChange={handleInputChange}
+                        type="datetime-local"
+                        setError={setError}
                     />
                     <InputField
                         keyName="endTime"
@@ -109,13 +135,13 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.GeoLocation]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>GeoLocation</h2>
                     <Divider/>
                     {['latitude', 'longitude'].map(key => (
                         <InputField
+                            isRequired={isFieldRequired(Tabs.GeoLocation, key)}
                             key={key}
                             keyName={key as keyof QRCodeRequest}
                             value={state[key as keyof QRCodeRequest] as string}
@@ -123,7 +149,10 @@ export const RenderAllTabs = (
                             setError={setError}
                         />
                     ))}
-                    <MapContainer center={[51.505, -0.09]} zoom={13} style={{width: '100%', height: '300px'}}>
+                    <MapContainer
+                        center={[51.505, -0.09]}
+                        zoom={13}
+                        style={{width: '100%', height: '300px'}}>
                         <section style={section}>
                             <LocationPicker
                                 state={state}
@@ -135,7 +164,6 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.MeCard]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>MeCard</h2>
@@ -145,7 +173,6 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.Phone]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>Phone</h2>
@@ -155,19 +182,20 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.SMS]: () => {
-            const {input, sectionTitle, label, section, fieldContainer} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>SMS</h2>
                     <Divider/>
                     <InputField
+                        isRequired={isFieldRequired(Tabs.SMS, 'phone')}
                         keyName="phone"
                         value={state.phone}
                         handleChange={handleInputChange}
                         setError={setError}
                     />
                     <div style={fieldContainer}>
-                        <label style={label} htmlFor="smsMessage">Enter SMS Message</label>
+                        <label style={label}
+                               htmlFor="smsMessage">Enter SMS Message</label>
                         <textarea
                             id="smsMessage"
                             style={{...input, height: '100px'}}
@@ -179,7 +207,6 @@ export const RenderAllTabs = (
                 </section>);
         },
         [Tabs.Text]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>Text</h2>
@@ -198,7 +225,6 @@ export const RenderAllTabs = (
                 </section>
             );
         }, [Tabs.VCard]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>VCard</h2>
@@ -208,7 +234,6 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.WiFi]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>WiFi Configuration</h2>
@@ -230,7 +255,6 @@ export const RenderAllTabs = (
             );
         },
         [Tabs.Zoom]: () => {
-            const {sectionTitle, section} = styles;
             return (
                 <section style={section}>
                     <h2 style={sectionTitle}>Zoom</h2>

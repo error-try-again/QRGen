@@ -6,9 +6,9 @@ import {resetBatchAndLoadingState} from "../../helpers/reset-loading-state";
 import {HandleBatchResponse} from "../../responses/handle-batch-response";
 import {HandleSingleResponse} from "../../responses/handle-single-response";
 import {UpdateBatchJob} from "../../services/batching/update-batch-job.tsx";
-import {GenerateButtonsSectionProperties} from "../../ts/interfaces/component-interfaces.tsx";
+import {GenerateButtonsSectionParameters} from "../../ts/interfaces/component-interfaces.tsx";
 
-export const GenerateButtonsSection: React.FC<GenerateButtonsSectionProperties> = ({
+export const GenerateButtonsSection: React.FC<GenerateButtonsSectionParameters> = ({
                                                                                        state,
                                                                                        dispatch,
                                                                                        activeTab,

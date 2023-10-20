@@ -3,10 +3,9 @@ import {styles} from "../assets/styles";
 import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants";
 import {VCardFields} from "../constants/fields";
 import {HandleInputChange} from "../callbacks/handle-input-change";
-import {VCard} from "../ts/interfaces/component-interfaces.tsx";
+import {VCardParameters} from "../ts/interfaces/component-interfaces.tsx";
 
-export function renderVCard(
-    {state, dispatch, renderInputFieldsInColumns}: VCard) {
+export function renderVCard({state, dispatch, renderInputFieldsInColumns}: VCardParameters) {
 
     const handleInputChange = HandleInputChange({state : state, dispatch : dispatch});
 

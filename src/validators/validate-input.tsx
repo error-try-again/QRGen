@@ -2,9 +2,9 @@ import {Tabs} from "../ts/enums/tabs-enum";
 import {resetBatchAndLoadingState} from "../helpers/reset-loading-state";
 import {areValidCcBcc} from "../utils/are-valid-cc-bcc.tsx";
 import {requiredFieldsMapping} from "./validation-mapping.tsx";
-import {Input} from "../ts/interfaces/component-interfaces.tsx";
+import {ValidateInputParameters} from "../ts/interfaces/component-interfaces.tsx";
 
-export function ValidateInput({activeTab, state, setError, setBatchData, setQrBatchCount, dispatch}: Input) {
+export function ValidateInput({activeTab, state, setError, setBatchData, setQrBatchCount, dispatch}: ValidateInputParameters) {
     return () => {
 
         const requiredFields = requiredFieldsMapping[activeTab];

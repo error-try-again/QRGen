@@ -9,7 +9,7 @@ import {CoreContextType, CoreProviderProperties} from "../ts/interfaces/context-
 export const CoreProvider: React.FC<CoreProviderProperties> = ({children}) => {
     const [state, dispatch] = useReducer(qrCodeReducer, initialState);
     const [activeTab, setActiveTab] = useState<Tabs>(Tabs.Text);
-    const [selectedCrypto, setSelectedCrypto] = useState<string>('Bitcoin');
+    const [selectedCrypto, setSelectedCrypto] = useState<string>('bitcoin');
     const [error, setError] = useState<string>("");
     const [qrBatchCount, setQrBatchCount] = useState<number>(0); // Add state to keep track of batch count
     const [batchData, setBatchData] = useState<QRCodeRequest[]>([]);

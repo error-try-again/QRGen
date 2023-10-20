@@ -34,14 +34,19 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
 
     const {theme, toggleTheme} = useTheme();
 
-    const handleTabChange = HandleTabChange({setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch, setTab : setActiveTab});
-    const TabSections = RenderAllTabs({state : state, dispatch : dispatch, setError : setError, selectedCrypto : selectedCrypto, setSelectedCrypto : setSelectedCrypto});
+    const handleTabChange = HandleTabChange({
+        dispatch: dispatch, setBatchData: setBatchData, setError: setError, setQrBatchCount: setQrBatchCount, setTab: setActiveTab
+    });
+    const TabSections = RenderAllTabs({
+        dispatch: dispatch, selectedCrypto: selectedCrypto, setError: setError, setSelectedCrypto: setSelectedCrypto, state: state, tab: activeTab
+    });
 
     const {themeContainer, tabContainer, errorContainer} = styles;
+
     return <div style={themeContainer}>
         <div style={tabContainer}>
             {ThemeToggle({theme, toggleTheme})}
-            {TabNav({activeTab : activeTab, handleTabChange : handleTabChange, setTab : setActiveTab})}
+            {TabNav({activeTab: activeTab, handleTabChange: handleTabChange, setTab: setActiveTab})}
             {TabSections[activeTab]?.()}
             {error && <div style={errorContainer}>{error}</div>}
             <GenerateButtonsSection
