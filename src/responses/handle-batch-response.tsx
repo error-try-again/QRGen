@@ -1,16 +1,8 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
-import React from "react";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
 import {resetBatchAndLoadingState} from "../helpers/reset-loading-state";
+import {HandleResponseParameters} from "../ts/interfaces/component-interfaces.tsx";
 
-export interface HandleBatchResponseParameters {
-    setError: (value: (((previousState: string) => string) | string)) => void;
-    setBatchData: (value: (((previousState: QRCodeRequest[]) => QRCodeRequest[]) | QRCodeRequest[])) => void;
-    setQrBatchCount: (value: (((previousState: number) => number) | number)) => void;
-    dispatch: React.Dispatch<QRCodeGeneratorAction>;
-}
 
-export function HandleBatchResponse({setError, setBatchData, setQrBatchCount, dispatch}: HandleBatchResponseParameters) {
+export function HandleBatchResponse({setError, setBatchData, setQrBatchCount, dispatch}: HandleResponseParameters) {
     return async (response: Response) => {
 
         // Convert the ReadableStream to a Blob.

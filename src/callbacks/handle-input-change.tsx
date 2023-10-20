@@ -1,12 +1,6 @@
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
-import React, {ChangeEvent, useCallback} from "react";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
+import {ChangeEvent, useCallback} from "react";
 import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
-
-interface HandleInputChangeParameters {
-    state: QRCodeGeneratorState;
-    dispatch: React.Dispatch<QRCodeGeneratorAction>;
-}
+import {HandleInputChangeParameters} from "../ts/interfaces/component-interfaces.tsx";
 
 export function HandleInputChange({state, dispatch}: HandleInputChangeParameters) {
     return useCallback((event: ChangeEvent<HTMLElement & {

@@ -1,15 +1,9 @@
-import {Tabs} from "../../ts/enums/tabs-enum";
 import {styles} from "../../assets/styles";
 import * as React from "react";
 import {memo} from "react";
+import {TabButtonParameters} from "../../ts/interfaces/component-interfaces.tsx";
 
-export const TabButtonComponent: React.FC<{
-    activeTab: Tabs,
-    tab: Tabs,
-    label: string,
-    handleTabChange: (freshTab: Tabs) => void,
-    setTab: React.Dispatch<React.SetStateAction<Tabs>>
-}> = (({activeTab, tab, label, handleTabChange}) => {
+export const TabButtonComponent: React.FC<TabButtonParameters> = memo(({activeTab, handleTabChange, label, tab}) => {
     const {tabButton} = styles;
     return (
         <button onClick={() => handleTabChange(tab)}

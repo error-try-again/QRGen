@@ -1,8 +1,5 @@
 import {isValidEmail} from "./is-email-valid";
-
-interface AreValidCcBccParameters {
-    emails: string;
-}
+import {AreValidCcBccParameters} from "../ts/interfaces/field-interfaces.tsx";
 
 export const areValidCcBcc = (({emails}: AreValidCcBccParameters) => {
     // Split the emails by commas

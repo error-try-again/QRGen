@@ -7,3 +7,7 @@ export interface QRCodeGeneratorProperties {
 export interface ErrorBoundaryProperties {
     children: ReactNode;
 }
+
+export interface DefaultUnknownParameters {
+    value: unknown;
+}

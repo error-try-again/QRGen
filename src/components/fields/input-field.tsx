@@ -12,9 +12,10 @@ export const InputFieldComponent: React.FC<{
     handleChange: (event: ChangeEvent<HTMLInputElement>, fieldName: keyof QRCodeRequest) => void
 }> = (({keyName, value, type = 'text', handleChange, setError}) => {
 
+    const {input, label, fieldContainer} = styles;
+
     const friendlyKeyName = keyName.charAt(0).toUpperCase() + keyName.slice(1).replaceAll(/([A-Z])/g, ' $1'); // Converts "cryptoType" to "Crypto Type"
     const convertedValue = convertValueToString({value : value});
-    const {input, label, fieldContainer} = styles;
 
     return (
         <div style={fieldContainer}>

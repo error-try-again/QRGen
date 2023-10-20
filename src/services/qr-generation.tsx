@@ -1,25 +1,11 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
-import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
 import {Tabs} from "../ts/enums/tabs-enum";
 import {resetBatchAndLoadingState} from "../helpers/reset-loading-state";
 import {HandleSingleResponse} from "../responses/handle-single-response";
 import {ValidateInput} from "../validators/validate-input";
-import React from "react";
-import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
 import {HandleFetchError} from "../helpers/handle-fetch-error";
 import {HandleErrorResponse} from "../responses/handle-error-response";
 import {HandleBatchResponse} from "../responses/handle-batch-response";
-
-interface QRGenerationProperties {
-    dispatch: React.Dispatch<QRCodeGeneratorAction>,
-    qrBatchCount: number,
-    batchData: QRCodeRequest[],
-    state: QRCodeGeneratorState,
-    activeTab: Tabs,
-    setError: (value: (((previousState: string) => string) | string)) => void,
-    setBatchData: React.Dispatch<React.SetStateAction<QRCodeRequest[]>>,
-    setQrBatchCount: React.Dispatch<React.SetStateAction<number>>
-}
+import {QRGenerationProperties} from "../ts/interfaces/component-interfaces.tsx";
 
 export function QRGeneration({
                                  dispatch,
@@ -32,11 +18,11 @@ export function QRGeneration({
                                  setQrBatchCount
                              }: QRGenerationProperties) {
 
-    const validateInput = ValidateInput({activeTab : activeTab, state : state, setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
-    const handleSingleResponse = HandleSingleResponse({dispatch : dispatch, setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount});
-    const handleFetchError = HandleFetchError({setError : setError, dispatch : dispatch, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount});
-    const handleErrorResponse = HandleErrorResponse(setError, setBatchData, setQrBatchCount, dispatch);
-    const handleBatchResponse = HandleBatchResponse({setError : setError, setBatchData : setBatchData, setQrBatchCount : setQrBatchCount, dispatch : dispatch});
+    const validateInput = ValidateInput({activeTab: activeTab, dispatch: dispatch, setBatchData: setBatchData, setError: setError, setQrBatchCount: setQrBatchCount, state: state});
+    const handleSingleResponse = HandleSingleResponse({dispatch: dispatch, setBatchData: setBatchData, setError: setError, setQrBatchCount: setQrBatchCount});
+    const handleFetchError = HandleFetchError({dispatch: dispatch, setBatchData: setBatchData, setError: setError, setQrBatchCount: setQrBatchCount});
+    const handleErrorResponse = HandleErrorResponse({dispatch: dispatch, setBatchData: setBatchData, setError: setError, setQrBatchCount: setQrBatchCount});
+    const handleBatchResponse = HandleBatchResponse({dispatch: dispatch, setBatchData: setBatchData, setError: setError, setQrBatchCount: setQrBatchCount});
 
     return async () => {
         if (!validateInput()) {

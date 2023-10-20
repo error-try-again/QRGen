@@ -1,9 +1,7 @@
-interface ConvertValueToStringParameters {
-    value: unknown;
-}
+import {DefaultUnknownParameters} from "../ts/interfaces/util-interfaces.tsx";
 
 // Convert value to string to ensure type safety and prevent errors
-export function convertValueToString({value}: ConvertValueToStringParameters): string {
+export function convertValueToString({value}: DefaultUnknownParameters): string {
     if (typeof value === 'string') {
         return value;
     }

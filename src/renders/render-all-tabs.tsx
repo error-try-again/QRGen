@@ -14,7 +14,7 @@ import {RenderFieldsAsColumns} from "./render-fields-as-cols";
 import {handleCryptoSelect} from "../helpers/handle-crypto-select";
 import {RenderInputFields} from "./render-input-fields";
 import {LocationPicker} from "../services/map-location-picker";
-import {AllTabs} from "../ts/interfaces/all-tabs-interface.tsx";
+import {AllTabs} from "../ts/interfaces/component-interfaces.tsx";
 
 
 export const RenderAllTabs = (

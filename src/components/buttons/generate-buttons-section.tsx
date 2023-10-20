@@ -1,13 +1,12 @@
 import React from "react";
 import {styles} from "../../assets/styles";
 import {Tabs} from "../../ts/enums/tabs-enum";
-import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces";
-
 import {ValidateInput} from "../../validators/validate-input";
 import {resetBatchAndLoadingState} from "../../helpers/reset-loading-state";
 import {HandleBatchResponse} from "../../responses/handle-batch-response";
 import {HandleSingleResponse} from "../../responses/handle-single-response";
-import {GenerateButtonsSectionProperties} from "../../ts/interfaces/generate-button-interface.tsx";
+import {UpdateBatchJob} from "../../services/batching/update-batch-job.tsx";
+import {GenerateButtonsSectionProperties} from "../../ts/interfaces/component-interfaces.tsx";
 
 export const GenerateButtonsSection: React.FC<GenerateButtonsSectionProperties> = ({
                                                                                        state,
@@ -21,31 +20,32 @@ export const GenerateButtonsSection: React.FC<GenerateButtonsSectionProperties> 
                                                                                    }) => {
 
     const {generateButton, qrButtonsContainer} = styles;
-
-    const validateInput = ValidateInput({activeTab, dispatch, setBatchData, setError, setQrBatchCount, state});
-
     const handleQRGeneration = async (isBatchAction: boolean) => {
+        const validateInput = ValidateInput({activeTab, dispatch, setBatchData, setError, setQrBatchCount, state});
+
+        if (!validateInput()) {
+            resetBatchAndLoadingState({dispatch, setBatchData, setQrBatchCount});
+            return;
+        }
+
+        if (!Tabs[activeTab]) {
+            resetBatchAndLoadingState({dispatch, setBatchData, setQrBatchCount});
+            return;
+        }
+
         if (isBatchAction) {
-            if (!validateInput()) {
-                resetBatchAndLoadingState({dispatch, setBatchData, setQrBatchCount});
-                return;
-            }
-
-            const dataToBatch = {customData: {...state}, type: Tabs[activeTab]};
-
-            if (!dataToBatch.type) {
-                console.error("Data does not have a 'type' property.");
-                return;
-            }
-
-            setBatchData((previousBatch: QRCodeRequest[]) => [...previousBatch, dataToBatch]);
-            setQrBatchCount((previous: number) => previous + 1);
+            UpdateBatchJob({state, activeTab, setQrBatchCount, setBatchData})();
             return;
         }
 
         dispatch({type: 'SET_LOADING', value: true});
-
         const endpoint = qrBatchCount > 1 ? '/qr/batch' : '/qr/generate';
+
+        if (qrBatchCount === 1) {
+            const errorMessage = 'Please add at least 2 QR codes to the batch.';
+            setError(errorMessage);
+            return;
+        }
 
         const requestData = qrBatchCount > 1
             ? {qrCodes: batchData}
@@ -67,7 +67,7 @@ export const GenerateButtonsSection: React.FC<GenerateButtonsSectionProperties> 
                 const errorMessage = 'Failed to generate the QR code. Please try again later.';
                 setError(errorMessage);
                 dispatch({type: 'SET_QRCODE_URL', value: ""});
-                resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
+                resetBatchAndLoadingState({setBatchData, setQrBatchCount, dispatch});
                 return;
             }
 
@@ -79,7 +79,7 @@ export const GenerateButtonsSection: React.FC<GenerateButtonsSectionProperties> 
             const errorMessage = 'Failed to generate the QR code. Please try again later.';
             setError(errorMessage);
             dispatch({type: 'SET_QRCODE_URL', value: ""});
-            resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
+            resetBatchAndLoadingState({setBatchData, setQrBatchCount, dispatch});
         }
     };
 

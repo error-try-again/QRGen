@@ -1,11 +1,11 @@
-import React, { memo, useEffect, useRef, useState } from "react";
-import { QRCodeGeneratorAction } from "../ts/types/reducer-types";
-import { QRCodeGeneratorState } from "../ts/interfaces/qr-code-generator-state";
-import L, { LatLng } from "leaflet";
-import { INITIAL_POSITION } from "../constants/constants";
-import { Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import { handleLocationSelect } from "../helpers/handle-location-select";
-import { CustomIcon } from "../components/icons/custom-map-icon";
+import React, {memo, useEffect, useRef, useState} from "react";
+import {QRCodeGeneratorAction} from "../ts/types/reducer-types";
+import {QRCodeGeneratorState} from "../ts/interfaces/qr-code-generator-state";
+import L, {LatLng} from "leaflet";
+import {INITIAL_POSITION} from "../constants/constants";
+import {Marker, Popup, TileLayer, useMap} from "react-leaflet";
+import {handleLocationSelect} from "../helpers/handle-location-select";
+import {CustomIcon} from "../components/icons/custom-map-icon";
 
 const LocationPickerComponent: React.FC<{ dispatch: React.Dispatch<QRCodeGeneratorAction>, state: QRCodeGeneratorState }> = ({ dispatch, state }) => {
     const markerReference = useRef<L.Marker | null>(null);

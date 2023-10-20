@@ -1,23 +1,11 @@
 import React from 'react';
 import 'leaflet/dist/leaflet.css';
-
-// Styles
 import {styles} from './assets/styles';
-
-// Hooks
 import {useTheme} from "./hooks/use-theme";
-
-// Contexts
 import {ThemeProvider} from "./contexts/theme-context";
 import {QRCodeGeneratorProperties} from "./ts/interfaces/util-interfaces";
-
-// Helpers & Callbacks
 import {HandleTabChange} from "./helpers/handle-tab-change";
-
-// Render methods
 import {RenderAllTabs} from "./renders/render-all-tabs";
-
-// Components
 import {GenerateButtonsSection} from "./components/buttons/generate-buttons-section";
 import {ThemeToggle} from "./components/theme/theme-toggle";
 import {TabNav} from "./components/tabs/tab-nav";
@@ -52,8 +40,8 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
     const {themeContainer, tabContainer, errorContainer} = styles;
     return <div style={themeContainer}>
         <div style={tabContainer}>
-            {ThemeToggle({toggleTheme, theme})}
-            {TabNav(activeTab, handleTabChange, setActiveTab)}
+            {ThemeToggle({theme, toggleTheme})}
+            {TabNav({activeTab : activeTab, handleTabChange : handleTabChange, setTab : setActiveTab})}
             {TabSections[activeTab]?.()}
             {error && <div style={errorContainer}>{error}</div>}
             <GenerateButtonsSection

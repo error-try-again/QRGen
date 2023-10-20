@@ -1,11 +1,6 @@
-import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
-import React from "react";
 import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants";
 import {MeCardFields} from "../constants/fields";
-
-interface MeCard {
-    renderInputFieldsInColumns: (fields: (keyof QRCodeRequest)[], columns: number) => React.JSX.Element;
-}
+import {MeCard} from "../ts/interfaces/component-interfaces.tsx";
 
 export function renderMeCard({renderInputFieldsInColumns}: MeCard) {
     function RenderedMeCard() {

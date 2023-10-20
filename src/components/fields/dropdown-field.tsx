@@ -1,7 +1,7 @@
-import { QRCodeRequest } from "../../ts/interfaces/qr-code-request-interfaces";
-import { styles } from "../../assets/styles";
+import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces";
+import {styles} from "../../assets/styles";
 import * as React from "react";
-import { ChangeEvent, memo } from "react";
+import {ChangeEvent, memo} from "react";
 
 const DropdownFieldComponent: React.FC<{
     handleChange: (event: ChangeEvent<HTMLSelectElement>, fieldName: keyof QRCodeRequest) => void,
