@@ -1,15 +1,26 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
-UNINSTALL_MODE=false
+# Configuration Variables
+USER_NAME="docker-primary"
+NVM_INSTALL_URL="https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh"
+NODE_VERSION="20.8.0"
 
-if [[ "$1" == "uninstall" ]]; then
-  UNINSTALL_MODE=true
+# Ensure correct number of arguments
+if [[ $# -gt 1 ]]; then
+    echo "Usage: $0 [uninstall]"
+    exit 1
 fi
 
+UNINSTALL_MODE=false
+if [[ "${1:-}" == "uninstall" ]]; then
+    UNINSTALL_MODE=true
+fi
+
+
 install_packages() {
-  local PACKAGES=(docker.io docker-doc docker-compose podman-docker containerd runc)
+  local PACKAGES=(docker.io docker-doc docker-compose podman-docker containerd runc systemd-container)
   for package in "${PACKAGES[@]}"; do
     sudo apt-get remove -y $package
   done
@@ -28,13 +39,11 @@ install_packages() {
 }
 
 setup_user() {
-  local USER_NAME="docker-primary"
   echo "Setting up $USER_NAME user..."
 
   if ! id "$USER_NAME" &>/dev/null; then
     sudo adduser --disabled-password --gecos "" $USER_NAME
     echo "$USER_NAME:test" | sudo chpasswd
-    # Ensure the home directory is created
     if [[ ! -d "/home/$USER_NAME" ]]; then
       sudo mkdir "/home/$USER_NAME"
       sudo chown $USER_NAME:$USER_NAME "/home/$USER_NAME"
@@ -59,7 +68,6 @@ uninstall_packages() {
 }
 
 remove_user() {
-  local USER_NAME="docker-primary"
   echo "Removing $USER_NAME user..."
 
   if pgrep -u $USER_NAME >/dev/null; then
@@ -79,53 +87,52 @@ remove_user() {
 setup_nvm_node() {
   echo "Setting up NVM and Node.js..."
 
-  if id "docker-primary" &>/dev/null; then
-    # Make sure the directory exists before setting it
-    sudo mkdir -p /home/docker-primary/.nvm
-    sudo chown docker-primary:docker-primary /home/docker-primary/.nvm
+  if id "$USER_NAME" &>/dev/null; then
+    sudo mkdir -p /home/$USER_NAME/.nvm
+    sudo chown $USER_NAME:$USER_NAME /home/$USER_NAME/.nvm
 
-    sudo -Eu docker-primary bash <<'EOF'
-export NVM_DIR="/home/docker-primary/.nvm"
-export npm_config_cache="/home/docker-primary/.npm"
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-source "$NVM_DIR/nvm.sh"
-nvm install 20.8.0
-nvm use 20.8.0
-nvm alias default 20.8.0
+    sudo -Eu $USER_NAME bash <<EOF
+export NVM_DIR="/home/$USER_NAME/.nvm"
+export npm_config_cache="/home/$USER_NAME/.npm"
+curl -o- $NVM_INSTALL_URL | bash
+source "\$NVM_DIR/nvm.sh"
+nvm install $NODE_VERSION
+nvm use $NODE_VERSION
+nvm alias default $NODE_VERSION
 npm install -g npm
 EOF
   else
-    echo "User docker-primary does not exist. Exiting..."
+    echo "User $USER_NAME does not exist. Exiting..."
     exit 1
   fi
 }
 
 remove_nvm_node() {
   echo "Removing NVM and Node.js..."
-
-  if id "docker-primary" &>/dev/null; then
-    if [[ -f /home/docker-primary/.nvm/nvm.sh ]]; then
-      sudo -Eu docker-primary bash <<'EOF'
+  if id "$USER_NAME" &>/dev/null; then
+    if [[ -f /home/$USER_NAME/.nvm/nvm.sh ]]; then
+      sudo -Eu $USER_NAME bash <<'EOF'
 source ~/.nvm/nvm.sh
 nvm deactivate
 nvm uninstall $(nvm current)
 rm -rf ~/.nvm
 EOF
     else
-      echo "NVM is not installed for docker-primary. Skipping..."
+      echo "NVM is not installed for $USER_NAME. Skipping..."
     fi
   else
-    echo "User docker-primary does not exist. Exiting..."
+    echo "User $USER_NAME does not exist. Exiting..."
     exit 1
   fi
 }
 
+# Main Execution
 if $UNINSTALL_MODE; then
-  remove_nvm_node
-  remove_user
-  uninstall_packages
+    remove_nvm_node
+    remove_user
+    uninstall_packages
 else
-  install_packages
-  setup_user
-  setup_nvm_node
+    install_packages
+    setup_user
+    setup_nvm_node
 fi

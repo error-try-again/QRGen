@@ -19,7 +19,7 @@ sudo ./depends.sh
 *Run the Project as the docker-primary user to build and install the core project*
 
 ```bash
-machinectl shell docker-primary@ $HOME/fullstack-qr-generator/install.sh $HOME/fullstack-qr-generator/         
+machinectl shell docker-primary@ $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/       
 ```
 
 *Uninstall the project*

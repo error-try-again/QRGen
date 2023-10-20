@@ -34,7 +34,7 @@ setup_project_directories() {
   create_directory "$BACKEND_DIR"
   create_directory "$STAGING_DIR"
 
-  local SRC_DIR="/home/void/Desktop/fullstack-qr-generator/src"
+  local SRC_DIR="$HOME/QRGen-FullStack/src"
   if [[ -d "$SRC_DIR" ]]; then
     cp -r "$SRC_DIR" "$STAGING_DIR"
     cp "tsconfig.json" "$STAGING_DIR"
