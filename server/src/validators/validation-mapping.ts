@@ -16,7 +16,7 @@ import {
 } from '../ts/interfaces/qr-code-request-interfaces';
 
 export type ValidatorFunction<T> = (data: T) => boolean;
-// noinspection OverlyComplexBooleanExpressionJS
+
 export const validators: {
   [K in keyof RequestTypeMap]: ValidatorFunction<RequestTypeMap[K]>;
 } = {

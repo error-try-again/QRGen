@@ -1,5 +1,5 @@
-import { Tabs } from '../ts/enums/tabs-enum.tsx';
-import { initialState } from '../constants/constants.tsx';
+import { Tabs } from '../ts/enums/tabs-enum';
+import { initialState } from '../constants/constants';
 
 export function setInitialTabState(activeTab: Tabs) {
   const init = { ...initialState };

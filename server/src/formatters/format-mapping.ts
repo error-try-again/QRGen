@@ -18,26 +18,28 @@ import { formatEmail } from './format-email';
 import { formatEvent } from './format-v-calender';
 import { formatVCard } from './format-v-card';
 import { formatMeCard } from './format-me-card';
+import { formatZoom } from './format-zoom.ts';
+import { formatWiFi } from './format-wifi.ts';
+import { formatURL } from './format-url.ts';
+import { formatSMS } from './format-sms.ts';
+import { formatText } from './format-text.ts';
+import { formatPhone } from './format-phone-number.ts';
+import { formatGeoLocation } from './format-geo-location.ts';
+import { formatCrypto } from './format-crypto.ts';
 
 export const formatters: {
   [K in keyof RequestTypeMap]: FormatHandler<RequestTypeMap[K]>;
 } = {
-  Text: (data: TextRequest) => data.text ?? '',
-  Url: (data: UrlRequest) => data.url ?? '',
+  Crypto: formatCrypto as FormatHandler<CryptoRequest>,
   Email: formatEmail as FormatHandler<EmailRequest>,
-  Phone: (data: PhoneRequest) => `tel:${data.phone}`,
-  SMS: (data: SMSRequest) => `sms:${data.phone}?body=${data.sms}`,
-  GeoLocation: (data: GeoLocationRequest) =>
-    `geo:${data.latitude},${data.longitude}`,
-  WiFi: (data: WifiRequest) =>
-    `WIFI:T:${data.encryption};S:${data.ssid};P:${data.password};H:${
-      data.hidden ? 1 : 0
-    };`,
   Event: formatEvent as FormatHandler<EventRequest>,
-  Crypto: (data: CryptoRequest) =>
-    `${data.address}?amount=${data.amount ?? ''}`,
-  VCard: formatVCard as FormatHandler<VCardRequest>,
+  GeoLocation: formatGeoLocation as FormatHandler<GeoLocationRequest>,
   MeCard: formatMeCard as FormatHandler<MeCardRequest>,
-  Zoom: (data: ZoomRequest) =>
-    `https://zoom.us/j/${data.zoomId}?pwd=${data.zoomPass}`
+  Phone: formatPhone as FormatHandler<PhoneRequest>,
+  SMS: formatSMS as FormatHandler<SMSRequest>,
+  Text: formatText as FormatHandler<TextRequest>,
+  Url: formatURL as FormatHandler<UrlRequest>,
+  VCard: formatVCard as FormatHandler<VCardRequest>,
+  WiFi: formatWiFi as FormatHandler<WifiRequest>,
+  Zoom: formatZoom as FormatHandler<ZoomRequest>
 };
