@@ -1,15 +1,15 @@
 export interface ValidEmail {
-    email: string;
+  email: string;
 }
 
 export interface AreValidCcBccParameters {
-    emails: string;
+  emails: string;
 }
 
 export interface CryptoTypeField {
-    cryptoType: string;
+  cryptoType: string;
 }
 
 export interface VersionField {
-    version: string;
+  version: string;
 }

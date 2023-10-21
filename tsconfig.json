@@ -33,13 +33,9 @@
     "allowSyntheticDefaultImports": true,
     "skipDefaultLibCheck": true,
     "downlevelIteration": true,
-    "importHelpers": true,
-
+    "importHelpers": true
   },
-  "include": [
-    "src",
-    "server",
-  ],
+  "include": ["src", "server"],
   "references": [
     {
       "path": "./tsconfig.node.json"

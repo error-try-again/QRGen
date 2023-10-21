@@ -1,1 +1,1 @@
-export type QRCodeErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
+export type QRCodeErrorCorrectionLevel = "L" | "M" | "Q" | "H";

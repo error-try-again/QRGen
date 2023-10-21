@@ -1,6 +1,6 @@
-import {QRCodeRequest} from "./qr-code-request-interfaces";
+import { QRCodeRequest } from "./qr-code-request-interfaces";
 
 export interface QRCodeGeneratorState extends QRCodeRequest {
-    isLoading: boolean;
-    qrCodeURL: string | null;
+  isLoading: boolean;
+  qrCodeURL: string | null;
 }

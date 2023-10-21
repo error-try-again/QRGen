@@ -1,6 +1,7 @@
-import {MeCardRequest} from "../ts/interfaces/qr-code-request-interfaces";
+import { MeCardRequest } from "../ts/interfaces/qr-code-request-interfaces";
 
-export const formatMeCard = (data: MeCardRequest): string => [
+export const formatMeCard = (data: MeCardRequest): string =>
+  [
     "MECARD:N:",
     `${data.lastName},${data.firstName}`,
     data.nickname && `NICKNAME:${data.nickname}`,
@@ -10,6 +11,9 @@ export const formatMeCard = (data: MeCardRequest): string => [
     data.email && `EMAIL:${data.email}`,
     data.website && `URL:${data.website}`,
     data.birthday && `BDAY:${data.birthday}`,
-    data.street && `ADR:${data.street},${data.city},${data.state},${data.zipcode},${data.country}`,
-    data.notes && `NOTE:${data.notes}`
-].filter(Boolean).join(';');
+    data.street &&
+      `ADR:${data.street},${data.city},${data.state},${data.zipcode},${data.country}`,
+    data.notes && `NOTE:${data.notes}`,
+  ]
+    .filter(Boolean)
+    .join(";");

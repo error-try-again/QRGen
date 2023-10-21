@@ -1,13 +1,13 @@
-import {ReactNode} from "react";
+import { ReactNode } from "react";
 
 export interface QRCodeGeneratorProperties {
-    children?: ReactNode;
+  children?: ReactNode;
 }
 
 export interface ErrorBoundaryProperties {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export interface DefaultUnknownParameters {
-    value: unknown;
+  value: unknown;
 }
