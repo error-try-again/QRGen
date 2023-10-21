@@ -1,82 +1,35 @@
-import React from "react";
-import "leaflet/dist/leaflet.css";
-import { styles } from "./assets/styles";
-import { useTheme } from "./hooks/use-theme";
-import { ThemeProvider } from "./contexts/theme-context";
-import { QRCodeGeneratorProperties } from "./ts/interfaces/util-interfaces";
-import { HandleTabChange } from "./helpers/handle-tab-change";
-import { RenderAllTabs } from "./renders/render-all-tabs";
-import { GenerateButtonsSection } from "./components/buttons/generate-buttons-section";
-import { ThemeToggle } from "./components/theme/theme-toggle";
-import { TabNav } from "./components/tabs/tab-nav";
-import { QRSection } from "./components/qr/qr-section";
-import { ErrorBoundary } from "./wrappers/error-boundary";
-import { Links } from "./components/links/links";
-import { CoreProvider } from "./contexts/core-context";
-import { useCore } from "./hooks/use-core";
+import React from 'react';
+import 'leaflet/dist/leaflet.css';
+import { styles } from './assets/styles';
+import { ThemeProvider } from './contexts/theme-context';
+import { QRCodeGeneratorProperties } from './ts/interfaces/util-interfaces';
+import { HandleTabChange } from './helpers/handle-tab-change';
+import { RenderAllTabs } from './renders/render-all-tabs';
+import { GenerateButtonsSection } from './components/buttons/generate-buttons-section';
+import { ThemeToggle } from './components/theme/theme-toggle';
+import { TabNav } from './components/tabs/tab-nav';
+import { QRSection } from './components/qr/qr-section';
+import { ErrorBoundary } from './wrappers/error-boundary';
+import { Links } from './components/links/links';
+import { CoreProvider } from './contexts/core-context';
+import { useCore } from './hooks/use-core';
 
 const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
-  const {
-    dispatch,
-    state,
-    batchData,
-    setBatchData,
-    qrBatchCount,
-    setQrBatchCount,
-    error,
-    setError,
-    selectedCrypto,
-    setSelectedCrypto,
-    activeTab,
-    setActiveTab,
-    selectedVersion,
-    setSelectedVersion,
-  } = useCore();
-
-  const { theme, toggleTheme } = useTheme();
-
-  const handleTabChange = HandleTabChange({
-    dispatch: dispatch,
-    setBatchData: setBatchData,
-    setError: setError,
-    setQrBatchCount: setQrBatchCount,
-    setTab: setActiveTab,
-  });
-
-  const TabSections = RenderAllTabs({
-    dispatch: dispatch,
-    selectedCrypto: selectedCrypto,
-    selectedVersion: selectedVersion,
-    setError: setError,
-    setSelectedCrypto: setSelectedCrypto,
-    setSelectedVersion: setSelectedVersion,
-    state: state,
-    tab: activeTab,
-  });
-
   const { themeContainer, tabContainer, errorContainer } = styles;
+
+  const { state, error, activeTab } = useCore();
+
+  const handleTabChange = HandleTabChange();
+  const TabSections = RenderAllTabs({ tab: activeTab });
 
   return (
     <div style={themeContainer}>
       <div style={tabContainer}>
-        {ThemeToggle({ theme, toggleTheme })}
-        {TabNav({
-          activeTab: activeTab,
-          handleTabChange: handleTabChange,
-          setTab: setActiveTab,
-        })}
+        <ThemeToggle />
+        <TabNav handleTabChange={handleTabChange} />
         {TabSections[activeTab]?.()}
         {error && <div style={errorContainer}>{error}</div>}
-        <GenerateButtonsSection
-          state={state}
-          dispatch={dispatch}
-          activeTab={activeTab}
-          qrBatchCount={qrBatchCount}
-          setQrBatchCount={setQrBatchCount}
-          batchData={batchData}
-          setBatchData={setBatchData}
-          setError={setError}
-        />
+        <GenerateButtonsSection />
         {QRSection(state)}
       </div>
     </div>

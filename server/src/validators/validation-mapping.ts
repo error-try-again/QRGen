@@ -1,4 +1,4 @@
-import { RequestTypeMap } from "../ts/types/all-request-types";
+import { RequestTypeMap } from '../ts/types/all-request-types';
 
 import {
   CryptoRequest,
@@ -12,8 +12,8 @@ import {
   UrlRequest,
   VCardRequest,
   WifiRequest,
-  ZoomRequest,
-} from "../ts/interfaces/qr-code-request-interfaces";
+  ZoomRequest
+} from '../ts/interfaces/qr-code-request-interfaces';
 
 export type ValidatorFunction<T> = (data: T) => boolean;
 // noinspection OverlyComplexBooleanExpressionJS
@@ -36,5 +36,5 @@ export const validators: {
   MeCard: ({ firstName, lastName, phone1 }: MeCardRequest) =>
     Boolean(firstName && lastName && phone1),
   WiFi: ({ encryption, ssid }: WifiRequest) => Boolean(ssid && encryption),
-  Zoom: ({ zoomId, zoomPass }: ZoomRequest) => Boolean(zoomId && zoomPass),
+  Zoom: ({ zoomId, zoomPass }: ZoomRequest) => Boolean(zoomId && zoomPass)
 };

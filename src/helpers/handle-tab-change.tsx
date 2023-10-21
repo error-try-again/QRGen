@@ -1,23 +1,37 @@
-import { Tabs } from "../ts/enums/tabs-enum";
-import { resetBatchAndLoadingState } from "./reset-loading-state";
-import { HandleTabChangeParameters } from "../ts/interfaces/component-interfaces";
+import { Tabs } from '../ts/enums/tabs-enum';
+import { resetBatchAndLoadingState } from './reset-loading-state';
+import { useCore } from '../hooks/use-core';
+import { initialState } from '../constants/constants.tsx';
 
-export function HandleTabChange({
-  setError,
-  setBatchData,
-  setQrBatchCount,
-  dispatch,
-  setTab,
-}: HandleTabChangeParameters) {
+export function HandleTabChange() {
+  const {
+    dispatch,
+    setError,
+    setBatchData,
+    setQrBatchCount,
+    setActiveTab,
+    activeTab
+  } = useCore();
+
   return (freshTab: Tabs) => {
-    setError("");
+    const init = { ...initialState };
+
+    if (activeTab === Tabs.Crypto) {
+      // Set the crypto type to bitcoin
+      init.cryptoType = 'bitcoin';
+    }
+    if (activeTab === Tabs.VCard) {
+      // Set the version to 3.0
+      init.version = '3.0';
+    }
+
+    setError('');
     resetBatchAndLoadingState({
       setBatchData: setBatchData,
       setQrBatchCount: setQrBatchCount,
       dispatch: dispatch,
+      initialState: init
     });
-    dispatch({ type: "SET_QRCODE_URL", value: "" });
-    dispatch({ type: "RESET_STATE" });
-    setTab(freshTab);
+    setActiveTab(freshTab);
   };
 }

@@ -1,8 +1,8 @@
-import { Tabs } from "../ts/enums/tabs-enum";
-import { resetBatchAndLoadingState } from "../helpers/reset-loading-state";
-import { areValidCcBcc } from "../utils/are-valid-cc-bcc";
-import { requiredFieldsMapping } from "./validation-mapping";
-import { ValidateInputParameters } from "../ts/interfaces/component-interfaces";
+import { Tabs } from '../ts/enums/tabs-enum';
+import { resetBatchAndLoadingState } from '../helpers/reset-loading-state';
+import { areValidCcBcc } from '../utils/are-valid-cc-bcc';
+import { requiredFieldsMapping } from './validation-mapping';
+import { ValidateInputParameters } from '../ts/interfaces/component-interfaces';
 
 export function ValidateInput({
   activeTab,
@@ -10,11 +10,10 @@ export function ValidateInput({
   setError,
   setBatchData,
   setQrBatchCount,
-  dispatch,
+  dispatch
 }: ValidateInputParameters) {
   return () => {
     const requiredFields = requiredFieldsMapping[activeTab];
-
     if (requiredFields) {
       for (const field of requiredFields.fields) {
         if (!state[field as keyof typeof state]) {
@@ -22,27 +21,27 @@ export function ValidateInput({
           resetBatchAndLoadingState({
             dispatch: dispatch,
             setBatchData: setBatchData,
-            setQrBatchCount: setQrBatchCount,
+            setQrBatchCount: setQrBatchCount
           });
           return false;
         }
       }
       if (activeTab === Tabs.Email) {
         if (state.cc && !areValidCcBcc({ emails: state.cc })) {
-          setError("One or more CC emails are invalid");
+          setError('One or more CC emails are invalid');
           resetBatchAndLoadingState({
             dispatch: dispatch,
             setBatchData: setBatchData,
-            setQrBatchCount: setQrBatchCount,
+            setQrBatchCount: setQrBatchCount
           });
           return false;
         }
         if (state.bcc && !areValidCcBcc({ emails: state.bcc })) {
-          setError("One or more BCC emails are invalid");
+          setError('One or more BCC emails are invalid');
           resetBatchAndLoadingState({
             dispatch: dispatch,
             setBatchData: setBatchData,
-            setQrBatchCount: setQrBatchCount,
+            setQrBatchCount: setQrBatchCount
           });
           return false;
         }

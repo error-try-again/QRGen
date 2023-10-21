@@ -1,9 +1,10 @@
-import { QRData } from "./helper-interfaces";
-import { AllRequests } from "../types/all-request-types";
+import { QRData } from './helper-interfaces';
+import { AllRequests } from '../types/all-request-types';
 
 export interface SingleQRDataParameters {
   qrData: QRData<AllRequests>;
 }
+
 export interface BatchQRDataParameters {
   qrData: QRData<AllRequests>[];
 }

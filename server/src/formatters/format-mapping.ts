@@ -1,5 +1,5 @@
-import { RequestTypeMap } from "../ts/types/all-request-types";
-import { FormatHandler } from "../ts/types/helper-types";
+import { RequestTypeMap } from '../ts/types/all-request-types';
+import { FormatHandler } from '../ts/types/helper-types';
 import {
   CryptoRequest,
   EmailRequest,
@@ -12,18 +12,18 @@ import {
   UrlRequest,
   VCardRequest,
   WifiRequest,
-  ZoomRequest,
-} from "../ts/interfaces/qr-code-request-interfaces";
-import { formatEmail } from "./format-email";
-import { formatEvent } from "./format-v-calender";
-import { formatVCard } from "./format-v-card";
-import { formatMeCard } from "./format-me-card";
+  ZoomRequest
+} from '../ts/interfaces/qr-code-request-interfaces';
+import { formatEmail } from './format-email';
+import { formatEvent } from './format-v-calender';
+import { formatVCard } from './format-v-card';
+import { formatMeCard } from './format-me-card';
 
 export const formatters: {
   [K in keyof RequestTypeMap]: FormatHandler<RequestTypeMap[K]>;
 } = {
-  Text: (data: TextRequest) => data.text ?? "",
-  Url: (data: UrlRequest) => data.url ?? "",
+  Text: (data: TextRequest) => data.text ?? '',
+  Url: (data: UrlRequest) => data.url ?? '',
   Email: formatEmail as FormatHandler<EmailRequest>,
   Phone: (data: PhoneRequest) => `tel:${data.phone}`,
   SMS: (data: SMSRequest) => `sms:${data.phone}?body=${data.sms}`,
@@ -35,9 +35,9 @@ export const formatters: {
     };`,
   Event: formatEvent as FormatHandler<EventRequest>,
   Crypto: (data: CryptoRequest) =>
-    `${data.address}?amount=${data.amount ?? ""}`,
+    `${data.address}?amount=${data.amount ?? ''}`,
   VCard: formatVCard as FormatHandler<VCardRequest>,
   MeCard: formatMeCard as FormatHandler<MeCardRequest>,
   Zoom: (data: ZoomRequest) =>
-    `https://zoom.us/j/${data.zoomId}?pwd=${data.zoomPass}`,
+    `https://zoom.us/j/${data.zoomId}?pwd=${data.zoomPass}`
 };

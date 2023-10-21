@@ -1,18 +1,13 @@
-import { Tabs } from "../../ts/enums/tabs-enum";
-import React from "react";
-import { TabButton } from "./tab-button";
+import { Tabs } from '../../ts/enums/tabs-enum';
+import { TabButton } from './tab-button';
+import { useCore } from '../../hooks/use-core.tsx';
 
 export interface TabNavParameters {
-  activeTab: Tabs;
   handleTabChange: (tab: Tabs) => void;
-  setTab: React.Dispatch<React.SetStateAction<Tabs>>;
 }
 
-export const TabNav = ({
-  activeTab,
-  handleTabChange,
-  setTab,
-}: TabNavParameters) => {
+export const TabNav = ({ handleTabChange }: TabNavParameters) => {
+  const { activeTab, setActiveTab } = useCore();
   return (
     <>
       {Object.values(Tabs).map((tab: Tabs) => (
@@ -22,7 +17,7 @@ export const TabNav = ({
           tab={tab}
           label={tab}
           handleTabChange={handleTabChange}
-          setTab={setTab}
+          setTab={setActiveTab}
         />
       ))}
     </>

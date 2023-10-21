@@ -1,19 +1,19 @@
-import { QRCodeRequest } from "../ts/interfaces/qr-code-request-interfaces";
-import { HandleInputChange } from "../callbacks/handle-input-change";
-import { InputField } from "../components/fields/input-field";
-import { convertValueToString } from "../utils/convert-to-string";
-import { RenderInputFieldsParameters } from "../ts/interfaces/component-interfaces";
-import { requiredFieldsMapping } from "../validators/validation-mapping";
+import { QRCodeRequest } from '../ts/interfaces/qr-code-request-interfaces';
+import { HandleInputChange } from '../callbacks/handle-input-change';
+import { InputField } from '../components/fields/input-field';
+import { convertValueToString } from '../utils/convert-to-string';
+import { RenderInputFieldsParameters } from '../ts/interfaces/component-interfaces';
+import { requiredFieldsMapping } from '../validators/validation-mapping';
 
 export function RenderInputFields({
   tab,
   state,
   dispatch,
-  setError,
+  setError
 }: RenderInputFieldsParameters) {
   const handleInputChange = HandleInputChange({
     state: state,
-    dispatch: dispatch,
+    dispatch: dispatch
   });
 
   function isFieldRequired(fieldName: keyof QRCodeRequest): boolean {
@@ -24,7 +24,7 @@ export function RenderInputFields({
   function RenderedInputFields(keys: (keyof QRCodeRequest)[]) {
     return (
       <>
-        {keys.map((key) => {
+        {keys.map(key => {
           const convertedValue = convertValueToString({ value: state[key] });
           const required = isFieldRequired(key);
 
@@ -39,12 +39,12 @@ export function RenderInputFields({
             />
           );
         })}
-        {() => setError("")}
+        {() => setError('')}
       </>
     );
   }
 
-  RenderedInputFields.displayName = "RenderedInputFields";
+  RenderedInputFields.displayName = 'RenderedInputFields';
 
   return RenderedInputFields;
 }

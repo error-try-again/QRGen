@@ -1,9 +1,9 @@
-import { VCardRequest } from "../ts/interfaces/qr-code-request-interfaces";
+import { VCardRequest } from '../ts/interfaces/qr-code-request-interfaces';
 
 export const formatVCard = (data: VCardRequest): string =>
   [
-    "BEGIN:VCARD",
-    `VERSION:${data.version || "3.0"}`,
+    'BEGIN:VCARD',
+    `VERSION:${data.version || '3.0'}`,
     `N:${data.lastName};${data.firstName}`,
     data.organization && `ORG:${data.organization}`,
     data.position && `TITLE:${data.position}`,
@@ -16,7 +16,7 @@ export const formatVCard = (data: VCardRequest): string =>
     data.website && `URL:${data.website}`,
     data.street &&
       `ADR:;;${data.street};${data.city};${data.state};${data.zipcode};${data.country}`,
-    "END:VCARD",
+    'END:VCARD'
   ]
     .filter(Boolean)
-    .join("\n");
+    .join('\n');

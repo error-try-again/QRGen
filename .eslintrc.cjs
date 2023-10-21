@@ -45,7 +45,6 @@ module.exports = {
     "react-hooks/exhaustive-deps": "warn",
     "react/prop-types": "off",
   },
-
   settings: {
     "import/resolver": {
       node: {

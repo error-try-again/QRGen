@@ -1,5 +1,5 @@
-import { Tabs } from "../enums/tabs-enum";
-import { QRCodeErrorCorrectionLevel } from "../types/error-correction-types";
+import { Tabs } from '../enums/tabs-enum';
+import { QRCodeErrorCorrectionLevel } from '../types/error-correction-types';
 
 export interface UrlRequest {
   url?: string;
@@ -11,7 +11,7 @@ export interface TextRequest {
 
 export interface WifiRequest {
   ssid?: string;
-  encryption?: "WEP" | "WPA" | "WPA2" | "WPA3";
+  encryption?: 'WEP' | 'WPA' | 'WPA2' | 'WPA3';
   hidden?: boolean;
   password?: string;
 }
@@ -57,7 +57,7 @@ export interface ZoomRequest {
 }
 
 export interface VCardRequest {
-  version?: "2.1" | "3.0" | "4.0";
+  version?: string;
   firstName?: string;
   lastName?: string;
   organization?: string;

@@ -1,5 +1,5 @@
-import React from "react";
-import { styles } from "../../assets/styles";
+import React from 'react';
+import { styles } from '../../assets/styles';
 
 export const Divider: React.FC = () => {
   const { divider } = styles;

@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import { errorHandlingMapping } from "../validators/validate-request-body";
+import { Request, Response } from 'express';
+import { errorHandlingMapping } from '../validators/validate-request-body';
 
 export const asyncErrorHandler = (
-  handler: (request: Request, response: Response) => Promise<void>,
+  handler: (request: Request, response: Response) => Promise<void>
 ) => {
   return async (request: Request, response: Response): Promise<void> => {
     try {

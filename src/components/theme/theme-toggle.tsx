@@ -1,16 +1,26 @@
-import { styles } from "../../assets/styles";
-import { ThemeContextType } from "../../contexts/theme-context";
+import { styles } from '../../assets/styles';
+import { useTheme } from '../../hooks/use-theme.tsx';
 
-export const ThemeToggle = ({ toggleTheme, theme }: ThemeContextType) => {
+export const ThemeToggle = () => {
+  const { theme, toggleTheme } = useTheme();
   const { tabButton } = styles;
   return (
-    <button style={{ ...tabButton }} onClick={toggleTheme}>
-      {theme === "light" ? (
-        <span role="img" aria-label="dark mode">
+    <button
+      style={{ ...tabButton }}
+      onClick={toggleTheme}
+    >
+      {theme === 'light' ? (
+        <span
+          role="img"
+          aria-label="dark mode"
+        >
           Dark 🌙
         </span>
       ) : (
-        <span role="img" aria-label="light mode">
+        <span
+          role="img"
+          aria-label="light mode"
+        >
           Light ☀️
         </span>
       )}

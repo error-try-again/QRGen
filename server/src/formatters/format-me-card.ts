@@ -1,8 +1,8 @@
-import { MeCardRequest } from "../ts/interfaces/qr-code-request-interfaces";
+import { MeCardRequest } from '../ts/interfaces/qr-code-request-interfaces';
 
 export const formatMeCard = (data: MeCardRequest): string =>
   [
-    "MECARD:N:",
+    'MECARD:N:',
     `${data.lastName},${data.firstName}`,
     data.nickname && `NICKNAME:${data.nickname}`,
     data.phone1 && `TEL:${data.phone1}`,
@@ -13,7 +13,7 @@ export const formatMeCard = (data: MeCardRequest): string =>
     data.birthday && `BDAY:${data.birthday}`,
     data.street &&
       `ADR:${data.street},${data.city},${data.state},${data.zipcode},${data.country}`,
-    data.notes && `NOTE:${data.notes}`,
+    data.notes && `NOTE:${data.notes}`
   ]
     .filter(Boolean)
-    .join(";");
+    .join(';');

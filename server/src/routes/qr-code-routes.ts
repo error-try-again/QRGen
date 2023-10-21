@@ -1,30 +1,30 @@
-import express, { Request, Response, Router } from "express";
+import express, { Request, Response, Router } from 'express';
 import {
   generateQRCodesForBatch,
-  processSingleQRCode,
-} from "../controllers/qr-code-controller";
-import { prepareAndSendArchive } from "./helpers/archival-helpers";
+  processSingleQRCode
+} from '../controllers/qr-code-controller';
+import { prepareAndSendArchive } from './helpers/archival-helpers';
 import {
   validateBatchRequest,
-  validateRequest,
-} from "../validators/validate-request-body";
-import { asyncErrorHandler } from "../middleware/async-error-handler";
+  validateRequest
+} from '../validators/validate-request-body';
+import { asyncErrorHandler } from '../middleware/async-error-handler';
 
 const router: Router = express.Router();
 
 router.post(
-  "/generate",
+  '/generate',
   asyncErrorHandler(async (request: Request, response: Response) => {
     validateRequest(request, async () => {
       const { body } = request;
       const processedQRCode = await processSingleQRCode({ qrData: body });
       response.json({ qrCodeURL: processedQRCode.qrCodeData });
     });
-  }),
+  })
 );
 
 router.post(
-  "/batch",
+  '/batch',
   asyncErrorHandler(async (request: Request, response: Response) => {
     validateBatchRequest(request, async () => {
       const { body } = request;
@@ -34,11 +34,11 @@ router.post(
         await prepareAndSendArchive(qrData, response);
       }
     });
-  }),
+  })
 );
 
-router.get("/", (response: Response) => {
-  response.send("Welcome to the QR code generator API.");
+router.get('/', (response: Response) => {
+  response.send('Welcome to the QR code generator API.');
 });
 
 export { router as qrCodeRoutes };

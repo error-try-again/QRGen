@@ -1,20 +1,20 @@
-import { QRCodeRequest } from "../ts/interfaces/qr-code-request-interfaces";
-import { HandleInputChange } from "../callbacks/handle-input-change";
-import { InputField } from "../components/fields/input-field";
-import { styles } from "../assets/styles";
-import { RenderInputFieldsParameters } from "../ts/interfaces/component-interfaces";
-import { requiredFieldsMapping } from "../validators/validation-mapping";
+import { QRCodeRequest } from '../ts/interfaces/qr-code-request-interfaces';
+import { HandleInputChange } from '../callbacks/handle-input-change';
+import { InputField } from '../components/fields/input-field';
+import { styles } from '../assets/styles';
+import { RenderInputFieldsParameters } from '../ts/interfaces/component-interfaces';
+import { requiredFieldsMapping } from '../validators/validation-mapping';
 
 // Function to render the fields distributed across the specified number of columns.
 export function RenderFieldsAsColumns({
   tab,
   state,
   dispatch,
-  setError,
+  setError
 }: RenderInputFieldsParameters) {
   const handleInputChange = HandleInputChange({
     state: state,
-    dispatch: dispatch,
+    dispatch: dispatch
   });
 
   function isFieldRequired(fieldName: keyof QRCodeRequest): boolean {
@@ -24,21 +24,24 @@ export function RenderFieldsAsColumns({
 
   function RenderedInputColumns(
     fields: (keyof QRCodeRequest)[],
-    columns: number,
+    columns: number
   ) {
     const colLength = Math.ceil(fields.length / columns);
     const cols = Array.from({ length: columns })
       .fill(0)
       .map((_, colIndex) =>
-        fields.slice(colIndex * colLength, (colIndex + 1) * colLength),
+        fields.slice(colIndex * colLength, (colIndex + 1) * colLength)
       );
 
     const { renderBizCardsContainer } = styles;
     return (
       <div style={renderBizCardsContainer}>
         {cols.map((colFields, index) => (
-          <div key={index} style={{ flex: 1, minWidth: `${100 / columns}%` }}>
-            {colFields.map((key) => (
+          <div
+            key={index}
+            style={{ flex: 1, minWidth: `${100 / columns}%` }}
+          >
+            {colFields.map(key => (
               <InputField
                 isRequired={isFieldRequired(key)}
                 key={key.toString()}
@@ -54,7 +57,7 @@ export function RenderFieldsAsColumns({
     );
   }
 
-  RenderedInputColumns.displayName = "RenderedInputColumns";
+  RenderedInputColumns.displayName = 'RenderedInputColumns';
 
   return RenderedInputColumns;
 }

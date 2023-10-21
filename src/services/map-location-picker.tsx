@@ -1,11 +1,11 @@
-import React, { memo, useEffect, useRef, useState } from "react";
-import { QRCodeGeneratorAction } from "../ts/types/reducer-types";
-import { QRCodeGeneratorState } from "../ts/interfaces/qr-code-generator-state";
-import L, { LatLng } from "leaflet";
-import { INITIAL_POSITION } from "../constants/constants";
-import { Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import { handleLocationSelect } from "../helpers/handle-location-select";
-import { CustomIcon } from "../components/icons/custom-map-icon";
+import React, { memo, useEffect, useRef, useState } from 'react';
+import { QRCodeGeneratorAction } from '../ts/types/reducer-types';
+import { QRCodeGeneratorState } from '../ts/interfaces/qr-code-generator-state';
+import L, { LatLng } from 'leaflet';
+import { INITIAL_POSITION } from '../constants/constants';
+import { Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import { handleLocationSelect } from '../helpers/handle-location-select';
+import { CustomIcon } from '../components/icons/custom-map-icon';
 
 const LocationPickerComponent: React.FC<{
   dispatch: React.Dispatch<QRCodeGeneratorAction>;
@@ -22,10 +22,10 @@ const LocationPickerComponent: React.FC<{
       handleLocationSelect(dispatch, setSelectedPosition)(latLng);
     };
 
-    map.on("click", handleMapClick);
+    map.on('click', handleMapClick);
 
     return () => {
-      map.off("click", handleMapClick);
+      map.off('click', handleMapClick);
     };
   }, [map, dispatch]);
 
@@ -33,7 +33,7 @@ const LocationPickerComponent: React.FC<{
     if (state.latitude && state.longitude) {
       const updatedLatLng = new LatLng(
         Number.parseFloat(state.latitude),
-        Number.parseFloat(state.longitude),
+        Number.parseFloat(state.longitude)
       );
       setSelectedPosition(updatedLatLng);
       map.flyTo(updatedLatLng);
@@ -47,10 +47,10 @@ const LocationPickerComponent: React.FC<{
         const { lat, lng } = marker.getLatLng();
         handleLocationSelect(
           dispatch,
-          setSelectedPosition,
+          setSelectedPosition
         )(new LatLng(lat, lng));
       }
-    },
+    }
   };
 
   return (
@@ -69,7 +69,7 @@ const LocationPickerComponent: React.FC<{
           eventHandlers={eventHandlers}
         >
           <Popup>
-            Latitude: {selectedPosition.lat.toFixed(4)}, Longitude:{" "}
+            Latitude: {selectedPosition.lat.toFixed(4)}, Longitude:{' '}
             {selectedPosition.lng.toFixed(4)}
           </Popup>
         </Marker>
@@ -78,6 +78,6 @@ const LocationPickerComponent: React.FC<{
   );
 };
 
-LocationPickerComponent.displayName = "LocationPicker";
+LocationPickerComponent.displayName = 'LocationPicker';
 
 export const LocationPicker = memo(LocationPickerComponent);

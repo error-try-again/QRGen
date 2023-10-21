@@ -10,8 +10,8 @@ import {
   UrlRequest,
   VCardRequest,
   WifiRequest,
-  ZoomRequest,
-} from "../interfaces/qr-code-request-interfaces";
+  ZoomRequest
+} from '../interfaces/qr-code-request-interfaces';
 
 export type AllRequests =
   | TextRequest

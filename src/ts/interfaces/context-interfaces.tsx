@@ -1,8 +1,8 @@
-import { initialState } from "../../constants/constants";
-import React, { ReactNode } from "react";
-import { QRCodeGeneratorAction } from "../types/reducer-types";
-import { Tabs } from "../enums/tabs-enum";
-import { QRCodeRequest } from "./qr-code-request-interfaces";
+import { initialState } from '../../constants/constants';
+import React, { ReactNode } from 'react';
+import { QRCodeGeneratorAction } from '../types/reducer-types';
+import { Tabs } from '../enums/tabs-enum';
+import { QRCodeRequest } from './qr-code-request-interfaces';
 
 export interface CoreContextType {
   activeTab: Tabs;

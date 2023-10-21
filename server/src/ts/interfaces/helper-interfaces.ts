@@ -1,4 +1,4 @@
-import { QRCodeErrorCorrectionLevel } from "qrcode";
+import { QRCodeErrorCorrectionLevel } from 'qrcode';
 
 interface BaseQRData {
   type: string;
@@ -9,7 +9,7 @@ interface BaseQRData {
 export interface QRData<
   T = {
     [key: string]: string | number | boolean | undefined;
-  },
+  }
 > extends BaseQRData {
   customData: T;
 }

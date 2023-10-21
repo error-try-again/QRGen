@@ -1,21 +1,21 @@
-import { styles } from "../assets/styles";
+import { styles } from '../assets/styles';
 import {
   DESKTOP_MEDIA_QUERY_THRESHOLD,
-  V_CARD_VERSION_LIST,
-} from "../constants/constants";
-import { VCardFields } from "../constants/fields";
-import { VCardParameters } from "../ts/interfaces/component-interfaces";
-import { handleVersionSelect } from "../helpers/handle-version-select";
+  V_CARD_VERSION_LIST
+} from '../constants/constants';
+import { VCardFields } from '../constants/fields';
+import { VCardParameters } from '../ts/interfaces/component-interfaces';
+import { handleVersionSelect } from '../helpers/handle-version-select';
 
 export function RenderVCard({
   dispatch,
   renderInputFieldsInColumns,
   selectedVersion,
-  setSelectedVersion,
+  setSelectedVersion
 }: VCardParameters) {
   const handleVersionChange = handleVersionSelect({
     setSelectedVersion,
-    dispatch,
+    dispatch
   });
 
   function RenderedVCard() {
@@ -25,7 +25,7 @@ export function RenderVCard({
       <>
         <div style={fieldContainer}>
           <p style={label}>vCard Version</p>
-          {V_CARD_VERSION_LIST.map((version) => {
+          {V_CARD_VERSION_LIST.map(version => {
             return (
               <div key={version}>
                 <input
@@ -54,7 +54,7 @@ export function RenderVCard({
     );
   }
 
-  RenderedVCard.displayName = "RenderedVCard";
+  RenderedVCard.displayName = 'RenderedVCard';
 
   return RenderedVCard;
 }

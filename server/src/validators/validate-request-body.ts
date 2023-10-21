@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import { handleErrorStatus } from "../routes/helpers/handle-error-status";
-import { ErrorType } from "../ts/enums/error-enum";
-import { validateBatchQRData, validateQRData } from "./data-validation-helper";
+import { Request, Response } from 'express';
+import { handleErrorStatus } from '../routes/helpers/handle-error-status';
+import { ErrorType } from '../ts/enums/error-enum';
+import { validateBatchQRData, validateQRData } from './data-validation-helper';
 
 export function errorHandlingMapping(error: Error, response: Response): void {
   const errorMappings: Record<string, number> = {
@@ -16,7 +16,7 @@ export function errorHandlingMapping(error: Error, response: Response): void {
     [ErrorType.ERROR_SETTING_HEADERS]: 500,
     [ErrorType.ERROR_APPENDING_FILES]: 500,
     [ErrorType.ERROR_FINALIZING_ARCHIVE]: 500,
-    [ErrorType.UNKNOWN_ARCHIVE_ERROR]: 500,
+    [ErrorType.UNKNOWN_ARCHIVE_ERROR]: 500
   };
 
   const statusCode = errorMappings[error.message] || 500;
@@ -31,7 +31,7 @@ export function errorHandlingMapping(error: Error, response: Response): void {
 }
 
 export const validateRequest = (request: Request, next: () => void): void => {
-  if (typeof request.body !== "object" || request.body === null) {
+  if (typeof request.body !== 'object' || request.body === null) {
     throw new Error(ErrorType.INVALID_TYPE);
   }
 
@@ -46,7 +46,7 @@ export const validateRequest = (request: Request, next: () => void): void => {
 
 export const validateBatchRequest = (
   request: Request,
-  next: () => void,
+  next: () => void
 ): void => {
   if (Array.isArray(request.body.qrCodes)) {
     validateBatchQRData({ qrData: request.body.qrCodes });

@@ -1,10 +1,10 @@
-import { ChangeEvent, useCallback } from "react";
-import { QRCodeRequest } from "../ts/interfaces/qr-code-request-interfaces";
-import { HandleInputChangeParameters } from "../ts/interfaces/component-interfaces";
+import { ChangeEvent, useCallback } from 'react';
+import { QRCodeRequest } from '../ts/interfaces/qr-code-request-interfaces';
+import { HandleInputChangeParameters } from '../ts/interfaces/component-interfaces';
 
 export function HandleInputChange({
   state,
-  dispatch,
+  dispatch
 }: HandleInputChangeParameters) {
   return useCallback(
     (
@@ -13,17 +13,17 @@ export function HandleInputChange({
           value: string;
         }
       >,
-      fieldName: keyof QRCodeRequest,
+      fieldName: keyof QRCodeRequest
     ) => {
       const value = event.target.value;
       if (state[fieldName] !== value) {
         dispatch({
-          type: "SET_FIELD",
+          type: 'SET_FIELD',
           field: fieldName,
-          value,
+          value
         });
       }
     },
-    [dispatch, state],
+    [dispatch, state]
   );
 }

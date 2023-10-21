@@ -1,5 +1,5 @@
-import React from "react";
-import { ErrorBoundaryProperties } from "../ts/interfaces/util-interfaces";
+import React from 'react';
+import { ErrorBoundaryProperties } from '../ts/interfaces/util-interfaces';
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProperties> {
   override state = { hasError: false };
@@ -9,7 +9,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties> {
   }
 
   override componentDidCatch = (error: Error, errorInfo: React.ErrorInfo) => {
-    console.error("ErrorBoundary caught an error", error, errorInfo);
+    console.error('ErrorBoundary caught an error', error, errorInfo);
   };
 
   override render() {

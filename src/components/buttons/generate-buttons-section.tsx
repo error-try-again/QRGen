@@ -1,34 +1,34 @@
-import React from "react";
-import { styles } from "../../assets/styles";
-import { Tabs } from "../../ts/enums/tabs-enum";
-import { ValidateInput } from "../../validators/validate-input";
-import { resetBatchAndLoadingState } from "../../helpers/reset-loading-state";
-import { HandleBatchResponse } from "../../responses/handle-batch-response";
-import { HandleSingleResponse } from "../../responses/handle-single-response";
-import { UpdateBatchJob } from "../../services/batching/update-batch-job";
-import { GenerateButtonsSectionParameters } from "../../ts/interfaces/component-interfaces";
+import { styles } from '../../assets/styles';
+import { Tabs } from '../../ts/enums/tabs-enum';
+import { ValidateInput } from '../../validators/validate-input';
+import { resetBatchAndLoadingState } from '../../helpers/reset-loading-state';
+import { HandleBatchResponse } from '../../responses/handle-batch-response';
+import { HandleSingleResponse } from '../../responses/handle-single-response';
+import { UpdateBatchJob } from '../../services/batching/update-batch-job';
+import { useCore } from '../../hooks/use-core';
 
-export const GenerateButtonsSection: React.FC<
-  GenerateButtonsSectionParameters
-> = ({
-  state,
-  dispatch,
-  activeTab,
-  qrBatchCount,
-  setQrBatchCount,
-  batchData,
-  setBatchData,
-  setError,
-}) => {
+export const GenerateButtonsSection = () => {
   const { generateButton, qrButtonsContainer } = styles;
+
+  const {
+    dispatch,
+    state,
+    setError,
+    activeTab,
+    qrBatchCount,
+    setQrBatchCount,
+    batchData,
+    setBatchData
+  } = useCore();
+
   const handleQRGeneration = async (isBatchAction: boolean) => {
     const validateInput = ValidateInput({
       activeTab,
-      dispatch,
-      setBatchData,
-      setError,
-      setQrBatchCount,
       state,
+      setError,
+      setBatchData,
+      setQrBatchCount,
+      dispatch
     });
 
     if (!validateInput()) {
@@ -42,15 +42,20 @@ export const GenerateButtonsSection: React.FC<
     }
 
     if (isBatchAction) {
-      UpdateBatchJob({ state, activeTab, setQrBatchCount, setBatchData })();
+      UpdateBatchJob({
+        state,
+        setBatchData,
+        setQrBatchCount,
+        activeTab
+      })();
       return;
     }
 
-    dispatch({ type: "SET_LOADING", value: true });
-    const endpoint = qrBatchCount > 1 ? "/qr/batch" : "/qr/generate";
+    dispatch({ type: 'SET_LOADING', value: true });
+    const endpoint = qrBatchCount > 1 ? '/qr/batch' : '/qr/generate';
 
     if (qrBatchCount === 1) {
-      const errorMessage = "Please add at least 2 QR codes to the batch.";
+      const errorMessage = 'Please add at least 2 QR codes to the batch.';
       setError(errorMessage);
       return;
     }
@@ -60,25 +65,25 @@ export const GenerateButtonsSection: React.FC<
         ? { qrCodes: batchData }
         : {
             customData: { ...state },
-            type: Tabs[activeTab],
+            type: Tabs[activeTab]
           };
 
-    console.log("requestData", requestData);
+    console.log('requestData', requestData);
 
     try {
       const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
       });
 
-      console.log("response", response);
+      console.log('response', response);
 
       if (!response.ok || response.status === 429) {
         const errorMessage =
-          "Failed to generate the QR code. Please try again later.";
+          'Failed to generate the QR code. Please try again later.';
         setError(errorMessage);
-        dispatch({ type: "SET_QRCODE_URL", value: "" });
+        dispatch({ type: 'SET_QRCODE_URL', value: '' });
         resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
         return;
       }
@@ -88,19 +93,19 @@ export const GenerateButtonsSection: React.FC<
             setError,
             setBatchData,
             setQrBatchCount,
-            dispatch,
+            dispatch
           })(response)
         : await HandleSingleResponse({
             dispatch,
             setError,
             setBatchData,
-            setQrBatchCount,
+            setQrBatchCount
           })(response);
     } catch {
       const errorMessage =
-        "Failed to generate the QR code. Please try again later.";
+        'Failed to generate the QR code. Please try again later.';
       setError(errorMessage);
-      dispatch({ type: "SET_QRCODE_URL", value: "" });
+      dispatch({ type: 'SET_QRCODE_URL', value: '' });
       resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
     }
   };
@@ -123,7 +128,7 @@ export const GenerateButtonsSection: React.FC<
       >
         {qrBatchCount >= 1
           ? `Generate Zip (${qrBatchCount})`
-          : "Generate QR Code"}
+          : 'Generate QR Code'}
       </button>
     </div>
   );

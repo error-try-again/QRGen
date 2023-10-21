@@ -1,17 +1,10 @@
-import { QRCodeGeneratorState } from "./qr-code-generator-state";
-import { Tabs } from "../enums/tabs-enum";
-import React, { ChangeEvent } from "react";
-import { QRCodeRequest } from "./qr-code-request-interfaces";
-import { QRCodeGeneratorAction } from "../types/reducer-types";
+import { QRCodeGeneratorState } from './qr-code-generator-state';
+import { Tabs } from '../enums/tabs-enum';
+import React, { ChangeEvent } from 'react';
+import { QRCodeRequest } from './qr-code-request-interfaces';
+import { QRCodeGeneratorAction } from '../types/reducer-types';
 
-export interface AllTabsParameters {
-  dispatch: React.Dispatch<QRCodeGeneratorAction>;
-  selectedCrypto: string;
-  selectedVersion: string;
-  setError: (value: ((previousState: string) => string) | string) => void;
-  setSelectedCrypto: React.Dispatch<React.SetStateAction<string>>;
-  setSelectedVersion: React.Dispatch<React.SetStateAction<string>>;
-  state: QRCodeGeneratorState;
+export interface TabParameters {
   tab: Tabs;
 }
 
@@ -35,10 +28,10 @@ export interface InputFieldParameters {
   keyName: keyof QRCodeRequest;
   value: string | boolean | null | undefined;
   type?: string;
-  setError: React.Dispatch<React.SetStateAction<string | "">>;
+  setError: React.Dispatch<React.SetStateAction<string | ''>>;
   handleChange: (
     event: ChangeEvent<HTMLInputElement>,
-    fieldName: keyof QRCodeRequest,
+    fieldName: keyof QRCodeRequest
   ) => void;
 }
 
@@ -48,11 +41,11 @@ export interface ValidateInputParameters {
   setBatchData: (
     value:
       | ((previousState: QRCodeRequest[]) => QRCodeRequest[])
-      | QRCodeRequest[],
+      | QRCodeRequest[]
   ) => void;
   setError: (value: ((previousState: string) => string) | string) => void;
   setQrBatchCount: (
-    value: ((previousState: number) => number) | number,
+    value: ((previousState: number) => number) | number
   ) => void;
   state: QRCodeGeneratorState;
 }
@@ -62,11 +55,11 @@ export interface HandleTabChangeParameters {
   setBatchData: (
     value:
       | ((previousState: QRCodeRequest[]) => QRCodeRequest[])
-      | QRCodeRequest[],
+      | QRCodeRequest[]
   ) => void;
   setError: (value: ((previousState: string) => string) | string) => void;
   setQrBatchCount: (
-    value: ((previousState: number) => number) | number,
+    value: ((previousState: number) => number) | number
   ) => void;
   setTab: React.Dispatch<React.SetStateAction<Tabs>>;
 }
@@ -76,11 +69,11 @@ export interface HandleResponseParameters {
   setBatchData: (
     value:
       | ((previousState: QRCodeRequest[]) => QRCodeRequest[])
-      | QRCodeRequest[],
+      | QRCodeRequest[]
   ) => void;
   setError: (value: ((previousState: string) => string) | string) => void;
   setQrBatchCount: (
-    value: ((previousState: number) => number) | number,
+    value: ((previousState: number) => number) | number
   ) => void;
 }
 
@@ -93,31 +86,31 @@ export interface VCardParameters {
   dispatch: React.Dispatch<QRCodeGeneratorAction>;
   renderInputFieldsInColumns: (
     fields: (keyof QRCodeRequest)[],
-    columns: number,
+    columns: number
   ) => React.JSX.Element;
   selectedVersion: string;
   setSelectedVersion: (
-    value: ((previousState: string) => string) | string,
+    value: ((previousState: string) => string) | string
   ) => void;
 }
 
 export interface MeCardParameters {
   renderInputFieldsInColumns: (
     fields: (keyof QRCodeRequest)[],
-    columns: number,
+    columns: number
   ) => React.JSX.Element;
 }
 
 export interface HandleCryptoSelectParameters {
   setSelectedCrypto: (
-    value: ((previousState: string) => string) | string,
+    value: ((previousState: string) => string) | string
   ) => void;
   dispatch: React.Dispatch<QRCodeGeneratorAction>;
 }
 
 export interface HandleVersionSelectParameters {
   setSelectedVersion: (
-    value: ((previousState: string) => string) | string,
+    value: ((previousState: string) => string) | string
   ) => void;
   dispatch: React.Dispatch<QRCodeGeneratorAction>;
 }

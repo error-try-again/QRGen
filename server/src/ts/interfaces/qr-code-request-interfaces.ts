@@ -7,7 +7,7 @@ export interface TextRequest {
 }
 
 export interface WifiRequest {
-  encryption?: "WEP" | "WPA" | "WPA2" | "WPA3";
+  encryption?: 'WEP' | 'WPA' | 'WPA2' | 'WPA3';
   hidden?: boolean;
   password?: string;
   ssid?: string;
@@ -54,7 +54,7 @@ export interface ZoomRequest {
 }
 
 export interface VCardRequest {
-  version?: "2.1" | "3.0" | "4.0";
+  version?: '2.1' | '3.0' | '4.0';
   city?: string;
   country?: string;
   email?: string;

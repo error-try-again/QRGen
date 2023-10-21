@@ -1,19 +1,19 @@
-import { DefaultUnknownParameters } from "../ts/interfaces/util-interfaces";
+import { DefaultUnknownParameters } from '../ts/interfaces/util-interfaces';
 
 // Convert value to string to ensure type safety and prevent errors
 export function convertValueToString({
-  value,
+  value
 }: DefaultUnknownParameters): string {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return value;
   }
-  if (typeof value === "boolean") {
+  if (typeof value === 'boolean') {
     // convert boolean to string for display
-    return value ? "True" : "False";
+    return value ? 'True' : 'False';
   }
   if (value === null || value === undefined) {
     // convert null or undefined to empty string
-    return "";
+    return '';
   }
   // Log a warning if the value is not a string, boolean, null or undefined
   console.warn(`Unexpected value type: ${typeof value}`);

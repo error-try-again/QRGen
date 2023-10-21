@@ -1,11 +1,17 @@
-import QRCode, { QRCodeErrorCorrectionLevel } from "qrcode";
-import { DEFAULT_QR_SIZE } from "../config";
+import QRCode, { QRCodeErrorCorrectionLevel } from 'qrcode';
+import { DEFAULT_QR_SIZE } from '../config';
 
-export const generateQR = async (
-  data: string,
-  size: string | number,
-  precision: QRCodeErrorCorrectionLevel,
-): Promise<string> => {
+interface GenerateQRParameters {
+  data: string;
+  size: string | number;
+  precision: QRCodeErrorCorrectionLevel;
+}
+
+export const generateQR = async ({
+  data,
+  size,
+  precision
+}: GenerateQRParameters): Promise<string> => {
   let parsedSize = Number(size);
 
   if (Number.isNaN(parsedSize) || parsedSize < 50 || parsedSize > 1000) {
@@ -15,7 +21,7 @@ export const generateQR = async (
   return QRCode.toDataURL(data, {
     errorCorrectionLevel: precision,
     margin: 1,
-    type: "image/png",
-    width: parsedSize,
+    type: 'image/png',
+    width: parsedSize
   });
 };
