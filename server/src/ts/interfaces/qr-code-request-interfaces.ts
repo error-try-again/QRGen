@@ -54,7 +54,7 @@ export interface ZoomRequest {
 }
 
 export interface VCardRequest {
-  version?: '2.1' | '3.0' | '4.0';
+  version?: string;
   city?: string;
   country?: string;
   email?: string;

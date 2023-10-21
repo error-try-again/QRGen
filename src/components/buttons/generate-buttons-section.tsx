@@ -1,11 +1,16 @@
 import { styles } from '../../assets/styles';
 import { Tabs } from '../../ts/enums/tabs-enum';
 import { ValidateInput } from '../../validators/validate-input';
-import { resetBatchAndLoadingState } from '../../helpers/reset-loading-state';
+import {
+  dispatchInitialTabState,
+  resetBatchAndLoadingState
+} from '../../helpers/reset-loading-state';
 import { HandleBatchResponse } from '../../responses/handle-batch-response';
 import { HandleSingleResponse } from '../../responses/handle-single-response';
 import { UpdateBatchJob } from '../../services/batching/update-batch-job';
 import { useCore } from '../../hooks/use-core';
+import { setInitialTabState } from '../../helpers/check-tab-type.tsx';
+import { useEffect } from 'react';
 
 export const GenerateButtonsSection = () => {
   const { generateButton, qrButtonsContainer } = styles;
@@ -21,6 +26,12 @@ export const GenerateButtonsSection = () => {
     setBatchData
   } = useCore();
 
+  useEffect(() => {
+    const initialState = setInitialTabState(activeTab);
+
+    dispatchInitialTabState({ dispatch, initialState });
+  }, [activeTab, dispatch]);
+
   const handleQRGeneration = async (isBatchAction: boolean) => {
     const validateInput = ValidateInput({
       activeTab,
@@ -32,7 +43,11 @@ export const GenerateButtonsSection = () => {
     });
 
     if (!validateInput()) {
-      resetBatchAndLoadingState({ dispatch, setBatchData, setQrBatchCount });
+      resetBatchAndLoadingState({
+        dispatch,
+        setBatchData,
+        setQrBatchCount
+      });
       return;
     }
 
@@ -76,8 +91,6 @@ export const GenerateButtonsSection = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData)
       });
-
-      console.log('response', response);
 
       if (!response.ok || response.status === 429) {
         const errorMessage =

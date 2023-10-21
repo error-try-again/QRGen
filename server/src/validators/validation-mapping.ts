@@ -31,8 +31,8 @@ export const validators: {
   SMS: ({ phone, sms }: SMSRequest) => Boolean(phone && sms),
   Text: ({ text }: TextRequest) => Boolean(text),
   Url: ({ url }: UrlRequest) => Boolean(url),
-  VCard: ({ firstName, lastName, email, phoneWork }: VCardRequest) =>
-    Boolean(firstName && lastName && email && phoneWork),
+  VCard: ({ version, firstName, lastName, email, phoneWork }: VCardRequest) =>
+    Boolean(version && firstName && lastName && email && phoneWork),
   MeCard: ({ firstName, lastName, phone1 }: MeCardRequest) =>
     Boolean(firstName && lastName && phone1),
   WiFi: ({ encryption, ssid }: WifiRequest) => Boolean(ssid && encryption),

@@ -16,21 +16,17 @@ export interface ResetBatchAndLoadingStateParameters {
   initialState?: QRCodeGeneratorState;
 }
 
-export function resetBatchAndLoadingState({
-  setBatchData,
-  setQrBatchCount,
+export function dispatchInitialTabState({
   dispatch,
   initialState
-}: ResetBatchAndLoadingStateParameters) {
-  function clear() {
-    setBatchData([]);
-    setQrBatchCount(0);
-    dispatch({ type: 'SET_LOADING', value: false });
-  }
-
+}: {
+  dispatch: React.Dispatch<QRCodeGeneratorAction>;
+  initialState?: QRCodeGeneratorState;
+}) {
   function handleInitialDispatch() {
     if (initialState) {
       if (initialState.cryptoType) {
+        console.log('initialState.cryptoType', initialState.cryptoType);
         dispatch({
           type: 'SET_FIELD',
           field: 'cryptoType',
@@ -46,6 +42,19 @@ export function resetBatchAndLoadingState({
     }
   }
 
-  clear();
   handleInitialDispatch();
+}
+
+export function resetBatchAndLoadingState({
+  setBatchData,
+  setQrBatchCount,
+  dispatch
+}: ResetBatchAndLoadingStateParameters) {
+  function clear() {
+    setBatchData([]);
+    setQrBatchCount(0);
+    dispatch({ type: 'SET_LOADING', value: false });
+  }
+
+  clear();
 }
