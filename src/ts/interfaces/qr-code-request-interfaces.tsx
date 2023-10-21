@@ -6,7 +6,7 @@ export interface UrlRequest {
     url?: string;
 }
 
-export  interface TextRequest {
+export interface TextRequest {
     text?: string;
 }
 

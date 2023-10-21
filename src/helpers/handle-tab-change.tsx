@@ -1,6 +1,6 @@
 import {Tabs} from "../ts/enums/tabs-enum";
 import {resetBatchAndLoadingState} from "./reset-loading-state";
-import {HandleTabChangeParameters} from "../ts/interfaces/component-interfaces.tsx";
+import {HandleTabChangeParameters} from "../ts/interfaces/component-interfaces";
 
 export function HandleTabChange({setError, setBatchData, setQrBatchCount, dispatch, setTab}: HandleTabChangeParameters) {
     return (freshTab: Tabs) => {

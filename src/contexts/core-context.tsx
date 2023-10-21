@@ -10,27 +10,27 @@ export const CoreProvider: React.FC<CoreProviderProperties> = ({children}) => {
     const [state, dispatch] = useReducer(qrCodeReducer, initialState);
     const [activeTab, setActiveTab] = useState<Tabs>(Tabs.Text);
     const [selectedCrypto, setSelectedCrypto] = useState<string>('bitcoin');
+    const [selectedVersion, setSelectedVersion] = useState<string>('3.0');
     const [error, setError] = useState<string>("");
     const [qrBatchCount, setQrBatchCount] = useState<number>(0); // Add state to keep track of batch count
     const [batchData, setBatchData] = useState<QRCodeRequest[]>([]);
-    const [selectedVersion, setSelectedVersion] = useState<string>('4.0');
 
     // Provide all state and setters to context consumers
     const value: CoreContextType = {
-        state,
-        dispatch,
         activeTab,
-        setActiveTab,
-        selectedCrypto,
-        setSelectedCrypto,
-        error,
-        setError,
-        qrBatchCount,
-        setQrBatchCount,
         batchData,
-        setBatchData,
+        dispatch,
+        error,
+        qrBatchCount,
+        selectedCrypto,
         selectedVersion,
-        setSelectedVersion
+        setActiveTab,
+        setBatchData,
+        setError,
+        setQrBatchCount,
+        setSelectedCrypto,
+        setSelectedVersion,
+        state
     };
 
     return (

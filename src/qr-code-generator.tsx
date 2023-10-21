@@ -47,12 +47,12 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
     const TabSections = RenderAllTabs({
         dispatch: dispatch,
         selectedCrypto: selectedCrypto,
+        selectedVersion: selectedVersion,
         setError: setError,
         setSelectedCrypto: setSelectedCrypto,
+        setSelectedVersion: setSelectedVersion,
         state: state,
-        tab: activeTab,
-        selectedVersion: selectedVersion,
-        setSelectedVersion: setSelectedVersion
+        tab: activeTab
     });
 
     const {

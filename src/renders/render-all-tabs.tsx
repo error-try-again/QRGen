@@ -14,8 +14,8 @@ import {RenderFieldsAsColumns} from "./render-fields-as-cols";
 import {handleCryptoSelect} from "../helpers/handle-crypto-select";
 import {RenderInputFields} from "./render-input-fields";
 import {LocationPicker} from "../services/map-location-picker";
-import {AllTabsParameters} from "../ts/interfaces/component-interfaces.tsx";
-import {requiredFieldsMapping} from "../validators/validation-mapping.tsx";
+import {AllTabsParameters} from "../ts/interfaces/component-interfaces";
+import {requiredFieldsMapping} from "../validators/validation-mapping";
 
 export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, setSelectedCrypto, selectedVersion, setSelectedVersion}: AllTabsParameters) => {
 
@@ -81,9 +81,7 @@ export const RenderAllTabs = ({tab, state, dispatch, setError, selectedCrypto, s
                                 name="cryptoType"
                                 value={cryptoType}
                                 checked={selectedCrypto === cryptoType}
-                                onChange={() => {
-                                    handleCryptoChange({cryptoType});
-                                }}
+                                onChange={() => handleCryptoChange({cryptoType})}
                                 defaultChecked={cryptoType === 'bitcoin'}
                             />
                             <label htmlFor={cryptoType}> {cryptoType}</label><br/>

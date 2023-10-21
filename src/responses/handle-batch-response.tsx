@@ -1,6 +1,5 @@
 import {resetBatchAndLoadingState} from "../helpers/reset-loading-state";
-import {HandleResponseParameters} from "../ts/interfaces/component-interfaces.tsx";
-
+import {HandleResponseParameters} from "../ts/interfaces/component-interfaces";
 
 export function HandleBatchResponse({setError, setBatchData, setQrBatchCount, dispatch}: HandleResponseParameters) {
     return async (response: Response) => {

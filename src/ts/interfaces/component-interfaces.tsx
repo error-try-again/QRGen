@@ -1,8 +1,8 @@
-import {QRCodeGeneratorState} from "./qr-code-generator-state.tsx";
-import {Tabs} from "../enums/tabs-enum.tsx";
+import {QRCodeGeneratorState} from "./qr-code-generator-state";
+import {Tabs} from "../enums/tabs-enum";
 import React, {ChangeEvent} from "react";
-import {QRCodeRequest} from "./qr-code-request-interfaces.tsx";
-import {QRCodeGeneratorAction} from "../types/reducer-types.tsx";
+import {QRCodeRequest} from "./qr-code-request-interfaces";
+import {QRCodeGeneratorAction} from "../types/reducer-types";
 
 export interface AllTabsParameters {
     dispatch: React.Dispatch<QRCodeGeneratorAction>;

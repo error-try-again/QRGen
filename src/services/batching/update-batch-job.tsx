@@ -1,6 +1,6 @@
 import {Tabs} from "../../ts/enums/tabs-enum";
 import {QRCodeRequest} from "../../ts/interfaces/qr-code-request-interfaces";
-import {UpdateBatchJobParameters} from "../../ts/interfaces/component-interfaces.tsx";
+import {UpdateBatchJobParameters} from "../../ts/interfaces/component-interfaces";
 
 export function UpdateBatchJob({state, activeTab, setQrBatchCount, setBatchData}: UpdateBatchJobParameters) {
     return () => {

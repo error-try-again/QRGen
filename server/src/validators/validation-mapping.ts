@@ -24,12 +24,12 @@ export const validators: {
     'Email': ({email}: EmailRequest) => Boolean(email),
     'Event': ({endTime, startTime, venue}: EventRequest) => Boolean(venue && startTime && endTime),
     'GeoLocation': ({latitude, longitude}: GeoLocationRequest) => Boolean(latitude && longitude),
-    'MeCard': ({email, firstName, lastName, phone1}: MeCardRequest) => Boolean(firstName && lastName && email && phone1),
     'Phone': (data: PhoneRequest) => Boolean(data.phone),
     'SMS': ({phone, sms}: SMSRequest) => Boolean(phone && sms),
     'Text': ({text}: TextRequest) => Boolean(text),
     'Url': ({url}: UrlRequest) => Boolean(url),
-    'VCard': ({email, firstName, lastName, phoneWork}: VCardRequest) => Boolean(firstName && lastName && email && phoneWork),
+    'VCard': ({ firstName, lastName, email, phoneWork }: VCardRequest) => Boolean(firstName && lastName && email && phoneWork),
+    'MeCard': ({firstName, lastName, phone1}: MeCardRequest) => Boolean(firstName && lastName && phone1),
     'WiFi': ({encryption, ssid}: WifiRequest) => Boolean(ssid && encryption),
     'Zoom': ({zoomId, zoomPass}: ZoomRequest) => Boolean(zoomId && zoomPass)
 };

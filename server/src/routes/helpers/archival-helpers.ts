@@ -5,8 +5,6 @@ import archiver, {Archiver} from "archiver";
 import {handleErrorStatus} from "./handle-error-status";
 import {ErrorType} from "../../ts/enums/error-enum";
 
-
-
 async function setArchiveHeaders(response: Response) {
     try {
         // Provide a unique name for the archive corresponding to the date and time
@@ -15,6 +13,7 @@ async function setArchiveHeaders(response: Response) {
         response.setHeader('Content-Disposition', `attachment; filename=bulk_qr_${dateStamp}.zip`);
     } catch {
         handleErrorStatus({response, errorType: ErrorType.ERROR_SETTING_HEADERS});
+        throw new TypeError(ErrorType.ERROR_SETTING_HEADERS);
     }
 }
 
@@ -33,8 +32,10 @@ export async function prepareAndSendArchive(qrCodes: ProcessedQRData<AllRequests
     } catch (error) {
         if (error instanceof Error) {
             handleErrorStatus({response, errorType: ErrorType.ERROR_FINALIZING_ARCHIVE});
+            throw new TypeError(ErrorType.ERROR_FINALIZING_ARCHIVE);
         } else {
             handleErrorStatus({response, errorType: ErrorType.UNKNOWN_ARCHIVE_ERROR});
+            throw new TypeError(ErrorType.UNKNOWN_ARCHIVE_ERROR);
         }
     }
 }
@@ -67,6 +68,7 @@ function appendQRCodesToArchive({response, qrCodes, archive}: {
             }
         } catch {
             handleErrorStatus({response, errorType: ErrorType.ERROR_APPENDING_FILES});
+            throw new TypeError(ErrorType.ERROR_APPENDING_FILES);
         }
     }
 }

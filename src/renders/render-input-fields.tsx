@@ -2,8 +2,8 @@ import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
 import {HandleInputChange} from "../callbacks/handle-input-change";
 import {InputField} from "../components/fields/input-field";
 import {convertValueToString} from "../utils/convert-to-string";
-import {RenderInputFieldsParameters} from "../ts/interfaces/component-interfaces.tsx";
-import {requiredFieldsMapping} from "../validators/validation-mapping.tsx";
+import {RenderInputFieldsParameters} from "../ts/interfaces/component-interfaces";
+import {requiredFieldsMapping} from "../validators/validation-mapping";
 
 export function RenderInputFields({
                                       tab,

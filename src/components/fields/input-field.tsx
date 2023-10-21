@@ -2,7 +2,7 @@ import {styles} from "../../assets/styles";
 import * as React from "react";
 import {ChangeEvent} from "react";
 import {convertValueToString} from "../../utils/convert-to-string";
-import {InputFieldParameters} from "../../ts/interfaces/component-interfaces.tsx";
+import {InputFieldParameters} from "../../ts/interfaces/component-interfaces";
 
 export const InputFieldComponent: React.FC<InputFieldParameters> = React.memo(({
                                                                                    isRequired = false,

@@ -1,6 +1,6 @@
 import {DESKTOP_MEDIA_QUERY_THRESHOLD} from "../constants/constants";
 import {MeCardFields} from "../constants/fields";
-import {MeCardParameters} from "../ts/interfaces/component-interfaces.tsx";
+import {MeCardParameters} from "../ts/interfaces/component-interfaces";
 
 export function renderMeCard({renderInputFieldsInColumns}: MeCardParameters) {
     function RenderedMeCard() {

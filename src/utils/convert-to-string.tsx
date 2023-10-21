@@ -1,4 +1,4 @@
-import {DefaultUnknownParameters} from "../ts/interfaces/util-interfaces.tsx";
+import {DefaultUnknownParameters} from "../ts/interfaces/util-interfaces";
 
 // Convert value to string to ensure type safety and prevent errors
 export function convertValueToString({value}: DefaultUnknownParameters): string {

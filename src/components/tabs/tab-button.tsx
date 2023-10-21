@@ -1,7 +1,7 @@
 import {styles} from "../../assets/styles";
 import * as React from "react";
 import {memo} from "react";
-import {TabButtonParameters} from "../../ts/interfaces/component-interfaces.tsx";
+import {TabButtonParameters} from "../../ts/interfaces/component-interfaces";
 
 export const TabButtonComponent: React.FC<TabButtonParameters> = memo(({activeTab, handleTabChange, label, tab}) => {
     const {tabButton} = styles;

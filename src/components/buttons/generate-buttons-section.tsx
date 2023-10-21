@@ -5,8 +5,8 @@ import {ValidateInput} from "../../validators/validate-input";
 import {resetBatchAndLoadingState} from "../../helpers/reset-loading-state";
 import {HandleBatchResponse} from "../../responses/handle-batch-response";
 import {HandleSingleResponse} from "../../responses/handle-single-response";
-import {UpdateBatchJob} from "../../services/batching/update-batch-job.tsx";
-import {GenerateButtonsSectionParameters} from "../../ts/interfaces/component-interfaces.tsx";
+import {UpdateBatchJob} from "../../services/batching/update-batch-job";
+import {GenerateButtonsSectionParameters} from "../../ts/interfaces/component-interfaces";
 
 export const GenerateButtonsSection: React.FC<GenerateButtonsSectionParameters> = ({
                                                                                        state,
@@ -51,10 +51,9 @@ export const GenerateButtonsSection: React.FC<GenerateButtonsSectionParameters> 
             ? {qrCodes: batchData}
             : {
                 customData: {...state},
-                precision: state.precision,
-                size: state.size,
                 type: Tabs[activeTab]
             };
+
         console.log('requestData', requestData);
 
         try {
@@ -63,6 +62,8 @@ export const GenerateButtonsSection: React.FC<GenerateButtonsSectionParameters> 
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(requestData)
             });
+
+            console.log('response', response);
 
             if (!response.ok || response.status === 429) {
                 const errorMessage = 'Failed to generate the QR code. Please try again later.';

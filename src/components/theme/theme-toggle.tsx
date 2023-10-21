@@ -1,5 +1,5 @@
 import {styles} from "../../assets/styles";
-import {ThemeContextType} from "../../contexts/theme-context.tsx";
+import {ThemeContextType} from "../../contexts/theme-context";
 
 export const ThemeToggle = ({toggleTheme, theme}: ThemeContextType) => {
     const {tabButton} = styles;

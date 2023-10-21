@@ -2,8 +2,8 @@ import {QRCodeRequest} from "../ts/interfaces/qr-code-request-interfaces";
 import {HandleInputChange} from "../callbacks/handle-input-change";
 import {InputField} from "../components/fields/input-field";
 import {styles} from "../assets/styles";
-import {RenderInputFieldsParameters} from "../ts/interfaces/component-interfaces.tsx";
-import {requiredFieldsMapping} from "../validators/validation-mapping.tsx";
+import {RenderInputFieldsParameters} from "../ts/interfaces/component-interfaces";
+import {requiredFieldsMapping} from "../validators/validation-mapping";
 
 // Function to render the fields distributed across the specified number of columns.
 export function RenderFieldsAsColumns({tab, state, dispatch, setError}: RenderInputFieldsParameters) {

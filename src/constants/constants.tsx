@@ -16,9 +16,9 @@ export const CRYPTO_TYPES = [
 ];
 
 export const V_CARD_VERSION_LIST = [
-    '2.1',
-    '3.0',
     '4.0',
+    '3.0',
+    '2.1',
 ];
 
 export const DESKTOP_MEDIA_QUERY_THRESHOLD = 768;

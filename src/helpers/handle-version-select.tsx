@@ -1,5 +1,5 @@
-import {HandleVersionSelectParameters} from "../ts/interfaces/component-interfaces.tsx";
-import {VersionField} from "../ts/interfaces/field-interfaces.tsx";
+import {HandleVersionSelectParameters} from "../ts/interfaces/component-interfaces";
+import {VersionField} from "../ts/interfaces/field-interfaces";
 
 export function handleVersionSelect({setSelectedVersion, dispatch}: HandleVersionSelectParameters) {
     return ({version}: VersionField) => {

@@ -5,7 +5,7 @@ import {ValidateInput} from "../validators/validate-input";
 import {HandleFetchError} from "../helpers/handle-fetch-error";
 import {HandleErrorResponse} from "../responses/handle-error-response";
 import {HandleBatchResponse} from "../responses/handle-batch-response";
-import {QRGenerationParameters} from "../ts/interfaces/component-interfaces.tsx";
+import {QRGenerationParameters} from "../ts/interfaces/component-interfaces";
 
 export function QRGeneration({
                                  dispatch,

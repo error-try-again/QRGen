@@ -1,5 +1,5 @@
-import {HandleCryptoSelectParameters} from "../ts/interfaces/component-interfaces.tsx";
-import {CryptoTypeField} from "../ts/interfaces/field-interfaces.tsx";
+import {HandleCryptoSelectParameters} from "../ts/interfaces/component-interfaces";
+import {CryptoTypeField} from "../ts/interfaces/field-interfaces";
 
 export function handleCryptoSelect({setSelectedCrypto, dispatch}: HandleCryptoSelectParameters) {
     return ({cryptoType}: CryptoTypeField) => {

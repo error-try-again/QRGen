@@ -7,18 +7,18 @@ export interface TextRequest {
 }
 
 export interface WifiRequest {
-    ssid?: string;
     encryption?: 'WEP' | 'WPA' | 'WPA2' | 'WPA3';
     hidden?: boolean;
     password?: string;
+    ssid?: string;
 }
 
 export interface EmailRequest {
-    email?: string;
-    subject?: string;
+    bcc?: string;
     body?: string;
     cc?: string;
-    bcc?: string;
+    email?: string;
+    subject?: string;
 }
 
 export interface PhoneRequest {
@@ -31,10 +31,10 @@ export interface SMSRequest {
 }
 
 export interface EventRequest {
-    event?: string;
-    venue?: string;
-    startTime?: string;
     endTime?: string;
+    event?: string;
+    startTime?: string;
+    venue?: string;
 }
 
 export interface GeoLocationRequest {
@@ -43,9 +43,9 @@ export interface GeoLocationRequest {
 }
 
 export interface CryptoRequest {
-    cryptoType?: string;
     address?: string;
     amount?: string;
+    cryptoType?: string;
 }
 
 export interface ZoomRequest {
@@ -55,38 +55,38 @@ export interface ZoomRequest {
 
 export interface VCardRequest {
     version?: '2.1' | '3.0' | '4.0';
+    city?: string;
+    country?: string;
+    email?: string;
+    faxPrivate?: string;
+    faxWork?: string;
     firstName?: string;
     lastName?: string;
     organization?: string;
-    position?: string;
-    phoneWork?: string;
-    phonePrivate?: string;
     phoneMobile?: string;
-    faxWork?: string;
-    faxPrivate?: string;
-    email?: string;
-    website?: string;
-    street?: string;
-    zipcode?: string;
-    city?: string;
+    phonePrivate?: string;
+    phoneWork?: string;
+    position?: string;
     state?: string;
-    country?: string;
+    street?: string;
+    website?: string;
+    zipcode?: string;
 }
 
 export interface MeCardRequest {
+    birthday?: string;
+    city?: string;
+    country?: string;
+    email?: string;
     firstName?: string;
     lastName?: string;
     nickname?: string;
+    notes?: string;
     phone1?: string;
     phone2?: string;
     phone3?: string;
-    email?: string;
-    website?: string;
-    birthday?: string;
-    street?: string;
-    zipcode?: string;
-    city?: string;
     state?: string;
-    country?: string;
-    notes?: string;
+    street?: string;
+    website?: string;
+    zipcode?: string;
 }
