@@ -1,7 +1,7 @@
 import { QRCodeRequest } from '../ts/interfaces/qr-code-request-interfaces';
 import React from 'react';
 import { QRCodeGeneratorAction } from '../ts/types/reducer-types';
-import { QRCodeGeneratorState } from '../ts/interfaces/qr-code-generator-state.tsx';
+import { QRCodeGeneratorState } from '../ts/interfaces/qr-code-generator-state';
 
 export interface ResetBatchAndLoadingStateParameters {
   setBatchData: (

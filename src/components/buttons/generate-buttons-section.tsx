@@ -9,7 +9,7 @@ import { HandleBatchResponse } from '../../responses/handle-batch-response';
 import { HandleSingleResponse } from '../../responses/handle-single-response';
 import { UpdateBatchJob } from '../../services/batching/update-batch-job';
 import { useCore } from '../../hooks/use-core';
-import { setInitialTabState } from '../../helpers/check-tab-type.tsx';
+import { setInitialTabState } from '../../helpers/check-tab-type';
 import { useEffect } from 'react';
 
 export const GenerateButtonsSection = () => {

@@ -1,5 +1,5 @@
 import { styles } from '../../assets/styles';
-import { useTheme } from '../../hooks/use-theme.tsx';
+import { useTheme } from '../../hooks/use-theme';
 
 export const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();

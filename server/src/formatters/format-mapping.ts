@@ -18,14 +18,14 @@ import { formatEmail } from './format-email';
 import { formatEvent } from './format-v-calender';
 import { formatVCard } from './format-v-card';
 import { formatMeCard } from './format-me-card';
-import { formatZoom } from './format-zoom.ts';
-import { formatWiFi } from './format-wifi.ts';
-import { formatURL } from './format-url.ts';
-import { formatSMS } from './format-sms.ts';
-import { formatText } from './format-text.ts';
-import { formatPhone } from './format-phone-number.ts';
-import { formatGeoLocation } from './format-geo-location.ts';
-import { formatCrypto } from './format-crypto.ts';
+import { formatZoom } from './format-zoom';
+import { formatWiFi } from './format-wifi';
+import { formatURL } from './format-url';
+import { formatSMS } from './format-sms';
+import { formatText } from './format-text';
+import { formatPhone } from './format-phone-number';
+import { formatGeoLocation } from './format-geo-location';
+import { formatCrypto } from './format-crypto';
 
 export const formatters: {
   [K in keyof RequestTypeMap]: FormatHandler<RequestTypeMap[K]>;

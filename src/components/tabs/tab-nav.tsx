@@ -1,6 +1,6 @@
 import { Tabs } from '../../ts/enums/tabs-enum';
 import { TabButton } from './tab-button';
-import { useCore } from '../../hooks/use-core.tsx';
+import { useCore } from '../../hooks/use-core';
 
 export interface TabNavParameters {
   handleTabChange: (tab: Tabs) => void;
