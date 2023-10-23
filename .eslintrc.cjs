@@ -11,19 +11,19 @@ module.exports = {
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended",
-    "plugin:import/recommended",
+    "plugin:import/recommended"
   ],
   ignorePatterns: [
     "node_modules/",
     "build/",
     "dist/",
     "public/",
-    "vite-env.d.ts",
+    "vite-env.d.ts"
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
-    sourceType: "module",
+    sourceType: "module"
   },
   plugins: [
     "react-refresh",
@@ -38,21 +38,21 @@ module.exports = {
     "react-refresh/only-export-components": [
       "warn",
       {
-        allowConstantExport: true,
-      },
+        allowConstantExport: true
+      }
     ],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
-    "react/prop-types": "off",
+    "react/prop-types": "off"
   },
   settings: {
     "import/resolver": {
       node: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
-      },
+        extensions: [".js", ".jsx", ".ts", ".tsx"]
+      }
     },
     react: {
-      version: "detect",
-    },
-  },
+      version: "detect"
+    }
+  }
 };

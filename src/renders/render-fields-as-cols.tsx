@@ -2,23 +2,16 @@ import { QRCodeRequest } from '../ts/interfaces/qr-code-request-interfaces';
 import { HandleInputChange } from '../callbacks/handle-input-change';
 import { InputField } from '../components/fields/input-field';
 import { styles } from '../assets/styles';
-import { RenderInputFieldsParameters } from '../ts/interfaces/component-interfaces';
 import { requiredFieldsMapping } from '../validators/validation-mapping';
+import { useCore } from '../hooks/use-core.tsx';
 
 // Function to render the fields distributed across the specified number of columns.
-export function RenderFieldsAsColumns({
-  tab,
-  state,
-  dispatch,
-  setError
-}: RenderInputFieldsParameters) {
-  const handleInputChange = HandleInputChange({
-    state: state,
-    dispatch: dispatch
-  });
+export function RenderFieldsAsColumns() {
+  const { state, setError, activeTab } = useCore();
+  const handleInputChange = HandleInputChange();
 
   function isFieldRequired(fieldName: keyof QRCodeRequest): boolean {
-    const requiredFields = requiredFieldsMapping[tab]?.fields || [];
+    const requiredFields = requiredFieldsMapping[activeTab]?.fields || [];
     return requiredFields.includes(fieldName as string);
   }
 

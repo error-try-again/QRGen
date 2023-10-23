@@ -4,7 +4,7 @@ import { styles } from './assets/styles';
 import { ThemeProvider } from './contexts/theme-context';
 import { QRCodeGeneratorProperties } from './ts/interfaces/util-interfaces';
 import { HandleTabChange } from './helpers/handle-tab-change';
-import { RenderAllTabs } from './renders/render-all-tabs';
+import { TabRenderer } from './renders/render-all-tabs';
 import { GenerateButtonsSection } from './components/buttons/generate-buttons-section';
 import { ThemeToggle } from './components/theme/theme-toggle';
 import { TabNav } from './components/tabs/tab-nav';
@@ -14,20 +14,19 @@ import { Links } from './components/links/links';
 import { CoreProvider } from './contexts/core-context';
 import { useCore } from './hooks/use-core';
 
-const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
+export const QRCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
   const { themeContainer, tabContainer, errorContainer } = styles;
 
-  const { state, error, activeTab } = useCore();
+  const { error, state, activeTab } = useCore();
 
   const handleTabChange = HandleTabChange();
-  const TabSections = RenderAllTabs({ tab: activeTab });
 
   return (
     <div style={themeContainer}>
       <div style={tabContainer}>
         <ThemeToggle />
         <TabNav handleTabChange={handleTabChange} />
-        {TabSections[activeTab]?.()}
+        <TabRenderer tab={activeTab} />
         {error && <div style={errorContainer}>{error}</div>}
         <GenerateButtonsSection />
         {QRSection(state)}
@@ -36,15 +35,16 @@ const QrCodeGenerator: React.FC<QRCodeGeneratorProperties> = () => {
   );
 };
 
-const WrappedQRCodeGenerator = () => (
-  <ThemeProvider>
-    <ErrorBoundary>
-      <CoreProvider>
-        <QrCodeGenerator />
-        <Links />
-      </CoreProvider>
-    </ErrorBoundary>
-  </ThemeProvider>
+export const WrappedQRCodeGenerator = () => (
+  <>
+    <h2>QR Code Generator</h2>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <CoreProvider>
+          <QRCodeGenerator />
+          <Links />
+        </CoreProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
+  </>
 );
-
-export { WrappedQRCodeGenerator as QRCodeGenerator };

@@ -1,11 +1,9 @@
 import { ChangeEvent, useCallback } from 'react';
 import { QRCodeRequest } from '../ts/interfaces/qr-code-request-interfaces';
-import { HandleInputChangeParameters } from '../ts/interfaces/component-interfaces';
+import { useCore } from '../hooks/use-core.tsx';
 
-export function HandleInputChange({
-  state,
-  dispatch
-}: HandleInputChangeParameters) {
+export function HandleInputChange() {
+  const { dispatch, state } = useCore();
   return useCallback(
     (
       event: ChangeEvent<

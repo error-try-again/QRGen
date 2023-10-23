@@ -23,8 +23,14 @@ create_directory() {
   fi
 }
 
-# Organizes and initializes the project directories.
-# Copies necessary files from the source location to the staging directory.
+copy_server_files() {
+  cp -r "src" "$STAGING_DIR"
+  cp -r "public" "$STAGING_DIR"
+  cp "tsconfig.json" "$STAGING_DIR"
+  cp "index.html" "$STAGING_DIR"
+  cp -r "server" "$BACKEND_DIR"
+}
+
 setup_project_directories() {
   echo "Staging project directories..."
 
@@ -37,29 +43,18 @@ setup_project_directories() {
   local SRC_DIR="$HOME/QRGen-FullStack/src"
 
   if [[ -d "$SRC_DIR" ]]; then
-    cp -r "src" "$STAGING_DIR"
-    cp -r "server" "$BACKEND_DIR"
-    cp "tsconfig.json" "$STAGING_DIR"
-    cp "index.html" "$STAGING_DIR"
+    copy_server_files
   else
     echo "Error: Source directory $SRC_DIR does not exist. Attempting to create.."
-
     # Create the source directory if possible, otherwise exit with an error.
     if ! mkdir -p "$SRC_DIR"; then
       echo "Error: Failed to create source directory $SRC_DIR"
       exit 1
     else
       echo "Source directory $SRC_DIR created."
-      cp -r "src" "$STAGING_DIR"
-      cp -r "server" "$BACKEND_DIR"
-      cp "tsconfig.json" "$STAGING_DIR"
-      cp "index.html" "$STAGING_DIR"
+      copy_server_files
     fi
-
   fi
-
-  # Move backend files to their dedicated directory.
-  cp -r "server" "$BACKEND_DIR"
 }
 
 # Validates and sets Docker-related environment variables.
@@ -97,6 +92,7 @@ setup_docker_rootless() {
     dockerd-rootless-setuptool.sh install
   fi
 
+  # Ensure Docker environment variables are set.
   ensure_docker_env
 
   # Append environment settings to the user's bashrc.
@@ -193,23 +189,23 @@ create_server_configuration_files() {
   cat <<EOF >"$BACKEND_DIR/tsconfig.json"
 {
   "compilerOptions": {
-    "target": "ES2021",  // Use latest ECMAScript features
-    "module": "CommonJS",  // Use latest ECMAScript features
-    "lib": ["ES2021"],  // Target ECMAScript features
-    "outDir": "./dist",  // Output directory for compiled JS files
-    "rootDir": "./src",  // Root directory containing TS source files
-    "strict": true,  // Enable all strict type-checking options
-    "moduleResolution": "node",  // Use Node.js module resolution strategy
-    "skipLibCheck": true,  // Skip type checking of declaration files
-    "esModuleInterop": true,  // Enables CommonJS/AMD/UMD module emit interop
-    "resolveJsonModule": true,  // Include modules imported with .json extension
-    "isolatedModules": true,  // Ensure each file can be safely transpiled without considering other modules
-    "noEmitOnError": true,  // Do not emit outputs if any errors were reported
-    "forceConsistentCasingInFileNames": true,  // Disallow inconsistent casing in filenames
-    "noUnusedLocals": true,  // Report errors on unused locals
-    "noUnusedParameters": true,  // Report errors on unused parameters
-    "noImplicitReturns": true,  // Report error when not all code paths in function return a value
-    "noFallthroughCasesInSwitch": true  // Report errors for fallthrough cases in switch statement
+    "target": "ES2022",
+    "module": "CommonJS",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmitOnError": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],  // Source files to be compiled
 }
@@ -223,10 +219,11 @@ FROM node:$NODE_VERSION
 WORKDIR /usr/app
 
 RUN npm install -g ts-node typescript \
- && npm install --save-dev @types/node typescript ts-node jest ts-jest \
+ && npm install --save-dev typescript ts-node jest ts-jest \
  && npx tsc --init \
  && npm install --save express cors multer archiver express-rate-limit helmet qrcode \
- && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver @types/express-rate-limit @types/helmet @types/qrcode @types/jest
+ && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver \
+ && npm install --save-dev @types/express-rate-limit @types/helmet @types/qrcode @types/jest
 
 # Copy Project files to the container
 COPY backend/server/ /usr/app
@@ -248,8 +245,11 @@ WORKDIR /usr/app
 
 # Install project dependencies
 RUN npm init -y \
- && npm install react-leaflet leaflet @types/leaflet react react-dom typescript \
- && npm install --save-dev @babel/plugin-proposal-private-property-in-object vite @vitejs/plugin-react vite-tsconfig-paths vite-plugin-svgr @types/react @types/react-dom \
+ && npm install react-leaflet leaflet react react-dom typescript \
+ && npm install --save-dev vite jsdom vite-tsconfig-paths vite-plugin-svgr vitest \
+ && npm install --save-dev @babel/plugin-proposal-private-property-in-object \
+ && npm install --save-dev @vitejs/plugin-react @testing-library/react @testing-library/jest-dom \
+ && npm install @types/leaflet @types/react @types/react-dom @types/jest\
  && npx create-vite frontend --template react-ts
 
 # Delete the default App.tsx/App.css file (does not use kebab case)
@@ -258,6 +258,7 @@ RUN rm /usr/app/frontend/src/App.css
 
 # Copy Project files to the container
 COPY staging/src/ /usr/app/frontend/src
+COPY staging/public/ /usr/app/frontend/public
 COPY staging/tsconfig.json /usr/app/frontend
 COPY staging/index.html /usr/app/frontend
 
@@ -341,9 +342,16 @@ cleanup() {
   echo "Cleaning up..."
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
+    docker system prune -a -f
+    echo "Docker containers cleaned up."
   fi
   if [[ -d "$PROJECT_DIR" ]]; then
     rm -rf "$PROJECT_DIR"
+    echo "Project directory $PROJECT_DIR deleted."
+  fi
+  if [[ -d "$STAGING_DIR" ]]; then
+    rm -rf "$STAGING_DIR"
+    echo "Staging directory $STAGING_DIR deleted."
   fi
 }
 

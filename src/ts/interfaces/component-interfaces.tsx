@@ -16,13 +16,6 @@ export interface TabButtonParameters {
   tab: Tabs;
 }
 
-export interface RenderInputFieldsParameters {
-  dispatch: React.Dispatch<QRCodeGeneratorAction>;
-  setError: (value: ((previousState: string) => string) | string) => void;
-  state: QRCodeGeneratorState;
-  tab: Tabs;
-}
-
 export interface InputFieldParameters {
   isRequired?: boolean;
   keyName: keyof QRCodeRequest;
@@ -75,37 +68,6 @@ export interface HandleResponseParameters {
   setQrBatchCount: (
     value: ((previousState: number) => number) | number
   ) => void;
-}
-
-export interface HandleInputChangeParameters {
-  dispatch: React.Dispatch<QRCodeGeneratorAction>;
-  state: QRCodeGeneratorState;
-}
-
-export interface VCardParameters {
-  dispatch: React.Dispatch<QRCodeGeneratorAction>;
-  renderInputFieldsInColumns: (
-    fields: (keyof QRCodeRequest)[],
-    columns: number
-  ) => React.JSX.Element;
-  selectedVersion: string;
-  setSelectedVersion: (
-    value: ((previousState: string) => string) | string
-  ) => void;
-}
-
-export interface MeCardParameters {
-  renderInputFieldsInColumns: (
-    fields: (keyof QRCodeRequest)[],
-    columns: number
-  ) => React.JSX.Element;
-}
-
-export interface HandleCryptoSelectParameters {
-  setSelectedCrypto: (
-    value: ((previousState: string) => string) | string
-  ) => void;
-  dispatch: React.Dispatch<QRCodeGeneratorAction>;
 }
 
 export interface HandleVersionSelectParameters {
