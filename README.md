@@ -52,7 +52,19 @@ _If you are running the project on a remote server, you must use the following c
 project_
 
 ```bash
-ssh -t <user>@<host> "sudo $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/"
+ssh -t <user>@<host> "./$HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/"
+```
+
+_update the project_
+
+```bash
+machinectl shell docker-primary@ $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/
+# Select option 2 (Delete old containers and images)
+# Then run the following command
+git pull
+# Then run the following command
+machinectl shell docker-primary@ $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/
+# Select option 1 (Build and install the project)
 ```
 
 _Uninstall the project_

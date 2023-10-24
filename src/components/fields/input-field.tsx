@@ -26,6 +26,10 @@ export const InputField: React.FC<InputFieldParameters> = ({
     placeholder = 'https://example.com';
   }
 
+  if (keyName === 'ssid') {
+    placeholder = 'WiFi Name';
+  }
+
   return (
     <div style={fieldContainer}>
       <label
@@ -45,7 +49,8 @@ export const InputField: React.FC<InputFieldParameters> = ({
         }
         onFocus={() => setError('')}
         placeholder={
-          `Enter ${placeholder || friendlyKeyName}` + (isRequired ? ' *' : '')
+          `${placeholder || 'Enter' + friendlyKeyName}` +
+          (isRequired ? ' *' : '')
         }
       />
     </div>

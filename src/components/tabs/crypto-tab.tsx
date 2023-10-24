@@ -3,10 +3,10 @@ import { useHandleInputChange } from '../../hooks/callbacks/use-handle-input-cha
 import { useCore } from '../../hooks/use-core';
 import { Divider } from '../extras/divider';
 import { CRYPTO_TYPES } from '../../constants/constants';
-import { HandleCryptoChange } from '../../helpers/handle-crypto-select';
 import { InputField } from '../fields/input-field';
 import { isFieldRequired } from '../../helpers/is-field-required';
 import { Tabs } from '../../ts/enums/tabs-enum';
+import { HandleCryptoChange } from '../../helpers/handle-crypto-select';
 
 export const CryptoTab = () => {
   const { sectionTitle, section } = styles;
