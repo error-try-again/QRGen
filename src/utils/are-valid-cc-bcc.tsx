@@ -1,10 +1,7 @@
-import { isValidEmail } from './is-email-valid';
-import { AreValidCcBccParameters } from '../ts/interfaces/field-interfaces';
+import { isValidEmail } from './is-email-valid.tsx';
 
-export const areValidCcBcc = ({ emails }: AreValidCcBccParameters) => {
-  // Split the emails by commas
-  const emailArray = emails.split(',').map(email => email.trim());
-
-  // Check if each email is valid
-  return emailArray.every(element => isValidEmail({ email: element }));
-};
+export const areValidCcBcc = (emails: { email: string }): boolean =>
+  emails.email
+    .split(',')
+    .map(email => email.trim())
+    .every(element => isValidEmail(element));

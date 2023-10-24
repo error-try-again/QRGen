@@ -14,10 +14,17 @@ export const InputField: React.FC<InputFieldParameters> = ({
 }) => {
   const { input, label, fieldContainer } = styles;
 
+  let placeholder = '';
+
   const friendlyKeyName =
     keyName.charAt(0).toUpperCase() +
     keyName.slice(1).replaceAll(/([A-Z])/g, ' $1'); // Converts "cryptoType" to "Crypto Type"
+
   const convertedValue = convertValueToString({ value: value });
+
+  if (keyName === 'url') {
+    placeholder = 'https://example.com';
+  }
 
   return (
     <div style={fieldContainer}>
@@ -37,7 +44,9 @@ export const InputField: React.FC<InputFieldParameters> = ({
           handleChange(event, keyName)
         }
         onFocus={() => setError('')}
-        placeholder={`Enter ${friendlyKeyName}` + (isRequired ? ' *' : '')}
+        placeholder={
+          `Enter ${placeholder || friendlyKeyName}` + (isRequired ? ' *' : '')
+        }
       />
     </div>
   );
