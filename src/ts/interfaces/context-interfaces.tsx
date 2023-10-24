@@ -24,3 +24,12 @@ export interface CoreContextType {
 export interface CoreProviderProperties {
   children: ReactNode;
 }
+
+export interface ThemeContextType {
+  theme: string;
+  toggleTheme: () => void;
+}
+
+export interface ThemeProviderProperties {
+  children: ReactNode;
+}

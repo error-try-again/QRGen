@@ -1,7 +1,7 @@
-import { Response } from 'express';
 import { ErrorType } from '../enums/error-enum';
+import { Response } from 'express';
 
-export interface ErrorResponse {
+export interface ResponseInterfaces {
   errorType: ErrorType;
   message?: string;
   response: Response;

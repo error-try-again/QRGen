@@ -5,20 +5,20 @@ import {
 } from '../constants/constants';
 import { VCardFields } from '../constants/fields';
 import { handleVersionSelect } from '../helpers/handle-version-select';
-import { RenderFieldsAsColumns } from './render-fields-as-cols.tsx';
-import { useCore } from '../hooks/use-core.tsx';
+import { useCore } from '../hooks/use-core';
+import { RenderFieldsInColumns } from './render-fields-as-cols';
+import { useHandleInputChange } from '../hooks/callbacks/use-handle-input-change';
 
 export function RenderVCard() {
   const { dispatch, selectedVersion, setSelectedVersion } = useCore();
-
-  const renderInputFieldsInColumns = RenderFieldsAsColumns();
+  const { label, fieldContainer } = styles;
 
   const handleVersionChange = handleVersionSelect({
     setSelectedVersion,
     dispatch
   });
 
-  const { label, fieldContainer } = styles;
+  const handleInputChange = useHandleInputChange();
 
   return (
     <>
@@ -42,13 +42,21 @@ export function RenderVCard() {
           );
         })}
       </div>
-      {
-        // Check the current viewport width.
-        // If it's larger or equal to the DESKTOP_MEDIA_QUERY_THRESHOLD, use 2 columns, otherwise use 1 column.
-        window.innerWidth >= DESKTOP_MEDIA_QUERY_THRESHOLD
-          ? renderInputFieldsInColumns(VCardFields, 2) // For wider screens (desktop)
-          : renderInputFieldsInColumns(VCardFields, 1) // For narrower screens (mobile)
-      }
+      <>
+        {window.innerWidth >= DESKTOP_MEDIA_QUERY_THRESHOLD ? (
+          <RenderFieldsInColumns
+            handleInputChange={handleInputChange}
+            fields={VCardFields}
+            columns={2}
+          />
+        ) : (
+          <RenderFieldsInColumns
+            handleInputChange={handleInputChange}
+            fields={VCardFields}
+            columns={1}
+          />
+        )}
+      </>
     </>
   );
 }

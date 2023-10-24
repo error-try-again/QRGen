@@ -223,7 +223,7 @@ RUN npm install -g ts-node typescript \
  && npx tsc --init \
  && npm install --save express cors multer archiver express-rate-limit helmet qrcode \
  && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver \
- && npm install --save-dev @types/express-rate-limit @types/helmet @types/qrcode @types/jest
+ && npm install --save-dev @types/express-rate-limit @types/helmet @types/qrcode @types/jest \
 
 # Copy Project files to the container
 COPY backend/server/ /usr/app

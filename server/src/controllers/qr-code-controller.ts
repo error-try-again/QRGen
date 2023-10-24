@@ -7,7 +7,7 @@ import { ErrorType } from '../ts/enums/error-enum';
 import {
   BatchQRDataParameters,
   SingleQRDataParameters
-} from '../ts/interfaces/qr-data-paramaters';
+} from '../ts/interfaces/qr-data-paramaters-interfaces';
 
 export const processSingleQRCode = async ({
   qrData: { type, customData, size = DEFAULT_QR_SIZE, precision = 'M' }

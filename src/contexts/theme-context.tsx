@@ -1,13 +1,8 @@
-import React, { createContext, ReactNode, useEffect, useState } from 'react';
-
-export interface ThemeContextType {
-  theme: string;
-  toggleTheme: () => void;
-}
-
-interface ThemeProviderProperties {
-  children: ReactNode;
-}
+import React, { createContext, useEffect, useState } from 'react';
+import {
+  ThemeContextType,
+  ThemeProviderProperties
+} from '../ts/interfaces/context-interfaces';
 
 export const ThemeProvider: React.FC<ThemeProviderProperties> = ({
   children

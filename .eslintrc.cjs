@@ -11,7 +11,8 @@ module.exports = {
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended",
-    "plugin:import/recommended"
+    "plugin:import/recommended",
+    ""
   ],
   ignorePatterns: [
     "node_modules/",
@@ -32,7 +33,7 @@ module.exports = {
     "react",
     "react-hooks",
     "jsx-a11y",
-    "import",
+    "import"
   ],
   rules: {
     "react-refresh/only-export-components": [
@@ -42,7 +43,9 @@ module.exports = {
       }
     ],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": ["warn", {
+      "additionalHooks": "(useMyCustomHook|useMyOtherCustomHook)"
+    }],
     "react/prop-types": "off"
   },
   settings: {

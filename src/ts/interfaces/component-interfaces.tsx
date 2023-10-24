@@ -3,6 +3,7 @@ import { Tabs } from '../enums/tabs-enum';
 import React, { ChangeEvent } from 'react';
 import { QRCodeRequest } from './qr-code-request-interfaces';
 import { QRCodeGeneratorAction } from '../types/reducer-types';
+import { QRCodeErrorCorrectionLevel } from '../types/error-correction-types';
 
 export interface TabParameters {
   tab: Tabs;
@@ -104,4 +105,27 @@ export interface QRGenerationParameters {
   setError: (value: ((previousState: string) => string) | string) => void;
   setQrBatchCount: React.Dispatch<React.SetStateAction<number>>;
   state: QRCodeGeneratorState;
+}
+
+export interface ResetBatchAndLoadingStateParameters {
+  setBatchData: (
+    value:
+      | ((previousState: QRCodeRequest[]) => QRCodeRequest[])
+      | QRCodeRequest[]
+  ) => void;
+  setQrBatchCount: (
+    value: ((previousState: number) => number) | number
+  ) => void;
+  dispatch: React.Dispatch<QRCodeGeneratorAction>;
+  initialState?: QRCodeGeneratorState;
+}
+
+export interface GenerateQRParameters {
+  data: string;
+  size: string | number;
+  precision: QRCodeErrorCorrectionLevel;
+}
+
+export interface TabNavParameters {
+  handleTabChange: (tab: Tabs) => void;
 }

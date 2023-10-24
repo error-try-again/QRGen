@@ -4,7 +4,7 @@ export enum ErrorType {
   MISSING_REQUEST_TYPE = 'Request type is missing.',
   INVALID_TYPE = 'Request type is invalid.',
   DUPLICATE_QR_CODES = 'Duplicate QR codes are not allowed.',
-  EXCEEDS_MAX_LIMIT = 'Exceeds max limit of 100 QR codes.',
+  EXCEEDS_MAX_LIMIT = 'Exceeds max limit of 1000 QR codes.',
   BATCH_MISSING_DATA_BODY = 'Request body data is missing for one or more QR codes.',
   BATCH_MISSING_CUSTOM_DATA = 'Custom data in the request body is missing for one or more QR codes.',
   ERROR_SETTING_HEADERS = 'Error occurred while setting headers.',

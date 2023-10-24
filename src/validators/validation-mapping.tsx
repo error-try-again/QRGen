@@ -1,34 +1,52 @@
 import { Tabs } from '../ts/enums/tabs-enum';
 
 export const requiredFieldsMapping = {
-  [Tabs.Text]: { fields: ['text'], errorMessage: 'Text is required' },
-  [Tabs.Url]: { fields: ['url'], errorMessage: 'URL is required' },
-  [Tabs.Email]: { fields: ['email'], errorMessage: 'Email is required' },
-  [Tabs.Phone]: { fields: ['phone'], errorMessage: 'Phone is required' },
-  [Tabs.WiFi]: { fields: ['ssid'], errorMessage: 'SSID is required' },
-  [Tabs.Crypto]: { fields: ['address'], errorMessage: 'Address is required' },
+  [Tabs.Text]: {
+    errorMessage: 'Text is required',
+    fields: ['text']
+  },
+  [Tabs.Url]: {
+    errorMessage: 'URL is required',
+    fields: ['url']
+  },
+  [Tabs.Email]: {
+    errorMessage: 'Email is required',
+    fields: ['email']
+  },
+  [Tabs.Phone]: {
+    errorMessage: 'Phone is required',
+    fields: ['phone']
+  },
+  [Tabs.WiFi]: {
+    errorMessage: 'SSID is required',
+    fields: ['ssid']
+  },
+  [Tabs.Crypto]: {
+    errorMessage: 'Address is required',
+    fields: ['address']
+  },
   [Tabs.SMS]: {
-    fields: ['phone', 'sms'],
-    errorMessage: 'Phone and SMS message are required'
+    errorMessage: 'Phone and SMS message are required',
+    fields: ['phone', 'sms']
   },
   [Tabs.Zoom]: {
-    fields: ['zoomId', 'zoomPass'],
-    errorMessage: 'Zoom Meeting ID and Password are required'
+    errorMessage: 'Zoom Meeting ID and Password are required',
+    fields: ['zoomId', 'zoomPass']
   },
   [Tabs.GeoLocation]: {
-    fields: ['latitude', 'longitude'],
-    errorMessage: 'Latitude and Longitude are required'
+    errorMessage: 'Latitude and Longitude are required',
+    fields: ['latitude', 'longitude']
   },
   [Tabs.Event]: {
-    fields: ['event', 'venue', 'startTime', 'endTime'],
-    errorMessage: 'Event, Venue, Start Time and End Time are required'
+    errorMessage: 'Event, Venue, Start Time and End Time are required',
+    fields: ['event', 'venue', 'startTime', 'endTime']
   },
   [Tabs.MeCard]: {
-    fields: ['firstName', 'lastName', 'phone1'],
-    errorMessage: 'First Name, Last Name and Phone are required'
+    errorMessage: 'First Name, Last Name and Phone are required',
+    fields: ['firstName', 'lastName', 'phone1']
   },
   [Tabs.VCard]: {
-    fields: ['firstName', 'lastName', 'email', 'phoneWork'],
-    errorMessage: 'First Name, Last Name, Email and Phone are required'
+    errorMessage: 'First Name, Last Name, Email and Phone are required',
+    fields: ['firstName', 'lastName', 'email', 'phoneWork']
   }
 };

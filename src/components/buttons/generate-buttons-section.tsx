@@ -83,8 +83,6 @@ export const GenerateButtonsSection = () => {
             type: Tabs[activeTab]
           };
 
-    console.log('requestData', requestData);
-
     try {
       const response = await fetch(endpoint, {
         method: 'POST',

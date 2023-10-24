@@ -1,19 +1,34 @@
-import { DESKTOP_MEDIA_QUERY_THRESHOLD } from '../constants/constants';
-import { MeCardFields } from '../constants/fields';
-import { RenderFieldsAsColumns } from './render-fields-as-cols.tsx';
+import { MeCardFields, VCardFields } from '../constants/fields';
+import { useHandleInputChange } from '../hooks/callbacks/use-handle-input-change';
+import { useCore } from '../hooks/use-core';
+import { handleVersionSelect } from '../helpers/handle-version-select';
+import { VersionSelector } from '../components/buttons/radio/version-selector';
+import { ResponsiveRenderer } from './responsive-renderer';
 
-export const RenderMeCard = () => {
-  const renderInputFieldsInColumns = RenderFieldsAsColumns();
+export function RenderVCard() {
+  const { dispatch, selectedVersion, setSelectedVersion } = useCore();
+  const handleVersionChange = handleVersionSelect({
+    setSelectedVersion,
+    dispatch
+  });
+
   return (
     <>
-      {
-        // Check the current viewport width.
-        // If it's larger or equal to the DESKTOP_MEDIA_QUERY_THRESHOLD, use two columns,
-        // otherwise use one column.
-        window.innerWidth >= DESKTOP_MEDIA_QUERY_THRESHOLD
-          ? renderInputFieldsInColumns(MeCardFields, 2) // For wider screens (desktop)
-          : renderInputFieldsInColumns(MeCardFields, 1) // For narrower screens (mobile)
-      }
+      <VersionSelector
+        selectedVersion={selectedVersion}
+        handleVersionChange={handleVersionChange}
+      />
+      <ResponsiveRenderer
+        handleInputChange={useHandleInputChange()}
+        fields={VCardFields}
+      />
     </>
   );
-};
+}
+
+export const RenderMeCard = () => (
+  <ResponsiveRenderer
+    handleInputChange={useHandleInputChange()}
+    fields={MeCardFields}
+  />
+);

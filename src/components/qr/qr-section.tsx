@@ -1,9 +1,10 @@
-import { QRCodeGeneratorState } from '../../ts/interfaces/qr-code-generator-state';
 import { styles } from '../../assets/styles';
 import React from 'react';
+import { useCore } from '../../hooks/use-core';
 
-export function QRSection(state: QRCodeGeneratorState) {
+export const QRSection = () => {
   const { qrCodeContainer } = styles;
+  const { state } = useCore();
   return (
     <>
       {state.qrCodeURL && (
@@ -26,4 +27,4 @@ export function QRSection(state: QRCodeGeneratorState) {
       )}
     </>
   );
-}
+};

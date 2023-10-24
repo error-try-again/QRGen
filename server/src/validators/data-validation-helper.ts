@@ -1,12 +1,9 @@
-import { AllRequests, RequestTypeMap } from '../ts/types/all-request-types';
-import { QRData } from '../ts/interfaces/helper-interfaces';
-import { validators } from './validation-mapping';
-import { MAX_QR_CODES } from '../config';
-import { ErrorType } from '../ts/enums/error-enum';
-import {
-  QRGenericData,
-  QRGenericDataArray
-} from '../ts/interfaces/qr-data-paramaters';
+import { AllRequests, RequestTypeMap } from "../ts/types/all-request-types";
+import { QRData } from "../ts/interfaces/helper-interfaces";
+import { validators } from "./validation-mapping";
+import { MAX_QR_CODES } from "../config";
+import { ErrorType } from "../ts/enums/error-enum";
+import { QRGenericData, QRGenericDataArray } from "../ts/interfaces/qr-data-paramaters-interfaces";
 
 // Validates the qrData for a batch of QR codes
 export const validateBatchQRData = <T extends AllRequests>({

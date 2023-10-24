@@ -1,11 +1,6 @@
-import QRCode, { QRCodeErrorCorrectionLevel } from 'qrcode';
+import QRCode from 'qrcode';
 import { DEFAULT_QR_SIZE } from '../config';
-
-interface GenerateQRParameters {
-  data: string;
-  size: string | number;
-  precision: QRCodeErrorCorrectionLevel;
-}
+import { GenerateQRParameters } from '../ts/interfaces/qr-data-paramaters-interfaces';
 
 export const generateQR = async ({
   data,
