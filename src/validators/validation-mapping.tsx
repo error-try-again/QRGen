@@ -3,7 +3,6 @@ import { isValidPhoneNumber } from '../utils/is-valid-phone.tsx';
 import { QRCodeGeneratorState } from '../ts/interfaces/qr-code-generator-state.tsx';
 import { isValidUrl } from '../utils/is-valid-url.tsx';
 import { isTextWithinQRSizeLimit } from '../utils/is-within-qr-size-limit.tsx';
-import { isValidLatLng } from '../utils/is-valid-lat-lng.tsx';
 
 type TabFieldMapping = {
   errorMessage: string;
@@ -28,8 +27,6 @@ export const requiredFieldsMapping: Record<Tabs, TabFieldMapping> = {
   [Tabs.GeoLocation]: {
     errorMessage: 'Latitude and Longitude are required',
     fields: ['latitude', 'longitude'],
-    validation: (state: QRCodeGeneratorState) =>
-      isValidLatLng(state.latitude, state.longitude),
     validationError: 'Invalid latitude or longitude'
   },
   [Tabs.MeCard]: {
