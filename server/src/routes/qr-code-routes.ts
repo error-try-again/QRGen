@@ -37,8 +37,4 @@ router.post(
   })
 );
 
-router.get('/', (response: Response) => {
-  response.send('Welcome to the QR code generator API.');
-});
-
 export { router as qrCodeRoutes };
