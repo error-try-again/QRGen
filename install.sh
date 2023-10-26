@@ -20,6 +20,7 @@ readonly LETS_ENCRYPT_SITE="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/s
 readonly LETS_ENCRYPT_DH_PARAM="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/src/letsencrypt/dh-param"
 readonly DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
 
+# Define configuration-related constants.
 BACKEND_PORT=3001
 NGINX_PORT=8080
 NODE_VERSION=20.8.0
@@ -106,6 +107,7 @@ create_directory() {
   fi
 }
 
+# Copies the server files to the staging directory.
 copy_server_files() {
   echo "Copying server files..."
   cp -r "src" "$STAGING_DIR"
@@ -115,6 +117,7 @@ copy_server_files() {
   cp -r "server" "$BACKEND_DIR"
 }
 
+# Sets up the project directories.
 setup_project_directories() {
   echo "Staging project directories..."
 
@@ -141,6 +144,7 @@ setup_project_directories() {
   fi
 }
 
+# Ensures XDG_RUNTIME_DIR is set.
 ensure_xdg_runtime() {
   echo "Ensuring XDG_RUNTIME_DIR is set..."
   local XDG_RUNTIME_DIR
