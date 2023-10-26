@@ -36,12 +36,20 @@ setup_letsencrypt_directories() {
   create_directory "$LETS_ENCRYPT_LOG"
   create_directory "$LETS_ENCRYPT_SITE"
   create_directory "$LETS_ENCRYPT_DH_PARAM"
+  echo "Finished setting up Let's Encrypt directories."
 }
 
 # Generates Diffie-Hellman parameters for Let's Encrypt.
 generate_dhparam() {
   echo "Generating Diffie-Hellman parameters..."
-  openssl dhparam -out "$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem" 2048
+  if [[ -d $LETS_ENCRYPT_DH_PARAM ]]; then
+    openssl dhparam -out "$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem" 2048
+  else
+    echo "Error: Diffie-Hellman parameters directory $LETS_ENCRYPT_DH_PARAM does not exist."
+    echo "Ensure that setup_letsencrypt_directories() is being run.. Exiting."
+    exit 1
+  fi
+
 }
 
 # Prompt for let's encrypt setup
@@ -50,7 +58,13 @@ prompt_for_letsencrypt() {
 
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     read -rp "Enter your domain name (e.g., example.com): " DOMAIN_NAME
-    letsencrypt_setup
+    if [[ $DOMAIN_NAME != "" ]]; then
+      letsencrypt_setup
+    else
+      echo "Error: Domain name cannot be empty. Exiting."
+      exit 1
+    fi
+
   else
     DOMAIN_NAME="localhost"
   fi
@@ -207,23 +221,6 @@ build_and_run_docker() {
 
 create_nginx_configuration() {
   echo "Setting up nginx configuration..."
-  local ssl_common_config=""
-  if [[ -d $DH_PARAM_FILE ]]; then
-    # Common SSL settings
-    read -r -d '' ssl_common_config <<EOL
-    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
-    ssl_prefer_server_ciphers on;
-    ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
-    ssl_buffer_size 8k;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-    ssl_ecdh_curve secp384r1;
-    ssl_session_tickets off;
-    ssl_stapling on;
-    ssl_stapling_verify on;
-    resolver 8.8.8.8;
-EOL
-  fi
-
   # Default configurations
   local backend_scheme="http"
   local ssl_config=""
@@ -236,7 +233,17 @@ EOL
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     backend_scheme="https"
     read -r -d '' ssl_config <<EOL
-    $ssl_common_config
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
+    ssl_buffer_size 8k;
+    ssl_dhparam $DH_PARAM_FILE;
+    ssl_ecdh_curve secp384r1;
+    ssl_session_tickets off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 8.8.8.8;
+
     ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
 EOL
@@ -279,6 +286,16 @@ http {
             root   /usr/share/nginx/html;
             index  index.html index.htm;
             try_files \$uri \$uri/ /index.html;
+
+            # Security headers
+             add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+             add_header X-XSS-Protection "1; mode=block" always;
+             add_header X-Content-Type-Options "nosniff" always;
+             add_header X-Frame-Options "DENY" always;
+
+            # Content Security Policy
+            # add_header Content-Security-Policy "frame-src 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://maxcdn.bootstrapcdn.com https://ajax.googleapis.com; img-src 'self'; style-src 'self' https://maxcdn.bootstrapcdn.com; font-src 'self' data: https://maxcdn.bootstrapcdn.com; form-action 'self'; upgrade-insecure-requests;" always;
+             add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         }
         location /qr/generate {
             proxy_pass $backend_scheme://backend:$BACKEND_PORT;
@@ -297,7 +314,6 @@ http {
 EOF
 
   echo "nginx configuration written to $PROJECT_DIR/nginx.conf"
-  cat "$PROJECT_DIR/nginx.conf"
 }
 
 write_frontend_docker() {
@@ -403,9 +419,14 @@ EOF
 
 write_docker_compose() {
   local mount_extras=""
+  local ssl_port=""
+  local ssl_port_directive=""
 
   # LetsEncrypt-specific configurations
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+    ssl_port="443"
+    ssl_port_directive=" - \"${ssl_port}:${ssl_port}\""
+
     read -r -d '' mount_extras <<EOL
      - /docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
      - /docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME
@@ -431,6 +452,7 @@ services:
       dockerfile: ./frontend/Dockerfile
     ports:
       - "${NGINX_PORT}:${NGINX_PORT}"
+    $ssl_port_directive
     volumes:
      - ./frontend:/usr/app
      - ./nginx.conf:/etc/nginx/nginx.conf
