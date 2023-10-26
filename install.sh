@@ -11,7 +11,7 @@ readonly FRONTEND_DIR="$PROJECT_DIR/frontend"
 readonly SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 readonly STAGING_DIR="$PROJECT_DIR/staging"
 
-# Change to:
+# Define Let's Encrypt-related constants and directory paths.
 readonly LETS_ENCRYPT_BASE="$HOME/docker_letsencrypt"
 readonly LETS_ENCRYPT_DIR="$LETS_ENCRYPT_BASE/etc/letsencrypt"
 readonly LETS_ENCRYPT_LIB="$LETS_ENCRYPT_BASE/var/lib/letsencrypt"
@@ -29,14 +29,14 @@ DOCKER_HOST=""
 
 # Sets up the directories required for Let's Encrypt.
 setup_letsencrypt_directories() {
-  echo "Setting up Let's Encrypt directories..."
+  echo "Creating Let's Encrypt directories..."
   create_directory "$LETS_ENCRYPT_BASE"
   create_directory "$LETS_ENCRYPT_DIR"
   create_directory "$LETS_ENCRYPT_LIB"
   create_directory "$LETS_ENCRYPT_LOG"
   create_directory "$LETS_ENCRYPT_SITE"
   create_directory "$LETS_ENCRYPT_DH_PARAM"
-  echo "Finished setting up Let's Encrypt directories."
+  echo "Finished creating Let's Encrypt directories."
 }
 
 # Generates Diffie-Hellman parameters for Let's Encrypt.
@@ -106,6 +106,7 @@ create_directory() {
 }
 
 copy_server_files() {
+  echo "Copying server files..."
   cp -r "src" "$STAGING_DIR"
   cp -r "public" "$STAGING_DIR"
   cp "tsconfig.json" "$STAGING_DIR"
@@ -140,6 +141,7 @@ setup_project_directories() {
 }
 
 ensure_xdg_runtime() {
+  echo "Ensuring XDG_RUNTIME_DIR is set..."
   local XDG_RUNTIME_DIR
   # Update or set XDG_RUNTIME_DIR.
   if [ -z "${XDG_RUNTIME_DIR:-}" ] || [ "${XDG_RUNTIME_DIR:-}" != "/run/user/$(id -u)" ]; then
@@ -151,6 +153,7 @@ ensure_xdg_runtime() {
 
 # Validates and sets Docker-related environment variables.
 ensure_docker_env() {
+  echo "Ensuring Docker environment variables are set..."
   local expected_docker_host
   # Update or set DOCKER_HOST.
   expected_docker_host="unix:///run/user/$(id -u)/docker.sock"
@@ -220,7 +223,7 @@ build_and_run_docker() {
 }
 
 create_nginx_configuration() {
-  echo "Setting up nginx configuration..."
+  echo "Creating NGINX configuration..."
   # Default configurations
   local backend_scheme="http"
   local ssl_config=""
@@ -253,12 +256,6 @@ EOL
     letsencrypt_challenge="location ~ /.well-known/acme-challenge { allow all; root /usr/share/nginx/html; }"
     server_name_directive="server_name $DOMAIN_NAME www.$DOMAIN_NAME;"
   fi
-
-  echo "backend_scheme: $backend_scheme"
-  echo "ssl_config: $ssl_config"
-  echo "listen_directive: $listen_directive"
-  echo "token_directive: $token_directive"
-  echo "server_name_directive: $server_name_directive"
 
   # Write configurations to nginx.conf
   cat <<EOF >"$PROJECT_DIR/nginx.conf"
@@ -491,12 +488,13 @@ EOF
 
 # Produces server-side configuration files essential for backend and frontend operations.
 create_server_configuration_files() {
-  echo "Setting up the docker backend..."
+  echo "Creating server configuration files..."
   write_tsconfig
+  echo "Configuring the Docker Express backend..."
   write_backend_docker
-  echo "Setting up the docker frontend..."
+  echo "Configuring the Docker NGINX Proxy & frontend..."
   write_frontend_docker
-  echo "Setting up Docker Compose..."
+  echo "Configuring Docker Compose..."
   write_docker_compose
 }
 
@@ -595,4 +593,5 @@ user_prompt() {
   done
 }
 
+# Serves as the entry point to the script.
 user_prompt
