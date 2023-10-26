@@ -31,16 +31,16 @@ export function errorHandlingMapping(error: Error, response: Response): void {
 }
 
 export const validateRequest = (request: Request, next: () => void): void => {
-  if (typeof request.body !== 'object' || request.body === null) {
-    throw new Error(ErrorType.INVALID_TYPE);
-  }
-
-  const { type } = request.body;
-  if (type) {
-    validateQRData(request.body);
-    next();
+  if (typeof request.body === 'object') {
+    const { type } = request.body;
+    if (type) {
+      validateQRData(request.body);
+      next();
+    } else {
+      throw new Error(ErrorType.MISSING_REQUEST_TYPE);
+    }
   } else {
-    throw new Error(ErrorType.MISSING_REQUEST_TYPE);
+    throw new TypeError(ErrorType.MISSING_DATA_BODY);
   }
 };
 

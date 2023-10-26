@@ -22,7 +22,7 @@ If you encounter any bugs, please feel free to open an issue or a pull request s
 * Supports multiple QR code formats (URL, SMS, Email, Events, Phone, Geolocation, Wifi, Zoom, Contact, Text)
 * Supports multiple QR code sizes
 * Supports multiple QR code error correction levels
-* QR Generation APIs (GET /qr/generate) or (POST /qr/batch)
+* QR Generation APIs (POST /qr/generate) or (POST /qr/batch)
 * CORS support, Rate limiting, and other security features
 * Responsive design
 * Mobile friendly
@@ -85,8 +85,7 @@ This should be changed in production environments.
 * Add import mechanism for QR code generation (CSV, JSON, Excel, etc.)
 * API Documentation
 * Complete CI/CD pipeline
-* 100% unit test coverage
-* Add additional security features (E.g. Sanitization, etc.)
+* Test coverage
 * SSL/TLS support (E.g. Let's Encrypt, etc.)
 * Add additional deployment options (E.g. Kubernetes, etc.)
 * Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content persistence, content expiry, etc.)

@@ -13,9 +13,21 @@ export function HandleBatchResponse({
     const href = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = href;
-    link.download =
-      response.headers.get('content-disposition')?.split('filename=')[1] ||
-      'qrcodes.zip'; // Use the filename from the response or default to 'download.zip'
+
+    // Extract the filename from the content-disposition header and set the download attribute
+    const contentDisposition = response.headers.get('content-disposition');
+    let filename = 'qrcodes.zip'; // default value
+    if (contentDisposition) {
+      const matches = contentDisposition.match(
+        /filename[^\n;=]*=((["']).*?\2|[^\n;]*)/
+      );
+      if (matches && matches[1]) {
+        filename = matches[1].replaceAll(/["']/g, ''); // remove any quotes
+      }
+    }
+    link.download = filename;
+
+    // Append the link, trigger download, and then remove the link
     document.body.append(link);
     link.click();
     link.remove();
