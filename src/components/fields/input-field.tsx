@@ -49,7 +49,7 @@ export const InputField: React.FC<InputFieldParameters> = ({
         }
         onFocus={() => setError('')}
         placeholder={
-          `${placeholder || 'Enter' + friendlyKeyName}` +
+          `${placeholder || 'Enter ' + friendlyKeyName}` +
           (isRequired ? ' *' : '')
         }
       />

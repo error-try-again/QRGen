@@ -242,10 +242,16 @@ EOL
 EOL
 
     token_directive="server_tokens off;"
-    listen_directive="listen 80; listen [::]:80; listen 443 ssl;"
+    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen 443 ssl;"
     letsencrypt_challenge="location ~ /.well-known/acme-challenge { allow all; root /usr/share/nginx/html; }"
     server_name_directive="server_name $DOMAIN_NAME www.$DOMAIN_NAME;"
   fi
+
+  echo "backend_scheme: $backend_scheme"
+  echo "ssl_config: $ssl_config"
+  echo "listen_directive: $listen_directive"
+  echo "token_directive: $token_directive"
+  echo "server_name_directive: $server_name_directive"
 
   # Write configurations to nginx.conf
   cat <<EOF >"$PROJECT_DIR/nginx.conf"
@@ -269,27 +275,29 @@ http {
         $token_directive
         $server_name_directive
         $letsencrypt_challenge
-            location / {
-                root   /usr/share/nginx/html;
-                index  index.html index.htm;
-                try_files \$uri \$uri/ /index.html;
-            }
-            location /qr/generate {
-                proxy_pass $backend_scheme://backend:\$BACKEND_PORT;
-                proxy_set_header Host \$host;
-                proxy_set_header X-Real-IP \$remote_addr;
-                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            }
-            location /qr/batch {
-                proxy_pass $backend_scheme://backend:\$BACKEND_PORT;
-                proxy_set_header Host \$host;
-                proxy_set_header X-Real-IP \$remote_addr;
-                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            }
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+            try_files \$uri \$uri/ /index.html;
+        }
+        location /qr/generate {
+            proxy_pass $backend_scheme://backend:$BACKEND_PORT;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        }
+        location /qr/batch {
+            proxy_pass $backend_scheme://backend:$BACKEND_PORT;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        }
     }
 }
 EOF
+
   echo "nginx configuration written to $PROJECT_DIR/nginx.conf"
+  cat "$PROJECT_DIR/nginx.conf"
 }
 
 write_frontend_docker() {
@@ -427,6 +435,8 @@ services:
      - ./frontend:/usr/app
      - ./nginx.conf:/etc/nginx/nginx.conf
      - ./saved_qrcodes:/usr/share/nginx/html/saved_qrcodes
+    networks:
+      - qrgen
 $mount_extras
 EOF
 
