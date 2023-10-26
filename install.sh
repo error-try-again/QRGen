@@ -99,11 +99,12 @@ get_certificates() {
 }
 
 # Creates the specified directory if it does not already exist.
-# Outputs a message upon directory creation.
 create_directory() {
   if [ ! -d "$1" ]; then
     mkdir -p "$1"
     echo "$1 created."
+  else
+    echo "$1 already exists."
   fi
 }
 
@@ -523,7 +524,6 @@ dump_logs() {
   fi
 }
 
-# Redoes the project setup.
 # Cleans current Docker Compose setup, arranges directories, and reinitiates Docker services.
 reload_project() {
   echo "Reloading the project..."
@@ -538,8 +538,7 @@ reload_project() {
   dump_logs
 }
 
-# Cleans up the project setup.
-# It shuts down any running Docker containers associated with the project and deletes the entire project directory.
+# Shuts down any running Docker containers associated with the project and deletes the entire project directory.
 cleanup() {
   ensure_docker_env
   echo "Cleaning up..."
@@ -558,8 +557,8 @@ cleanup() {
   fi
 }
 
-# The main function to set up the entire project.
-# It sets up the directories, configures Docker in rootless mode, generates necessary configuration files, and runs the Docker setup.
+# Sets up the directories, configures Docker in rootless mode
+# Generates necessary configuration files, and runs the Docker setup.
 main() {
   setup_project_directories
   setup_docker_rootless
@@ -569,8 +568,7 @@ main() {
   build_and_run_docker
 }
 
-# Provides an interactive prompt to the user to select an action.
-# Users can choose between setting up the project, cleaning up, reloading the project, or dumping Docker logs.
+# Users choose between setting up the project, cleaning up, reloading the project, or dumping Docker logs.
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
 
