@@ -23,10 +23,14 @@ readonly DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
 # Define configuration-related constants.
 BACKEND_PORT=3001
 NGINX_PORT=8080
+ORIGIN_URL="http://localhost"
+ORIGIN_PORT="$NGINX_PORT"
+ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
 NODE_VERSION=20.8.0
 DOMAIN_NAME=""
 USE_LETS_ENCRYPT="no"
 DOCKER_HOST=""
+BACKEND_FILES=""
 
 # Sets up the directories required for Let's Encrypt.
 setup_letsencrypt_directories() {
@@ -50,13 +54,11 @@ generate_dhparam() {
     echo "Ensure that setup_letsencrypt_directories() is being run.. Exiting."
     exit 1
   fi
-
 }
 
 # Prompt for let's encrypt setup
 prompt_for_letsencrypt() {
   read -rp "Do you want to setup Let's Encrypt SSL (yes/no)? " USE_LETS_ENCRYPT
-
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     read -rp "Enter your domain name (e.g., example.com): " DOMAIN_NAME
     if [[ $DOMAIN_NAME != "" ]]; then
@@ -65,7 +67,6 @@ prompt_for_letsencrypt() {
       echo "Error: Domain name cannot be empty. Exiting."
       exit 1
     fi
-
   else
     DOMAIN_NAME="localhost"
   fi
@@ -111,11 +112,25 @@ create_directory() {
 # Copies the server files to the staging directory.
 copy_server_files() {
   echo "Copying server files..."
-  cp -r "src" "$STAGING_DIR"
-  cp -r "public" "$STAGING_DIR"
-  cp "tsconfig.json" "$STAGING_DIR"
-  cp "index.html" "$STAGING_DIR"
+  copy_frontend_files
+  copy_backend_files
+}
+
+copy_backend_files() {
+  echo "Copying backend files..."
   cp -r "server" "$BACKEND_DIR"
+  cp "tsconfig.json" "$BACKEND_DIR"
+  cp ".env" "$BACKEND_DIR"
+  BACKEND_FILES="backend/*"
+}
+
+copy_frontend_files() {
+  ls "$PROJECT_DIR"
+  echo "Copying frontend files..."
+  cp -r "src" "$FRONTEND_DIR"
+  cp -r "public" "$FRONTEND_DIR"
+  cp "tsconfig.json" "$FRONTEND_DIR"
+  cp "index.html" "$FRONTEND_DIR"
 }
 
 # Sets up the project directories.
@@ -198,6 +213,7 @@ setup_docker_rootless() {
       echo "$line" >>~/.bashrc
     fi
   }
+
   add_to_bashrc "export PATH=/usr/bin:$PATH"
   add_to_bashrc "export XDG_RUNTIME_DIR=/run/user/$(id -u)"
   add_to_bashrc "DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock"
@@ -206,6 +222,25 @@ setup_docker_rootless() {
   systemctl --user status docker.service
   systemctl --user start docker.service
   systemctl --user enable docker.service
+}
+
+# Check if a port is in use.
+is_port_in_use() {
+  local port="$1"
+  netstat -tuln | grep -q ":$port "
+  return $?
+}
+
+# If a port is in use, prompt for an alternate port.
+ensure_port_available() {
+  local port="$1"
+  local default_port="$1"
+  while is_port_in_use "$port"; do
+    echo "Port $port is already in use."
+    read -rp "Please provide an alternate port or Ctrl+C to exit: " port
+    port="${port:-$default_port}"
+  done
+  NGINX_PORT="$port"
 }
 
 # Uses Docker Compose to build and launch the Docker containers for the project.
@@ -343,10 +378,10 @@ RUN rm /usr/app/frontend/src/App.tsx
 RUN rm /usr/app/frontend/src/App.css
 
 # Copy Project files to the container
-COPY staging/src/ /usr/app/frontend/src
-COPY staging/public/ /usr/app/frontend/public
-COPY staging/tsconfig.json /usr/app/frontend
-COPY staging/index.html /usr/app/frontend
+COPY frontend/src/ /usr/app/frontend/src
+COPY frontend/public/ /usr/app/frontend/public
+COPY frontend/tsconfig.json /usr/app/frontend
+COPY frontend/index.html /usr/app/frontend
 
 # Move to the frontend directory before building
 WORKDIR /usr/app/frontend
@@ -378,15 +413,13 @@ FROM node:$NODE_VERSION
 WORKDIR /usr/app
 
 RUN npm install -g ts-node typescript \
- && npm install --save-dev typescript ts-node jest ts-jest dompurify jsdom \
+ && npm install --save-dev typescript ts-node jest ts-jest jsdom \
  && npx tsc --init \
- && npm install --save express cors multer archiver express-rate-limit helmet qrcode \
+ && npm install dotenv express cors multer archiver express-rate-limit helmet qrcode \
  && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver \
- && npm install --save-dev @types/express-rate-limit @types/helmet @types/qrcode @types/jest @types/dompurify \
+ && npm install --save-dev @types/express-rate-limit @types/helmet @types/qrcode @types/jest \
 
-# Copy Project files to the container
-COPY backend/server/ /usr/app
-COPY backend/tsconfig.json /usr/app
+COPY $BACKEND_FILES /usr/app
 
 # Set the backend express port
 EXPOSE $BACKEND_PORT
@@ -421,6 +454,13 @@ write_tsconfig() {
   },
   "include": ["src/**/*.ts"],  // Source files to be compiled
 }
+EOF
+}
+
+write_dot_env() {
+  cat <<EOF >"$BACKEND_DIR/.env"
+ORIGIN=$ORIGIN
+PORT=$BACKEND_PORT
 EOF
 }
 
@@ -501,9 +541,10 @@ EOF
 create_server_configuration_files() {
   echo "Creating server configuration files..."
   write_tsconfig
-  echo "Configuring the Docker Express backend..."
+  write_dot_env
+  echo "Configuring the Docker Express..."
   write_backend_docker
-  echo "Configuring the Docker NGINX Proxy & frontend..."
+  echo "Configuring the Docker NGINX Proxy..."
   write_frontend_docker
   echo "Configuring Docker Compose..."
   write_docker_compose
@@ -542,19 +583,33 @@ reload_project() {
 cleanup() {
   ensure_docker_env
   echo "Cleaning up..."
+
   if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
     docker system prune -a -f
     echo "Docker containers cleaned up."
   fi
-  if [[ -d "$PROJECT_DIR" ]]; then
-    rm -rf "$PROJECT_DIR"
-    echo "Project directory $PROJECT_DIR deleted."
-  fi
-  if [[ -d "$STAGING_DIR" ]]; then
-    rm -rf "$STAGING_DIR"
-    echo "Staging directory $STAGING_DIR deleted."
-  fi
+
+  declare -A directories=(
+    ["Project"]=$PROJECT_DIR
+    ["Staging"]=$STAGING_DIR
+    ["Frontend"]=$FRONTEND_DIR
+    ["Backend"]=$BACKEND_DIR
+    ["Let's Encrypt"]=$LETS_ENCRYPT_BASE
+  )
+
+  local dir_name
+  local dir_path
+
+  for dir_name in "${!directories[@]}"; do
+    dir_path="${directories[$dir_name]}"
+    if [[ -d "$dir_path" ]]; then
+      rm -rf "$dir_path"
+      echo "$dir_name directory $dir_path deleted."
+    fi
+  done
+
+  echo "Cleanup complete."
 }
 
 # Sets up the directories, configures Docker in rootless mode
@@ -565,6 +620,7 @@ main() {
   prompt_for_letsencrypt
   create_server_configuration_files
   create_nginx_configuration
+  #  ensure_port_available "$NGINX_PORT"
   build_and_run_docker
 }
 

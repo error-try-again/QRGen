@@ -4,9 +4,13 @@ import helmet from "helmet";
 import { qrCodeRoutes } from "./routes/qr-code-routes";
 import { JSON_BODY_LIMIT, ORIGIN, PORT, TRUST_PROXY } from "./config";
 import { rateLimiters } from "./middleware/rate-limiters";
+import dotenv from "dotenv";
 
 // Initialize express
 export const app = express();
+
+// Initialize dotenv
+dotenv.config({ path: './.env' });
 
 // Middleware Setup
 app.set('trust proxy', TRUST_PROXY);
