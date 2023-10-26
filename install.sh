@@ -70,6 +70,7 @@ prompt_for_letsencrypt() {
   fi
 }
 
+# Sets up Let's Encrypt.
 letsencrypt_setup() {
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     setup_letsencrypt_directories
@@ -222,6 +223,7 @@ build_and_run_docker() {
   docker compose ps
 }
 
+# Writes the NGINX configuration file to the project directory.
 create_nginx_configuration() {
   echo "Creating NGINX configuration..."
   # Default configurations
@@ -313,6 +315,7 @@ EOF
   echo "nginx configuration written to $PROJECT_DIR/nginx.conf"
 }
 
+# Writes the Dockerfile to the frontend directory.
 write_frontend_docker() {
   cat <<EOF >"$FRONTEND_DIR/Dockerfile"
 # Use the latest version of Node.js
@@ -360,6 +363,7 @@ CMD ["nginx", "-g", "daemon off;"]
 EOF
 }
 
+# Writes the Dockerfile to the backend directory.
 write_backend_docker() {
   cat <<EOF >"$BACKEND_DIR/Dockerfile"
 # Use the latest version of Node.js
@@ -387,6 +391,7 @@ CMD ["npx", "ts-node", "src/server.ts"]
 EOF
 }
 
+# Writes the TypeScript configuration file to the backend directory.
 write_tsconfig() {
   cat <<EOF >"$BACKEND_DIR/tsconfig.json"
 {
@@ -414,6 +419,7 @@ write_tsconfig() {
 EOF
 }
 
+# Writes the Docker Compose file to the project directory.
 write_docker_compose() {
   local mount_extras=""
   local ssl_port=""
