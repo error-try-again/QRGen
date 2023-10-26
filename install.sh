@@ -227,19 +227,21 @@ setup_docker_rootless() {
 # Check if a port is in use.
 is_port_in_use() {
   local port="$1"
-  netstat -tuln | grep -q ":$port "
-  return $?
+  if lsof -i :"$port" >/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 # If a port is in use, prompt for an alternate port.
 ensure_port_available() {
   local port="$1"
-  local default_port="$1"
-  while is_port_in_use "$port"; do
+  if is_port_in_use "$port"; then
     echo "Port $port is already in use."
     read -rp "Please provide an alternate port or Ctrl+C to exit: " port
     port="${port:-$default_port}"
-  done
+  fi
   NGINX_PORT="$port"
 }
 
@@ -617,10 +619,10 @@ cleanup() {
 main() {
   setup_project_directories
   setup_docker_rootless
+  ensure_port_available "$NGINX_PORT"
   prompt_for_letsencrypt
   create_server_configuration_files
   create_nginx_configuration
-  #  ensure_port_available "$NGINX_PORT"
   build_and_run_docker
 }
 
