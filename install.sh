@@ -649,14 +649,14 @@ update_project() {
 purge_builds() {
   local containers
   containers=$(docker ps -a -q)
+  echo "Stopping all containers..."
   if [ -n "$containers" ]; then
-    echo "Stopping all Docker containers..."
-    docker stop "$containers"
+    docker stop $containers
   else
     echo "No containers to stop."
   fi
   echo "Purging Docker builds..."
-  docker builder prune -a
+  docker system prune -a
 }
 
 quit() {
@@ -702,7 +702,7 @@ main() {
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
 
-  PS3="Choose an option (1/2/3/4/5/6/7/8/9): "
+  PS3="Choose an option (1/2/3/4/5/6/7/8): "
   local options=(
     "Run Setup"
     "Cleanup"
