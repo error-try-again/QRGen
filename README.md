@@ -8,6 +8,7 @@ environments.
     Setup: Two Bash scripts used to orchestrate containers, setup enviornments, and install dependencies.
     Backend: A Node.js server powered by Express, written in TypeScript. 
     Frontend: A Vite-React TSX application powered by NGINX proxying requests to the backend.
+    SSL: NGINX reverse proxy with SSL termination using LetsEncrypt.
 
 The entire project is self-hostable and has been built over <s>a weekend</s> three weeks.
 Although it's been thoroughly tested manually at the time of writing, unit tests are still a work in progress.
@@ -84,12 +85,12 @@ This should be changed in production environments.
 * Add additional client/server validation for QR code formats
 * Add import mechanism for QR code generation (CSV, JSON, Excel, etc.)
 * API Documentation
-* Complete CI/CD pipeline
+* CI/CD pipeline
 * Test coverage
-* SSL/TLS support (E.g. Let's Encrypt, etc.)
 * Add additional deployment options (E.g. Kubernetes, etc.)
 * Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content persistence, content expiry, etc.)
-* Database support (E.g. MongoDB, etc.) for hosted content persistence
+* Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code generation history, dynamic QR code
+  generation, etc.)
 
 # Example
 

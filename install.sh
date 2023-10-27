@@ -4,112 +4,51 @@ set -euo pipefail
 # Change the current working directory to the script's location.
 cd "$(dirname "$0")"
 
-# Define project-related constants and directory paths.
-readonly PROJECT_DIR="$HOME/QRGen-FullStack"
-readonly BACKEND_DIR="$PROJECT_DIR/backend"
-readonly FRONTEND_DIR="$PROJECT_DIR/frontend"
-readonly SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
-readonly STAGING_DIR="$PROJECT_DIR/staging"
+# Define constants and directory paths.
+declare -r PROJECT_DIR="$HOME/QRGen-FullStack"
+declare -r BACKEND_DIR="$PROJECT_DIR/backend"
+declare -r FRONTEND_DIR="$PROJECT_DIR/frontend"
+declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
+declare -r STAGING_DIR="$PROJECT_DIR/staging"
 
-# Define Let's Encrypt-related constants and directory paths.
-readonly LETS_ENCRYPT_BASE="$HOME/docker_letsencrypt"
-readonly LETS_ENCRYPT_DIR="$LETS_ENCRYPT_BASE/etc/letsencrypt"
-readonly LETS_ENCRYPT_LIB="$LETS_ENCRYPT_BASE/var/lib/letsencrypt"
-readonly LETS_ENCRYPT_LOG="$LETS_ENCRYPT_BASE/var/log/letsencrypt"
-readonly LETS_ENCRYPT_SITE="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site"
-readonly LETS_ENCRYPT_DH_PARAM="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/src/letsencrypt/dh-param"
-readonly DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
+declare -r LETS_ENCRYPT_BASE="$HOME/docker_letsencrypt"
+declare -r LETS_ENCRYPT_DIR="$LETS_ENCRYPT_BASE/etc/letsencrypt"
+declare -r LETS_ENCRYPT_LIB="$LETS_ENCRYPT_BASE/var/lib/letsencrypt"
+declare -r LETS_ENCRYPT_LOG="$LETS_ENCRYPT_BASE/var/log/letsencrypt"
+declare -r LETS_ENCRYPT_SITE="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site"
+declare -r LETS_ENCRYPT_DH_PARAM="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/src/letsencrypt/dh-param"
+declare -r DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
 
-# Define configuration-related constants.
+# Configuration-related constants.
 BACKEND_PORT=3001
 NGINX_PORT=8080
-ORIGIN_URL="http://localhost"
+BACKEND_SCHEME="http"
+DOMAIN_NAME="localhost"
+ORIGIN_URL="$BACKEND_SCHEME://$DOMAIN_NAME"
 ORIGIN_PORT="$NGINX_PORT"
 ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
-NODE_VERSION=20.8.0
-DOMAIN_NAME=""
+NODE_VERSION="20.8.0"
+SUBDOMAIN="www"
 USE_LETS_ENCRYPT="no"
 DOCKER_HOST=""
 BACKEND_FILES=""
 
-# Sets up the directories required for Let's Encrypt.
-setup_letsencrypt_directories() {
-  echo "Creating Let's Encrypt directories..."
-  create_directory "$LETS_ENCRYPT_BASE"
-  create_directory "$LETS_ENCRYPT_DIR"
-  create_directory "$LETS_ENCRYPT_LIB"
-  create_directory "$LETS_ENCRYPT_LOG"
-  create_directory "$LETS_ENCRYPT_SITE"
-  create_directory "$LETS_ENCRYPT_DH_PARAM"
-  echo "Finished creating Let's Encrypt directories."
-}
+# ---- Helper Functions ---- #
 
-# Generates Diffie-Hellman parameters for Let's Encrypt.
-generate_dhparam() {
-  echo "Generating Diffie-Hellman parameters..."
-  if [[ -d $LETS_ENCRYPT_DH_PARAM ]]; then
-    openssl dhparam -out "$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem" 2048
-  else
-    echo "Error: Diffie-Hellman parameters directory $LETS_ENCRYPT_DH_PARAM does not exist."
-    echo "Ensure that setup_letsencrypt_directories() is being run.. Exiting."
-    exit 1
-  fi
-}
-
-# Prompt for let's encrypt setup
-prompt_for_letsencrypt() {
-  read -rp "Do you want to setup Let's Encrypt SSL (yes/no)? " USE_LETS_ENCRYPT
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-    read -rp "Enter your domain name (e.g., example.com): " DOMAIN_NAME
-    if [[ $DOMAIN_NAME != "" ]]; then
-      letsencrypt_setup
-    else
-      echo "Error: Domain name cannot be empty. Exiting."
-      exit 1
-    fi
-  else
-    DOMAIN_NAME="localhost"
-  fi
-}
-
-# Sets up Let's Encrypt.
-letsencrypt_setup() {
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-    setup_letsencrypt_directories
-    generate_dhparam
-    get_certificates
-  fi
-}
-
-# Obtains SSL certificates from Let's Encrypt.
-get_certificates() {
-  echo "Obtaining SSL certificates for $DOMAIN_NAME..."
-  docker run -it --rm \
-    -v "$LETS_ENCRYPT_DIR:/etc/letsencrypt" \
-    -v "$LETS_ENCRYPT_LIB:/var/lib/letsencrypt" \
-    -v "$LETS_ENCRYPT_SITE:/data/letsencrypt" \
-    -v "$LETS_ENCRYPT_LOG:/var/log/letsencrypt" \
-    certbot/certbot \
-    certonly --webroot \
-    --non-interactive \
-    --register-unsafely-without-email \
-    --agree-tos \
-    --webroot-path=/data/letsencrypt \
-    --staging \
-    -d "$DOMAIN_NAME" -d www."$DOMAIN_NAME"
-}
-
-# Creates the specified directory if it does not already exist.
 create_directory() {
-  if [ ! -d "$1" ]; then
-    mkdir -p "$1"
-    echo "$1 created."
+  local directory="$1"
+  if [ ! -d "$directory" ]; then
+    mkdir -p "$directory"
+    echo "$directory created."
   else
-    echo "$1 already exists."
+    echo "$directory already exists."
   fi
 }
 
-# Copies the server files to the staging directory.
+docker_compose_exists() {
+  [[ -f "$PROJECT_DIR/docker-compose.yml" ]]
+}
+
 copy_server_files() {
   echo "Copying server files..."
   copy_frontend_files
@@ -133,34 +72,6 @@ copy_frontend_files() {
   cp "index.html" "$FRONTEND_DIR"
 }
 
-# Sets up the project directories.
-setup_project_directories() {
-  echo "Staging project directories..."
-
-  # Ensure required directories exist.
-  create_directory "$SERVER_DIR"
-  create_directory "$FRONTEND_DIR"
-  create_directory "$BACKEND_DIR"
-  create_directory "$STAGING_DIR"
-
-  local SRC_DIR="$HOME/QRGen-FullStack/src"
-
-  if [[ -d "$SRC_DIR" ]]; then
-    copy_server_files
-  else
-    echo "Error: Source directory $SRC_DIR does not exist. Attempting to create.."
-    # Create the source directory if possible, otherwise exit with an error.
-    if ! mkdir -p "$SRC_DIR"; then
-      echo "Error: Failed to create source directory $SRC_DIR"
-      exit 1
-    else
-      echo "Source directory $SRC_DIR created."
-      copy_server_files
-    fi
-  fi
-}
-
-# Ensures XDG_RUNTIME_DIR is set.
 ensure_xdg_runtime() {
   echo "Ensuring XDG_RUNTIME_DIR is set..."
   local XDG_RUNTIME_DIR
@@ -172,7 +83,6 @@ ensure_xdg_runtime() {
   fi
 }
 
-# Validates and sets Docker-related environment variables.
 ensure_docker_env() {
   echo "Ensuring Docker environment variables are set..."
   local expected_docker_host
@@ -182,6 +92,83 @@ ensure_docker_env() {
     DOCKER_HOST="${expected_docker_host}"
     export DOCKER_HOST
     echo "Set DOCKER_HOST to ${DOCKER_HOST}"
+  fi
+}
+
+bring_down_docker_compose() {
+  if docker_compose_exists; then
+    docker compose -f "$PROJECT_DIR/docker-compose.yml" down
+  fi
+}
+
+produce_docker_logs() {
+  if docker_compose_exists; then
+    docker compose -f "$PROJECT_DIR/docker-compose.yml" logs
+  fi
+}
+
+is_port_in_use() {
+  local port="$1"
+  if lsof -i :"$port" >/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+ensure_port_available() {
+  local port="$1"
+  if is_port_in_use "$port"; then
+    echo "Port $port is already in use."
+    read -rp "Please provide an alternate port or Ctrl+C to exit: " port
+    port="${port:-$default_port}"
+  fi
+  NGINX_PORT="$port"
+}
+
+# Prompts user with a message and ensures a non-empty response.
+# Returns the response when it's non-empty.
+prompt_with_validation() {
+  local prompt_message="$1"
+  local error_message="$2"
+  local user_input=""
+
+  while true; do
+    read -rp "$prompt_message" user_input
+
+    if [[ -z "$user_input" ]]; then
+      echo "$error_message"
+    else
+      echo "$user_input"
+      break
+    fi
+  done
+}
+
+# ---- Setup Functions ---- #
+
+setup_project_directories() {
+  echo "Staging project directories..."
+
+  local directory
+  for directory in "$SERVER_DIR" "$FRONTEND_DIR" "$BACKEND_DIR" "$STAGING_DIR"; do
+    create_directory "$directory"
+  done
+
+  local SRC_DIR="$HOME/QRGen-FullStack/src"
+
+  if [[ -d "$SRC_DIR" ]]; then
+    copy_server_files
+  else
+    echo "Error: $SRC_DIR does not exist. Attempting to create."
+
+    if mkdir -p "$SRC_DIR"; then
+      echo "Source directory $SRC_DIR created."
+      copy_server_files
+    else
+      echo "Error: Failed to create $SRC_DIR"
+      exit 1
+    fi
   fi
 }
 
@@ -224,49 +211,93 @@ setup_docker_rootless() {
   systemctl --user enable docker.service
 }
 
-# Check if a port is in use.
-is_port_in_use() {
-  local port="$1"
-  if lsof -i :"$port" >/dev/null 2>&1; then
-    return 0
+setup_letsencrypt_directories() {
+  echo "Creating Let's Encrypt directories..."
+  local directories
+  for directories in "$LETS_ENCRYPT_BASE" "$LETS_ENCRYPT_DIR" "$LETS_ENCRYPT_LIB" "$LETS_ENCRYPT_LOG" "$LETS_ENCRYPT_SITE" "$LETS_ENCRYPT_DH_PARAM"; do
+    create_directory "$directories"
+  done
+  echo "Finished creating Let's Encrypt directories."
+}
+
+# ---- Let's Encrypt Functions ---- #
+
+generate_dhparam() {
+  echo "Generating Diffie-Hellman parameters..."
+
+  if [[ -d $LETS_ENCRYPT_DH_PARAM ]]; then
+    openssl dhparam -out "$DH_PARAM_FILE" 2048
   else
-    return 1
+    echo "Error: $LETS_ENCRYPT_DH_PARAM does not exist. Ensure setup_letsencrypt_directories() is run."
+    exit 1
   fi
 }
 
-# If a port is in use, prompt for an alternate port.
-ensure_port_available() {
-  local port="$1"
-  if is_port_in_use "$port"; then
-    echo "Port $port is already in use."
-    read -rp "Please provide an alternate port or Ctrl+C to exit: " port
-    port="${port:-$default_port}"
+letsencrypt_setup() {
+  [[ "$USE_LETS_ENCRYPT" == "yes" ]] && setup_letsencrypt_directories && generate_dhparam && get_certificates
+}
+
+get_certificates() {
+  echo "Obtaining SSL certificates for $DOMAIN_NAME..."
+  docker run -it --rm \
+    -v "$LETS_ENCRYPT_DIR:/etc/letsencrypt" \
+    -v "$LETS_ENCRYPT_LIB:/var/lib/letsencrypt" \
+    -v "$LETS_ENCRYPT_SITE:/data/letsencrypt" \
+    -v "$LETS_ENCRYPT_LOG:/var/log/letsencrypt" \
+    certbot/certbot \
+    certonly --webroot --non-interactive --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging -d "$DOMAIN_NAME" -d "$SUBDOMAIN"."$DOMAIN_NAME"
+}
+
+# ---- User Input ---- #
+
+# Prompts the user for domain details and Let's Encrypt setup.
+prompt_for_domain_and_letsencrypt() {
+  local user_response=""
+  local custom_domain_prompt="Would you like to specify a domain name other than the default (http://localhost) (yes/no)? "
+
+  local domain_prompt="Enter your domain name (e.g., example.com): "
+  local domain_error_message="Error: Domain name cannot be empty."
+
+  local custom_subdomain_prompt="Would you like to specify a subdomain (e.g., www.example.com, void.example.com) other than the default (none) (yes/no)? "
+  local subdomain_prompt="Enter your subdomain name (e.g., www): "
+  local subdomain_error_message="Error: Subdomain name cannot be empty."
+
+  # Ask if the user wants to specify a different domain name.
+  read -rp "$custom_domain_prompt" user_response
+
+  if [[ "$user_response" == "yes" ]]; then
+    DOMAIN_NAME=$(prompt_with_validation "$domain_prompt" "$domain_error_message")
+    ORIGIN_URL="$BACKEND_SCHEME://$DOMAIN_NAME"
+    ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
+    echo "Using custom domain name: $ORIGIN_URL"
+
+    # Ask if the user wants to specify a subdomain.
+    read -rp "$custom_subdomain_prompt" user_response
+
+    if [[ "$user_response" == "yes" ]]; then
+      SUBDOMAIN=$(prompt_with_validation "$subdomain_prompt" "$subdomain_error_message")
+      ORIGIN_URL="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"
+      ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
+      echo "Using custom domain name: $ORIGIN_URL"
+    fi
+
+    local setup_letsencrypt_prompt="Would you like to setup Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? "
+
+    # Ask if the user wants to set up Let's Encrypt SSL.
+    read -rp "$setup_letsencrypt_prompt" user_response
+
+    if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+      letsencrypt_setup
+    fi
+  else
+    echo "Using default domain name: $DOMAIN_NAME"
   fi
-  NGINX_PORT="$port"
 }
 
-# Uses Docker Compose to build and launch the Docker containers for the project.
-build_and_run_docker() {
-  echo "Building and running Docker setup..."
-
-  # Move to the project directory before invoking Docker commands.
-  cd "$PROJECT_DIR" || {
-    echo "Failed to change directory to $PROJECT_DIR"
-    exit 1
-  }
-  docker compose build || {
-    echo "Failed to build Docker image using Docker Compose"
-    exit 1
-  }
-  docker compose up -d || {
-    echo "Failed to run Docker Compose"
-    exit 1
-  }
-  docker compose ps
-}
+# ---- Configuration Functions ---- #
 
 # Writes the NGINX configuration file to the project directory.
-create_nginx_configuration() {
+configure_nginx() {
   echo "Creating NGINX configuration..."
   # Default configurations
   local backend_scheme="http"
@@ -276,10 +307,18 @@ create_nginx_configuration() {
   local token_directive=""
   local server_name_directive="server_name $DOMAIN_NAME;"
 
+  # if subdomain is not specified, use the domain name
+  if [[ "$SUBDOMAIN" == "www" ]]; then
+    server_name_directive="server_name $DOMAIN_NAME;"
+  else
+    server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
+  fi
+
   # LetsEncrypt-specific configurations
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     backend_scheme="https"
     read -r -d '' ssl_config <<EOL
+    # SSL configurations
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
     ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
@@ -294,7 +333,6 @@ create_nginx_configuration() {
     ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
 EOL
-
     token_directive="server_tokens off;"
     listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen 443 ssl;"
     letsencrypt_challenge="location ~ /.well-known/acme-challenge { allow all; root /usr/share/nginx/html; }"
@@ -316,7 +354,6 @@ http {
     access_log /var/log/nginx/access.log main;
     sendfile on;
     keepalive_timeout 65;
-    # SSL configurations
     $ssl_config
     server {
         $listen_directive
@@ -358,7 +395,7 @@ EOF
 }
 
 # Writes the Dockerfile to the frontend directory.
-write_frontend_docker() {
+configure_frontend_docker() {
   cat <<EOF >"$FRONTEND_DIR/Dockerfile"
 # Use the latest version of Node.js
 FROM node:$NODE_VERSION as build
@@ -406,7 +443,7 @@ EOF
 }
 
 # Writes the Dockerfile to the backend directory.
-write_backend_docker() {
+configure_backend_docker() {
   cat <<EOF >"$BACKEND_DIR/Dockerfile"
 # Use the latest version of Node.js
 FROM node:$NODE_VERSION
@@ -432,7 +469,7 @@ EOF
 }
 
 # Writes the TypeScript configuration file to the backend directory.
-write_tsconfig() {
+configure_backend_tsconfig() {
   cat <<EOF >"$BACKEND_DIR/tsconfig.json"
 {
   "compilerOptions": {
@@ -459,7 +496,7 @@ write_tsconfig() {
 EOF
 }
 
-write_dot_env() {
+configure_dot_env() {
   cat <<EOF >"$BACKEND_DIR/.env"
 ORIGIN=$ORIGIN
 PORT=$BACKEND_PORT
@@ -467,7 +504,7 @@ EOF
 }
 
 # Writes the Docker Compose file to the project directory.
-write_docker_compose() {
+configure_docker_compose() {
   local mount_extras=""
   local ssl_port=""
   local ssl_port_directive=""
@@ -540,31 +577,30 @@ EOF
 }
 
 # Produces server-side configuration files essential for backend and frontend operations.
-create_server_configuration_files() {
+generate_server_files() {
   echo "Creating server configuration files..."
-  write_tsconfig
-  write_dot_env
+  configure_backend_tsconfig
+  configure_dot_env
   echo "Configuring the Docker Express..."
-  write_backend_docker
+  configure_backend_docker
   echo "Configuring the Docker NGINX Proxy..."
-  write_frontend_docker
+  configure_frontend_docker
   echo "Configuring Docker Compose..."
-  write_docker_compose
+  configure_docker_compose
 }
+
+# --- User Actions --- #
 
 # Dumps logs of all containers orchestrated by the Docker Compose file.
 dump_logs() {
   ensure_docker_env
-  echo "Dumping Docker logs..."
-  if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
-    docker compose -f "$PROJECT_DIR/docker-compose.yml" logs >"$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
-    echo "Logs dumped to $PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
-    echo "Contents:"
-    cat "$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
-    echo "Done."
-  else
-    echo "Error: Docker Compose configuration not found!"
-  fi
+
+  local log_file
+  log_file="$PROJECT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
+
+  produce_docker_logs >"$log_file" && {
+    echo "Docker logs dumped to $log_file"
+  }
 }
 
 # Cleans current Docker Compose setup, arranges directories, and reinitiates Docker services.
@@ -572,11 +608,9 @@ reload_project() {
   echo "Reloading the project..."
   ensure_docker_env
   setup_project_directories
-  if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
-    docker compose -f "$PROJECT_DIR/docker-compose.yml" down
-  fi
-  create_server_configuration_files
-  create_nginx_configuration
+  bring_down_docker_compose
+  generate_server_files
+  configure_nginx
   build_and_run_docker
   dump_logs
 }
@@ -586,11 +620,7 @@ cleanup() {
   ensure_docker_env
   echo "Cleaning up..."
 
-  if [[ -f "$PROJECT_DIR/docker-compose.yml" ]]; then
-    docker compose -f "$PROJECT_DIR/docker-compose.yml" down
-    docker system prune -a -f
-    echo "Docker containers cleaned up."
-  fi
+  bring_down_docker_compose
 
   declare -A directories=(
     ["Project"]=$PROJECT_DIR
@@ -614,15 +644,37 @@ cleanup() {
   echo "Cleanup complete."
 }
 
+# ---- Build and Run Docker ---- #
+
+build_and_run_docker() {
+  echo "Building and running Docker setup..."
+  # Move to the project directory before invoking Docker commands.
+  cd "$PROJECT_DIR" || {
+    echo "Failed to change directory to $PROJECT_DIR"
+    exit 1
+  }
+  docker compose build || {
+    echo "Failed to build Docker image using Docker Compose"
+    exit 1
+  }
+  docker compose up -d || {
+    echo "Failed to run Docker Compose"
+    exit 1
+  }
+  docker compose ps
+}
+
+# ---- Main Function/Entry ---- #
+
 # Sets up the directories, configures Docker in rootless mode
 # Generates necessary configuration files, and runs the Docker setup.
 main() {
   setup_project_directories
   setup_docker_rootless
   ensure_port_available "$NGINX_PORT"
-  prompt_for_letsencrypt
-  create_server_configuration_files
-  create_nginx_configuration
+  prompt_for_domain_and_letsencrypt
+  generate_server_files
+  configure_nginx
   build_and_run_docker
 }
 
