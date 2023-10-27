@@ -648,6 +648,7 @@ update_project() {
 
 purge_builds() {
   echo "Purging Docker builds..."
+  docker stop "$(docker ps -aq)"
   docker builder prune -a
 }
 
@@ -694,11 +695,12 @@ main() {
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
 
-  PS3="Choose an option (1/2/3/4/5/6/7): "
+  PS3="Choose an option (1/2/3/4/5/6/7/8/9): "
   local options=(
     "Run Setup"
     "Cleanup"
     "Reload/Refresh"
+    "Stop docker-compose and dump logs"
     "Update Project"
     "Dump Docker Logs"
     "Prune All Docker Builds - Dangerous"
@@ -714,6 +716,11 @@ user_prompt() {
       ;;
     "Cleanup")
       cleanup
+      break
+      ;;
+    "Stop docker-compose and dump logs")
+      bring_down_docker_compose
+      dump_logs
       break
       ;;
     "Reload/Refresh")
