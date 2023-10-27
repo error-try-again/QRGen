@@ -647,8 +647,15 @@ update_project() {
 }
 
 purge_builds() {
+  local containers
+  containers=$(docker ps -a -q)
+  if [ -n "$containers" ]; then
+    echo "Stopping all Docker containers..."
+    docker stop "$containers"
+  else
+    echo "No containers to stop."
+  fi
   echo "Purging Docker builds..."
-  docker stop "$(docker ps -aq)"
   docker builder prune -a
 }
 
