@@ -642,6 +642,20 @@ cleanup() {
   echo "Cleanup complete."
 }
 
+update_project() {
+  git pull
+}
+
+purge_builds() {
+  echo "Purging Docker builds..."
+  docker builder prune -a
+}
+
+quit() {
+  echo "Exiting..."
+  exit 0
+}
+
 # ---- Build and Run Docker ---- #
 
 build_and_run_docker() {
@@ -680,8 +694,16 @@ main() {
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
 
-  PS3="Choose an option (1/2/3/4): "
-  local options=("Run Setup" "Cleanup" "Reload/Refresh" "Dump Docker Logs")
+  PS3="Choose an option (1/2/3/4/5/6/7): "
+  local options=(
+    "Run Setup"
+    "Cleanup"
+    "Reload/Refresh"
+    "Update Project"
+    "Dump Docker Logs"
+    "Prune All Docker Builds - Dangerous"
+    "Quit"
+  )
   local opt
 
   select opt in "${options[@]}"; do
@@ -698,9 +720,20 @@ user_prompt() {
       reload_project
       break
       ;;
+    "Update Project")
+      update_project
+      break
+      ;;
     "Dump Docker Logs")
       dump_logs
       break
+      ;;
+    "Prune All Docker Builds - Dangerous")
+      purge_builds
+      break
+      ;;
+    "Quit")
+      quit
       ;;
     *)
       echo "Invalid option"
