@@ -9,7 +9,6 @@ declare -r PROJECT_DIR="$HOME/QRGen-FullStack"
 declare -r BACKEND_DIR="$PROJECT_DIR/backend"
 declare -r FRONTEND_DIR="$PROJECT_DIR/frontend"
 declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
-declare -r STAGING_DIR="$PROJECT_DIR/staging"
 
 declare -r LETS_ENCRYPT_BASE="$HOME/docker_letsencrypt"
 declare -r LETS_ENCRYPT_DIR="$LETS_ENCRYPT_BASE/etc/letsencrypt"
@@ -151,7 +150,7 @@ setup_project_directories() {
   echo "Staging project directories..."
 
   local directory
-  for directory in "$SERVER_DIR" "$FRONTEND_DIR" "$BACKEND_DIR" "$STAGING_DIR"; do
+  for directory in "$SERVER_DIR" "$FRONTEND_DIR" "$BACKEND_DIR"; do
     create_directory "$directory"
   done
 
@@ -624,7 +623,6 @@ cleanup() {
 
   declare -A directories=(
     ["Project"]=$PROJECT_DIR
-    ["Staging"]=$STAGING_DIR
     ["Frontend"]=$FRONTEND_DIR
     ["Backend"]=$BACKEND_DIR
     ["Let's Encrypt"]=$LETS_ENCRYPT_BASE
