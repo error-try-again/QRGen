@@ -249,14 +249,12 @@ get_certificates() {
 
 # ---- User Input ---- #
 
-# Prompts the user for domain details and Let's Encrypt setup.
-prompt_for_domain_and_letsencrypt() {
+# Prompts the user for domain and subdomain details.
+prompt_for_domain_details() {
   local user_response=""
   local custom_domain_prompt="Would you like to specify a domain name other than the default (http://localhost) (yes/no)? "
-
   local domain_prompt="Enter your domain name (e.g., example.com): "
   local domain_error_message="Error: Domain name cannot be empty."
-
   local custom_subdomain_prompt="Would you like to specify a subdomain (e.g., www.example.com, void.example.com) other than the default (none) (yes/no)? "
   local subdomain_prompt="Enter your subdomain name (e.g., www): "
   local subdomain_error_message="Error: Subdomain name cannot be empty."
@@ -272,25 +270,34 @@ prompt_for_domain_and_letsencrypt() {
 
     # Ask if the user wants to specify a subdomain.
     read -rp "$custom_subdomain_prompt" user_response
-
     if [[ "$user_response" == "yes" ]]; then
       SUBDOMAIN=$(prompt_with_validation "$subdomain_prompt" "$subdomain_error_message")
       ORIGIN_URL="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"
       ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
       echo "Using custom domain name: $ORIGIN_URL"
     fi
-
-    local setup_letsencrypt_prompt="Would you like to setup Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? "
-
-    # Ask if the user wants to set up Let's Encrypt SSL.
-    read -rp "$setup_letsencrypt_prompt" user_response
-
-    if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-      letsencrypt_setup
-    fi
   else
     echo "Using default domain name: $DOMAIN_NAME"
   fi
+}
+
+# Prompts the user whether they would like to setup Let's Encrypt SSL for their domain.
+prompt_for_letsencrypt_setup() {
+  local user_response=""
+  local setup_letsencrypt_prompt="Would you like to setup Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? "
+
+  # Ask if the user wants to set up Let's Encrypt SSL.
+  read -rp "$setup_letsencrypt_prompt" user_response
+
+  if [[ "$user_response" == "yes" ]]; then
+    letsencrypt_setup
+  fi
+}
+
+# Prompts the user for domain details and Let's Encrypt setup.
+prompt_for_domain_and_letsencrypt() {
+  prompt_for_domain_details
+  prompt_for_letsencrypt_setup
 }
 
 # ---- Configuration Functions ---- #
@@ -702,13 +709,14 @@ main() {
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
 
-  PS3="Choose an option (1/2/3/4/5/6/7/8): "
+  PS3="Choose an option (1/2/3/4/5/6/7/8/9): "
   local options=(
     "Run Setup"
     "Cleanup"
     "Reload/Refresh"
     "Stop docker-compose and dump logs"
     "Update Project"
+    "Enable SSL with Let's Encrypt"
     "Dump Docker Logs"
     "Prune All Docker Builds - Dangerous"
     "Quit"
@@ -736,6 +744,11 @@ user_prompt() {
       ;;
     "Update Project")
       update_project
+      break
+      ;;
+    "Enable SSL with Let's Encrypt")
+      USE_LETS_ENCRYPT="yes"
+      main
       break
       ;;
     "Dump Docker Logs")
