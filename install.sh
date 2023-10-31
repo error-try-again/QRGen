@@ -228,7 +228,9 @@ generate_dhparam() {
 }
 
 letsencrypt_setup() {
-  setup_letsencrypt_directories && generate_dhparam
+  echo "Setting up Let's Encrypt..."
+  setup_letsencrypt_directories
+  generate_dhparam
 }
 
 # ---- User Input ---- #
@@ -295,7 +297,7 @@ prompt_for_domain_and_letsencrypt() {
 # Writes the NGINX configuration file to the project directory.
 configure_nginx() {
   echo "Creating NGINX configuration..."
-  # Default configurations
+
   local backend_scheme="http"
   local ssl_config=""
   local listen_directive="listen $NGINX_PORT;"
@@ -313,8 +315,9 @@ configure_nginx() {
   # LetsEncrypt-specific configurations
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     backend_scheme="https"
-    read -r -d '' ssl_config <<EOL
-    # SSL configurations
+
+    # Directly assign the multiline string to the variable
+    ssl_config="
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
     ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
@@ -327,10 +330,10 @@ configure_nginx() {
     resolver 8.8.8.8;
 
     ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-EOL
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
+
     token_directive="server_tokens off;"
-    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen 443 ssl;"
+    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen 443 ssl; listen [::]:443 ssl;"
     letsencrypt_challenge="location ~ /.well-known/acme-challenge { allow all; root /usr/share/nginx/html; }"
     server_name_directive="server_name $DOMAIN_NAME www.$DOMAIN_NAME;"
   fi
@@ -505,17 +508,25 @@ configure_docker_compose() {
   local ssl_port=""
   local ssl_port_directive=""
 
-  # LetsEncrypt-specific configurations
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port="443"
-    ssl_port_directive=" - \"${ssl_port}:${ssl_port}\""
+    ssl_port_directive="      - \"${ssl_port}:${ssl_port}\""
 
-    read -r -d '' mount_extras <<EOL
-     - /docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
-     - /docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME
-EOL
+    if [[ ! -d "$PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME" ]]; then
+      echo "Directory $PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME does not exist. Creating now..."
+      mkdir -p "$PROJECT_DIR"/docker-volumes/etc/letsencrypt/live/"$DOMAIN_NAME"
+    fi
+
+    if [[ ! -d "$PROJECT_DIR/docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME" ]]; then
+      echo "Directory $PROJECT_DIR/docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME does not exist. Creating now..."
+      mkdir -p "$PROJECT_DIR"/docker-volumes/etc/letsencrypt/archive/"$DOMAIN_NAME"
+    fi
+
+    mount_extras="      - $PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME"
+    mount_extras="$mount_extras\n      - $PROJECT_DIR/docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
   fi
 
+  # Creating the Docker Compose file
   cat <<EOF >"$PROJECT_DIR/docker-compose.yml"
 version: '3.8'
 services:
@@ -535,17 +546,17 @@ services:
       dockerfile: ./frontend/Dockerfile
     ports:
       - "${NGINX_PORT}:${NGINX_PORT}"
-    $ssl_port_directive
+$ssl_port_directive
     volumes:
-     - ./frontend:/usr/app
-     - ./nginx.conf:/etc/nginx/nginx.conf
-     - ./saved_qrcodes:/usr/share/nginx/html/saved_qrcodes
+      - ./frontend:/usr/app
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./saved_qrcodes:/usr/share/nginx/html/saved_qrcodes
+$mount_extras
     networks:
       - qrgen
-$mount_extras
 EOF
 
-  # If Let's Encrypt is enabled, add the certbot service to the Docker Compose file
+  # Add the certbot service to the Docker Compose file if Let's Encrypt is enabled
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
   certbot:
@@ -557,18 +568,14 @@ EOF
       - /frontend:/data/letsencrypt
     depends_on:
       - frontend
-
 networks:
   qrgen:
     driver: bridge
 EOF
   else
-    cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
-networks:
-  qrgen:
-    driver: bridge
-EOF
+    echo -e "networks:\n  qrgen:\n    driver: bridge" >>"$PROJECT_DIR/docker-compose.yml"
   fi
+
   echo "Docker Compose file written to $PROJECT_DIR/docker-compose.yml"
 }
 
