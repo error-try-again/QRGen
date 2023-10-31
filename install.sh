@@ -10,12 +10,7 @@ declare -r BACKEND_DIR="$PROJECT_DIR/backend"
 declare -r FRONTEND_DIR="$PROJECT_DIR/frontend"
 declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 
-declare -r LETS_ENCRYPT_BASE="$HOME/docker_letsencrypt"
-declare -r LETS_ENCRYPT_DIR="$LETS_ENCRYPT_BASE/etc/letsencrypt"
-declare -r LETS_ENCRYPT_LIB="$LETS_ENCRYPT_BASE/var/lib/letsencrypt"
-declare -r LETS_ENCRYPT_LOG="$LETS_ENCRYPT_BASE/var/log/letsencrypt"
-declare -r LETS_ENCRYPT_SITE="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site"
-declare -r LETS_ENCRYPT_DH_PARAM="$LETS_ENCRYPT_BASE/docker/letsencrypt-docker-nginx/src/letsencrypt/dh-param"
+declare -r LETS_ENCRYPT_DH_PARAM="$FRONTEND_DIR/dh-param"
 declare -r DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
 
 # Configuration-related constants.
@@ -213,7 +208,7 @@ setup_docker_rootless() {
 setup_letsencrypt_directories() {
   echo "Creating Let's Encrypt directories..."
   local directories
-  for directories in "$LETS_ENCRYPT_BASE" "$LETS_ENCRYPT_DIR" "$LETS_ENCRYPT_LIB" "$LETS_ENCRYPT_LOG" "$LETS_ENCRYPT_SITE" "$LETS_ENCRYPT_DH_PARAM"; do
+  for directories in $LETS_ENCRYPT_DH_PARAM; do
     create_directory "$directories"
   done
   echo "Finished creating Let's Encrypt directories."
@@ -233,18 +228,7 @@ generate_dhparam() {
 }
 
 letsencrypt_setup() {
-  setup_letsencrypt_directories && generate_dhparam && get_certificates
-}
-
-get_certificates() {
-  echo "Obtaining SSL certificates for $DOMAIN_NAME..."
-  docker run -it --rm \
-    -v "$LETS_ENCRYPT_DIR:/etc/letsencrypt" \
-    -v "$LETS_ENCRYPT_LIB:/var/lib/letsencrypt" \
-    -v "$LETS_ENCRYPT_SITE:/data/letsencrypt" \
-    -v "$LETS_ENCRYPT_LOG:/var/log/letsencrypt" \
-    certbot/certbot \
-    certonly --webroot --non-interactive --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging -d "$DOMAIN_NAME" -d "$SUBDOMAIN"."$DOMAIN_NAME"
+  setup_letsencrypt_directories && generate_dhparam
 }
 
 # ---- User Input ---- #
@@ -569,7 +553,7 @@ EOF
     volumes:
       - /docker-volumes/etc/letsencrypt:/etc/letsencrypt
       - /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt
-      - /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt
+      - /frontend:/data/letsencrypt
     depends_on:
       - frontend
 
@@ -637,7 +621,6 @@ cleanup() {
     ["Project"]=$PROJECT_DIR
     ["Frontend"]=$FRONTEND_DIR
     ["Backend"]=$BACKEND_DIR
-    ["Let's Encrypt"]=$LETS_ENCRYPT_BASE
   )
 
   local dir_name
