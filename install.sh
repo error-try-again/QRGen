@@ -289,14 +289,19 @@ prompt_for_letsencrypt_setup() {
   # Ask if the user wants to set up Let's Encrypt SSL.
   read -rp "$setup_letsencrypt_prompt" user_response
 
+  echo "Using Let's Encrypt SSL: $user_response"
+
   if [[ "$user_response" == "yes" ]]; then
     letsencrypt_setup
+  else
+    echo "Skipping Let's Encrypt setup."
   fi
 }
 
 # Prompts the user for domain details and Let's Encrypt setup.
 prompt_for_domain_and_letsencrypt() {
   prompt_for_domain_details
+  # TODO: Needs to be conditional on whether the user chose to use a custom domain.
   prompt_for_letsencrypt_setup
 }
 
