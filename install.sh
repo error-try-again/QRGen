@@ -233,7 +233,7 @@ generate_dhparam() {
 }
 
 letsencrypt_setup() {
-  [[ "$USE_LETS_ENCRYPT" == "yes" ]] && setup_letsencrypt_directories && generate_dhparam && get_certificates
+  setup_letsencrypt_directories && generate_dhparam && get_certificates
 }
 
 get_certificates() {
