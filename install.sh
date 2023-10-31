@@ -249,6 +249,7 @@ setup_docker_rootless() {
 generate_dummy_certificates() {
   local cert_dir="$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
   mkdir -p "$cert_dir"
+  mkdir -p "$cert_dir/dh"
 
   # Generate self-signed certificates for staging
   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "$cert_dir/privkey.pem" -out "$cert_dir/fullchain.pem" -subj "/CN=$DOMAIN_NAME"
