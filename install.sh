@@ -16,7 +16,7 @@ declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/letsencrypt/archive"
 
 # Configuration-related constants.
 BACKEND_PORT=3001
-NGINX_PORT=8080
+NGINX_PORT=8081
 NGINX_SSL_PROXY_PORT=8443
 NGINX_SSL_PORT=443
 BACKEND_SCHEME="http"
@@ -31,6 +31,7 @@ USE_CUSTOM_DOMAIN="no"
 DOCKER_HOST=""
 BACKEND_FILES=""
 DNS_RESOLVER="8.8.8.8"
+CERT_MODE="no"
 
 # Let's Encrypt configuration constants.
 EMAIL="--email"
@@ -257,6 +258,18 @@ generate_dummy_certificates() {
   openssl dhparam -out "$cert_dir"/dh/dhparam-2048.pem 2048
 
   echo "Dummy certificates generated for staging in $cert_dir."
+}
+
+enter_cert_mode() {
+  CERT_MODE="yes"
+  configure_docker_compose
+  docker-compose up -d
+}
+
+exit_cert_mode() {
+  CERT_MODE="no"
+  configure_docker_compose
+  docker-compose up -d
 }
 
 # ---- User Input ---- #
@@ -626,7 +639,7 @@ configure_docker_compose() {
   local shared_volume=""
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
-    ssl_port_directive+=$'\n      - "80:80"'
+    ssl_port_directive+=$'\n      - "8080:80"'
 
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
     ensure_directory_exists "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
