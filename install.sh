@@ -10,12 +10,9 @@ declare -r BACKEND_DIR="$PROJECT_DIR/backend"
 declare -r FRONTEND_DIR="$PROJECT_DIR/frontend"
 declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 
-declare -r LETS_ENCRYPT_LIVE_DIR="$PROJECT_DIR/docker-volumes/etc/letsencrypt/live"
-declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/docker-volumes/etc/letsencrypt/archive"
-declare -r LETS_ENCRYPT_DIR="$PROJECT_DIR/docker-volumes/etc/letsencrypt"
-declare -r LETS_ENCRYPT_LIB_DIR="$PROJECT_DIR/docker-volumes/var/lib/letsencrypt"
-declare -r LETS_ENCRYPT_DH_PARAM="$PROJECT_DIR/dh-param"
-declare -r DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
+declare -r LETS_ENCRYPT_DIR="$PROJECT_DIR/letsencrypt"
+declare -r LETS_ENCRYPT_LIVE_DIR="$PROJECT_DIR/letsencrypt/live"
+declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/letsencrypt/archive"
 
 # Configuration-related constants.
 BACKEND_PORT=3001
@@ -109,6 +106,7 @@ ensure_docker_env() {
 }
 
 bring_down_docker_compose() {
+  ensure_docker_env
   if docker_compose_exists; then
     docker compose -f "$PROJECT_DIR/docker-compose.yml" down
   fi
@@ -141,6 +139,7 @@ produce_docker_logs() {
     echo "Docker Compose not found. Please install Docker Compose."
   fi
 }
+
 is_port_in_use() {
   local port="$1"
   if lsof -i :"$port" >/dev/null 2>&1; then
@@ -245,16 +244,6 @@ setup_docker_rootless() {
   systemctl --user enable docker.service
 }
 
-setup_letsencrypt_directories() {
-  echo "Creating Let's Encrypt directories..."
-  local directories
-
-  for directories in "$LETS_ENCRYPT_DH_PARAM" "$LETS_ENCRYPT_DIR" "$LETS_ENCRYPT_LIB_DIR"; do
-    create_directory "$directories"
-  done
-  echo "Finished creating Let's Encrypt directories."
-}
-
 # ---- Let's Encrypt Functions ---- #
 
 generate_dummy_certificates() {
@@ -263,7 +252,7 @@ generate_dummy_certificates() {
 
   # Generate self-signed certificates for staging
   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "$cert_dir/privkey.pem" -out "$cert_dir/fullchain.pem" -subj "/CN=$DOMAIN_NAME"
-  openssl dhparam -out "$DH_PARAM_FILE" 2048
+  openssl dhparam -out "$cert_dir"/dh/dhparam-2048.pem 2048
 
   echo "Dummy certificates generated for staging in $cert_dir."
 }
@@ -310,12 +299,11 @@ prompt_for_letsencrypt_setup() {
   # Ask if the user wants to set up Let's Encrypt SSL.
   read -rp "$setup_letsencrypt_prompt" user_response
 
-  echo "Using Let's Encrypt SSL: $user_response"
+  echo "$user_response"
 
   if [[ "$user_response" == "yes" ]]; then
     USE_LETS_ENCRYPT="yes"
-    echo "Setting up directories for Let's Encrypt..."
-    setup_letsencrypt_directories
+    echo "Setting up with Let's Encrypt SSL."
   else
     echo "Skipping Let's Encrypt setup."
   fi
@@ -353,7 +341,7 @@ configure_nginx() {
     backend_scheme="https"
 
     local missing_files=()
-    [[ ! -f "$DH_PARAM_FILE" ]] && missing_files+=("$DH_PARAM_FILE")
+    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/dhparam-2048.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dhparam-2048.pem")
     [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem")
     [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem")
 
@@ -382,15 +370,15 @@ configure_nginx() {
     ssl_prefer_server_ciphers on;
     ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
     ssl_buffer_size 8k;
-    ssl_dhparam $DH_PARAM_FILE;
+    ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
     ssl_ecdh_curve secp384r1;
     ssl_session_tickets off;
     ssl_stapling on;
     ssl_stapling_verify on;
     resolver $DNS_RESOLVER valid=300s;
 
-    ssl_certificate $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem;
-    ssl_certificate_key $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem;"
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
 
     token_directive="server_tokens off;"
     listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
@@ -454,6 +442,9 @@ http {
     }
 }
 EOF
+
+  cat "$PROJECT_DIR/nginx.conf"
+
   if [[ $? -ne 0 ]]; then
     echo "Error: Failed to write nginx configuration."
     return 1
@@ -579,6 +570,11 @@ configure_docker_compose() {
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
 
+    if [[ ! -d "$LETS_ENCRYPT_DIR" ]]; then
+      echo "Directory $LETS_ENCRYPT_DIR does not exist. Creating now..."
+      mkdir -p "$LETS_ENCRYPT_DIR"
+    fi
+
     if [[ ! -d "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME" ]]; then
       echo "Directory $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME does not exist. Creating now..."
       mkdir -p "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
@@ -589,8 +585,10 @@ configure_docker_compose() {
       mkdir -p "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME"
     fi
 
-    mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
+    mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
+      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
       - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
+
   fi
 
   # Creating the Docker Compose file
@@ -633,15 +631,18 @@ EOF
     image: certbot/certbot
     command: $CERTBOT_COMMAND
     volumes:
-      - $LETS_ENCRYPT_DIR:/etc/letsencrypt
-      - $LETS_ENCRYPT_LIB_DIR:/var/lib/letsencrypt
-      - $FRONTEND_DIR:/data/letsencrypt
+      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
+      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
+      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME
+      - ./frontend:/data/letsencrypt
     depends_on:
       - frontend
 networks:
   qrgen:
     driver: bridge
 EOF
+
+    cat "$PROJECT_DIR"/docker-compose.yml
   else
     echo -e "networks:\n  qrgen:\n    driver: bridge" >>"$PROJECT_DIR/docker-compose.yml"
   fi
@@ -721,6 +722,7 @@ update_project() {
 }
 
 purge_builds() {
+  ensure_docker_env
   local containers
   containers=$(docker ps -a -q)
   echo "Stopping all containers..."
@@ -785,7 +787,7 @@ user_prompt() {
     "Dump logs"
     "Update Project"
     "Enable SSL with Let's Encrypt"
-    "Dump Docker Logs"
+    "Stop Project Docker Containers"
     "Prune All Docker Builds - Dangerous"
     "Quit"
   )
@@ -819,8 +821,8 @@ user_prompt() {
       main
       break
       ;;
-    "Dump Docker Logs")
-      dump_logs
+    "Stop Project Docker Containers")
+      bring_down_docker_compose
       break
       ;;
     "Prune All Docker Builds - Dangerous")
