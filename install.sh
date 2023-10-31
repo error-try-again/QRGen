@@ -27,6 +27,7 @@ ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
 NODE_VERSION="20.8.0"
 SUBDOMAIN="www"
 USE_LETS_ENCRYPT="no"
+USE_CUSTOM_DOMAIN="no"
 DOCKER_HOST=""
 BACKEND_FILES=""
 DNS_RESOLVER="8.8.8.8"
@@ -41,7 +42,7 @@ NO_EFF_EMAIL="--no-eff-email"
 INTERACTIVE="--non-interactive"
 WITHOUT_EMAIL="--register-unsafely-without-email"
 FORCE_RENEWAL="--force-renewal"
-WEBROOT_PATH="/usr/share/nginx"
+WEBROOT_PATH="/usr/share/nginx/html"
 
 # ---- Helper Functions ---- #
 
@@ -274,6 +275,7 @@ prompt_for_domain_details() {
   read -rp "$custom_domain_prompt" user_response
 
   if [[ "$user_response" == "yes" ]]; then
+    USE_CUSTOM_DOMAIN="yes"
     DOMAIN_NAME=$(prompt_with_validation "$domain_prompt" "$domain_error_message")
     ORIGIN_URL="$BACKEND_SCHEME://$DOMAIN_NAME"
     ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
@@ -289,6 +291,7 @@ prompt_for_domain_details() {
     fi
   else
     echo "Using default domain name: $DOMAIN_NAME"
+    USE_CUSTOM_DOMAIN="no"
   fi
 }
 
@@ -313,8 +316,9 @@ prompt_for_letsencrypt_setup() {
 # Prompts the user for domain details and Let's Encrypt setup.
 prompt_for_domain_and_letsencrypt() {
   prompt_for_domain_details
-  # TODO: Needs to be conditional on whether the user chose to use a custom domain.
-  prompt_for_letsencrypt_setup
+  if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
+    prompt_for_letsencrypt_setup
+  fi
 }
 
 # ---- Configuration Functions ---- #
@@ -325,37 +329,47 @@ configure_nginx() {
 
   local backend_scheme="http"
   local ssl_config=""
-  local listen_directive="listen $NGINX_PORT;"
-  local letsencrypt_challenge=""
   local token_directive=""
+  local letsencrypt_challenge="location /.well-known/acme-challenge/ {
+        root /usr/share/nginx/html;
+    }"
+
+  local location_rewrite="location / {
+        rewrite ^ https://\$host\$request_uri? permanent;
+    }"
+
+  local redirect_http_to_https="server {
+        listen 80;
+        server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;
+        return 301 https://\$host\$request_uri;
+    }"
+
+  local listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;"
   local server_name_directive="server_name $DOMAIN_NAME;"
 
-  # if subdomain is not specified, use the domain name
   if [[ "$SUBDOMAIN" == "www" || -z $SUBDOMAIN ]]; then
-    local server_name_directive="server_name $DOMAIN_NAME;"
+    server_name_directive="server_name $DOMAIN_NAME;"
   else
-    local server_name_directive="server_name $SUBDOMAIN.$DOMAIN_NAME;"
+    server_name_directive="server_name $SUBDOMAIN.$DOMAIN_NAME;"
   fi
 
-  # LetsEncrypt-specific configurations
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     backend_scheme="https"
 
     local missing_files=()
-    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/dhparam-2048.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dhparam-2048.pem")
+    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/dhparam-2048.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/dhparam-2048.pem")
     [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem")
     [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem")
 
-    local file
-    local answer
-
     if [[ ${#missing_files[@]} -gt 0 ]]; then
+      local file
       echo "Error: The following files were not found:"
       for file in "${missing_files[@]}"; do
         echo "$file"
       done
 
       echo "Do you want to generate dummy certificates for staging? (yes/no)"
+      local answer
       read -r answer
       if [[ "$answer" == "yes" ]]; then
         generate_dummy_certificates
@@ -365,26 +379,31 @@ configure_nginx() {
       fi
     fi
 
-    # Directly assign the multiline string to the variable
     ssl_config="
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-    ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
-    ssl_buffer_size 8k;
-    ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
-    ssl_ecdh_curve secp384r1;
-    ssl_session_tickets off;
-    ssl_stapling on;
-    ssl_stapling_verify on;
-    resolver $DNS_RESOLVER valid=300s;
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers on;
+ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
+ssl_buffer_size 8k;
+ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
+ssl_ecdh_curve secp384r1;
+ssl_session_tickets off;
+ssl_stapling on;
+ssl_stapling_verify on;
+resolver $DNS_RESOLVER valid=300s;
 
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
+ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
+
+    local http_server_block=""
 
     token_directive="server_tokens off;"
-    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
-    letsencrypt_challenge="location ~ /.well-known/acme-challenge { allow all; root /usr/share/nginx/html; }"
+
     server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
+
+    listen_directive="listen $NGINX_PORT;
+    listen [::]:$NGINX_PORT;
+    listen $NGINX_SSL_PORT ssl;
+    listen [::]:$NGINX_SSL_PORT ssl;"
   fi
 
   if [[ -f "$PROJECT_DIR/nginx.conf" ]]; then
@@ -392,59 +411,87 @@ configure_nginx() {
     echo "Backup created at $PROJECT_DIR/nginx.conf.bak"
   fi
 
-  # Write configurations to nginx.conf
+  local https_server_block=""
+  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+    https_server_block="
+$ssl_config
+server {
+    $listen_directive
+    $token_directive
+    $server_name_directive
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files \$uri \$uri/ /index.html;
+        add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;
+        add_header X-Frame-Options \"DENY\" always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-XSS-Protection \"1; mode=block\" always;
+        add_header Referrer-Policy \"strict-origin-when-cross-origin\" always;
+        add_header Content-Security-Policy \"default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';\";
+    }
+    location /qr/generate {
+        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    location /qr/batch {
+        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+}"
+  else
+    http_server_block="
+server {
+    $listen_directive
+    $token_directive
+    $server_name_directive
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files \$uri \$uri/ /index.html;
+    }
+    location /qr/generate {
+        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    location /qr/batch {
+        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+}"
+  fi
+
+  local letsencrypt_server_block="
+server {
+    listen 80;
+    listen [::]:80;
+    server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;
+    $location_rewrite
+    $letsencrypt_challenge
+}"
+
+  local combined_server_blocks="$http_server_block $https_server_block $letsencrypt_server_block"
+
   cat <<EOF >"$PROJECT_DIR/nginx.conf"
 worker_processes auto;
 events {
     worker_connections 1024;
 }
 http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-    log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
-                '\$status \$body_bytes_sent "\$http_referer" '
-                '"\$http_user_agent" "\$http_x_forwarded_for"';
-    access_log /var/log/nginx/access.log main;
-    sendfile on;
-    keepalive_timeout 65;
-    $ssl_config
-    server {
-        $listen_directive
-        $token_directive
-        $server_name_directive
-        $letsencrypt_challenge
-        location / {
-            root   /usr/share/nginx/html;
-            index  index.html index.htm;
-            try_files \$uri \$uri/ /index.html;
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
 
-            # Security headers
-             add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
-             add_header X-XSS-Protection "1; mode=block" always;
-             add_header X-Content-Type-Options "nosniff" always;
-             add_header X-Frame-Options "DENY" always;
-
-            # Content Security Policy
-            # add_header Content-Security-Policy "frame-src 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://maxcdn.bootstrapcdn.com https://ajax.googleapis.com; img-src 'self'; style-src 'self' https://maxcdn.bootstrapcdn.com; font-src 'self' data: https://maxcdn.bootstrapcdn.com; form-action 'self'; upgrade-insecure-requests;" always;
-             add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-        }
-        location /qr/generate {
-            proxy_pass $backend_scheme://backend:$BACKEND_PORT;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        }
-        location /qr/batch {
-            proxy_pass $backend_scheme://backend:$BACKEND_PORT;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        }
-    }
+    $combined_server_blocks
 }
 EOF
-
-  cat "$PROJECT_DIR/nginx.conf"
 
   if [[ $? -ne 0 ]]; then
     echo "Error: Failed to write nginx configuration."
@@ -576,6 +623,7 @@ configure_docker_compose() {
   # Configure SSL if Let's Encrypt is used.
   local mount_extras=""
   local ssl_port_directive=""
+  local shared_volume=""
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
 
@@ -586,6 +634,8 @@ configure_docker_compose() {
     mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
       - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
+
+    shared_volume="      - nginx-shared-volume:$WEBROOT_PATH"
   fi
 
   # Creating the Docker Compose file
@@ -598,8 +648,6 @@ services:
       dockerfile: ./backend/Dockerfile
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
-    volumes:
-      - ./saved_qrcodes:/usr/app/saved_qrcodes
     networks:
       - qrgen
   frontend:
@@ -612,8 +660,8 @@ $ssl_port_directive
     volumes:
       - ./frontend:/usr/app
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./saved_qrcodes:/usr/share/nginx/html/saved_qrcodes
 $mount_extras
+$shared_volume
     networks:
       - qrgen
 EOF
@@ -636,7 +684,7 @@ EOF
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
       - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME
-      - nginx-shared-volume:/usr/share/nginx
+      - nginx-shared-volume:/usr/share/nginx/html
     depends_on:
       - frontend
 networks:
