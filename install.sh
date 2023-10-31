@@ -10,12 +10,16 @@ declare -r BACKEND_DIR="$PROJECT_DIR/backend"
 declare -r FRONTEND_DIR="$PROJECT_DIR/frontend"
 declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 
+declare -r LETS_ENCRYPT_DIR="$PROJECT_DIR/docker-volumes/etc/letsencrypt"
+declare -r LETS_ENCRYPT_LIB_DIR="$PROJECT_DIR/docker-volumes/var/lib/letsencrypt"
 declare -r LETS_ENCRYPT_DH_PARAM="$FRONTEND_DIR/dh-param"
 declare -r DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
 
 # Configuration-related constants.
 BACKEND_PORT=3001
 NGINX_PORT=8080
+NGINX_SSL_PROXY_PORT=8443
+NGINX_SSL_PORT=443
 BACKEND_SCHEME="http"
 DOMAIN_NAME="localhost"
 ORIGIN_URL="$BACKEND_SCHEME://$DOMAIN_NAME"
@@ -208,7 +212,8 @@ setup_docker_rootless() {
 setup_letsencrypt_directories() {
   echo "Creating Let's Encrypt directories..."
   local directories
-  for directories in $LETS_ENCRYPT_DH_PARAM; do
+
+  for directories in "$LETS_ENCRYPT_DH_PARAM" "$LETS_ENCRYPT_DIR" "$LETS_ENCRYPT_LIB_DIR"; do
     create_directory "$directories"
   done
   echo "Finished creating Let's Encrypt directories."
@@ -333,7 +338,7 @@ configure_nginx() {
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
 
     token_directive="server_tokens off;"
-    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen 443 ssl; listen [::]:443 ssl;"
+    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
     letsencrypt_challenge="location ~ /.well-known/acme-challenge { allow all; root /usr/share/nginx/html; }"
     server_name_directive="server_name $DOMAIN_NAME www.$DOMAIN_NAME;"
   fi
@@ -505,12 +510,10 @@ EOF
 # Writes the Docker Compose file to the project directory.
 configure_docker_compose() {
   local mount_extras=""
-  local ssl_port=""
   local ssl_port_directive=""
 
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-    ssl_port="443"
-    ssl_port_directive="      - \"${ssl_port}:${ssl_port}\""
+    ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
 
     if [[ ! -d "$PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME" ]]; then
       echo "Directory $PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME does not exist. Creating now..."
@@ -563,9 +566,9 @@ EOF
     image: certbot/certbot
     command: certonly --webroot --webroot-path=/data/letsencrypt --email you@example.com --agree-tos --no-eff-email --staging
     volumes:
-      - /docker-volumes/etc/letsencrypt:/etc/letsencrypt
-      - /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt
-      - /frontend:/data/letsencrypt
+      - $LETS_ENCRYPT_DIR:/etc/letsencrypt
+      - $LETS_ENCRYPT_LIB_DIR:/var/lib/letsencrypt
+      - $FRONTEND_DIR:/data/letsencrypt
     depends_on:
       - frontend
 networks:
