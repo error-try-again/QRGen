@@ -41,7 +41,7 @@ NO_EFF_EMAIL="--no-eff-email"
 INTERACTIVE="--non-interactive"
 WITHOUT_EMAIL="--register-unsafely-without-email"
 FORCE_RENEWAL="--force-renewal"
-WEBROOT_PATH="/data/letsencrypt"
+WEBROOT_PATH="/usr/share/nginx"
 
 # ---- Helper Functions ---- #
 
@@ -565,31 +565,27 @@ EOF
 
 # Writes the Docker Compose file to the project directory.
 configure_docker_compose() {
+  # Ensure required directories for Let's Encrypt exist.
+  ensure_directory_exists() {
+    if [[ ! -d "$1" ]]; then
+      echo "Directory $1 does not exist. Creating now..."
+      mkdir -p "$1"
+    fi
+  }
+
+  # Configure SSL if Let's Encrypt is used.
   local mount_extras=""
   local ssl_port_directive=""
-
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
 
-    if [[ ! -d "$LETS_ENCRYPT_DIR" ]]; then
-      echo "Directory $LETS_ENCRYPT_DIR does not exist. Creating now..."
-      mkdir -p "$LETS_ENCRYPT_DIR"
-    fi
-
-    if [[ ! -d "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME" ]]; then
-      echo "Directory $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME does not exist. Creating now..."
-      mkdir -p "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
-    fi
-
-    if [[ ! -d "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME" ]]; then
-      echo "Directory $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME does not exist. Creating now..."
-      mkdir -p "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME"
-    fi
+    ensure_directory_exists "$LETS_ENCRYPT_DIR"
+    ensure_directory_exists "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
+    ensure_directory_exists "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME"
 
     mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
       - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
-
   fi
 
   # Creating the Docker Compose file
@@ -627,6 +623,11 @@ EOF
     local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
     local CERTBOT_COMMAND="certonly --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
 
+    if ! ls "$FRONTEND_DIR"; then
+      echo "Error: $FRONTEND_DIR does not exist."
+      return 1
+    fi
+
     cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
   certbot:
     image: certbot/certbot
@@ -635,12 +636,15 @@ EOF
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
       - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME
-      - ./frontend:/data/letsencrypt
+      - nginx-shared-volume:/usr/share/nginx
     depends_on:
       - frontend
 networks:
   qrgen:
     driver: bridge
+
+volumes:
+  nginx-shared-volume:
 EOF
 
     cat "$PROJECT_DIR"/docker-compose.yml
