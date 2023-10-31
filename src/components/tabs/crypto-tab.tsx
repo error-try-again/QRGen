@@ -6,12 +6,20 @@ import { CRYPTO_TYPES } from '../../constants/constants';
 import { InputField } from '../fields/input-field';
 import { isFieldRequired } from '../../helpers/is-field-required';
 import { Tabs } from '../../ts/enums/tabs-enum';
-import { HandleCryptoChange } from '../../helpers/handle-crypto-select';
+import { handleCryptoSelect } from '../../helpers/handle-crypto-select';
 
 export const CryptoTab = () => {
   const { sectionTitle, section } = styles;
+  const { dispatch, state, setError, selectedCrypto, setSelectedCrypto } =
+    useCore();
+
   const handleInputChange = useHandleInputChange();
-  const { state, setError, selectedCrypto } = useCore();
+
+  const handleCryptoChange = handleCryptoSelect({
+    setSelectedCrypto,
+    dispatch
+  });
+
   return (
     <section style={section}>
       <h2 style={sectionTitle}>Crypto</h2>
@@ -24,7 +32,9 @@ export const CryptoTab = () => {
             name="cryptoType"
             value={cryptoType}
             checked={cryptoType === selectedCrypto}
-            onChange={() => HandleCryptoChange({ cryptoType })}
+            onChange={() => {
+              handleCryptoChange({ cryptoType });
+            }}
           />
           <label htmlFor={cryptoType}> {cryptoType}</label>
           <br />

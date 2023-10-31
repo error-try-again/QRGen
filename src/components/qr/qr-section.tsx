@@ -4,21 +4,25 @@ import { useCore } from '../../hooks/use-core';
 
 export const QRSection = () => {
   const { qrCodeContainer } = styles;
-  const { state } = useCore();
+
+  const {
+    state: { qrCodeURL, size }
+  } = useCore();
+
   return (
     <>
-      {state.qrCodeURL && (
+      {qrCodeURL && (
         <div style={qrCodeContainer}>
           <img
-            src={state.qrCodeURL}
+            src={qrCodeURL}
             alt="Generated QR Code"
-            style={{ width: `${state.size}px`, height: `${state.size}px` }}
+            style={{ width: `${size}px`, height: `${size}px` }}
             onError={(event: React.SyntheticEvent<HTMLImageElement>) =>
               console.error('Image Error:', event)
             }
           />
           <a
-            href={state.qrCodeURL}
+            href={qrCodeURL}
             download="QRCode.png"
           >
             Download QR Code

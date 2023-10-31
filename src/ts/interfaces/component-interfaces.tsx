@@ -59,6 +59,13 @@ export interface HandleVersionSelectParameters {
   dispatch: React.Dispatch<QRCodeGeneratorAction>;
 }
 
+export interface HandelCryptoSelectParameters {
+  setSelectedCrypto: (
+    value: ((previousState: string) => string) | string
+  ) => void;
+  dispatch: React.Dispatch<QRCodeGeneratorAction>;
+}
+
 export interface UpdateBatchJobParameters {
   activeTab: Tabs;
   setBatchData: React.Dispatch<React.SetStateAction<QRCodeRequest[]>>;

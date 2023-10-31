@@ -17,7 +17,7 @@ export const qrCodeReducer = (
       return { ...state, qrCodeURL: action.value, isLoading: false };
     }
     case 'RESET_STATE': {
-      return { ...initialState };
+      return { ...state, ...initialState };
     }
     default: {
       return state;

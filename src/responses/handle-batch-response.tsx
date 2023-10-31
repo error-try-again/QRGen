@@ -1,5 +1,14 @@
-import { resetBatchAndLoadingState } from '../helpers/reset-loading-state';
-import { HandleResponseParameters } from '../ts/interfaces/component-interfaces';
+import { resetBatchAndLoadingState } from "../helpers/reset-loading-state";
+import { HandleResponseParameters } from "../ts/interfaces/component-interfaces";
+
+// Extract the filename from the content-disposition header
+function doesContentMatch(contentDisposition: string) {
+  return contentDisposition.match(/filename[^\n;=]*=((["']).*?\2|[^\n;]*)/);
+}
+
+function removeQuotesOnMatch(matches: RegExpMatchArray) {
+  return matches[1].replaceAll(/["']/g, ''); // remove any quotes
+}
 
 export function HandleBatchResponse({
   setError,
@@ -17,14 +26,14 @@ export function HandleBatchResponse({
     // Extract the filename from the content-disposition header and set the download attribute
     const contentDisposition = response.headers.get('content-disposition');
     let filename = 'qrcodes.zip'; // default value
+
     if (contentDisposition) {
-      const matches = contentDisposition.match(
-        /filename[^\n;=]*=((["']).*?\2|[^\n;]*)/
-      );
+      const matches = doesContentMatch(contentDisposition);
       if (matches && matches[1]) {
-        filename = matches[1].replaceAll(/["']/g, ''); // remove any quotes
+        filename = removeQuotesOnMatch(matches);
       }
     }
+
     link.download = filename;
 
     // Append the link, trigger download, and then remove the link
@@ -33,10 +42,6 @@ export function HandleBatchResponse({
     link.remove();
 
     setError('');
-    resetBatchAndLoadingState({
-      setBatchData: setBatchData,
-      setQrBatchCount: setQrBatchCount,
-      dispatch: dispatch
-    });
+    resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
   };
 }

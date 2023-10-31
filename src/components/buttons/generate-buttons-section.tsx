@@ -12,6 +12,30 @@ import { useCore } from '../../hooks/use-core';
 import { setInitialTabState } from '../../helpers/check-tab-type';
 import { useEffect } from 'react';
 
+function setGenericErrorMessage(
+  setError: (value: ((previousState: string) => string) | string) => void
+) {
+  const errorMessage =
+    'Failed to generate the QR code. Please try again later.';
+  setError(errorMessage);
+}
+
+function dispatchLoading(
+  dispatch: (value: { type: 'SET_LOADING'; value: boolean }) => void
+) {
+  dispatch({ type: 'SET_LOADING', value: true });
+}
+
+function dispatchClearQRCodeUrl(
+  dispatch: (value: { type: 'SET_QRCODE_URL'; value: string | null }) => void
+) {
+  dispatch({ type: 'SET_QRCODE_URL', value: '' });
+}
+
+function handleEndpointSelection(qrBatchCount: number) {
+  return qrBatchCount > 1 ? '/qr/batch' : '/qr/generate';
+}
+
 export const GenerateButtonsSection = () => {
   const { generateButton, qrButtonsContainer } = styles;
 
@@ -43,11 +67,7 @@ export const GenerateButtonsSection = () => {
     });
 
     if (!validateInput()) {
-      resetBatchAndLoadingState({
-        dispatch,
-        setBatchData,
-        setQrBatchCount
-      });
+      resetBatchAndLoadingState({ dispatch, setBatchData, setQrBatchCount });
       return;
     }
 
@@ -66,8 +86,8 @@ export const GenerateButtonsSection = () => {
       return;
     }
 
-    dispatch({ type: 'SET_LOADING', value: true });
-    const endpoint = qrBatchCount > 1 ? '/qr/batch' : '/qr/generate';
+    dispatchLoading(dispatch);
+    const endpoint = handleEndpointSelection(qrBatchCount);
 
     if (qrBatchCount === 1) {
       const errorMessage = 'Please add at least 2 QR codes to the batch.';
@@ -78,10 +98,7 @@ export const GenerateButtonsSection = () => {
     const requestData =
       qrBatchCount > 1
         ? { qrCodes: batchData }
-        : {
-            customData: { ...state },
-            type: Tabs[activeTab]
-          };
+        : { customData: { ...state }, type: Tabs[activeTab] };
 
     try {
       const response = await fetch(endpoint, {
@@ -91,10 +108,8 @@ export const GenerateButtonsSection = () => {
       });
 
       if (!response.ok || response.status === 429) {
-        const errorMessage =
-          'Failed to generate the QR code. Please try again later.';
-        setError(errorMessage);
-        dispatch({ type: 'SET_QRCODE_URL', value: '' });
+        setGenericErrorMessage(setError);
+        dispatchClearQRCodeUrl(dispatch);
         resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
         return;
       }
@@ -113,10 +128,8 @@ export const GenerateButtonsSection = () => {
             setQrBatchCount
           })(response);
     } catch {
-      const errorMessage =
-        'Failed to generate the QR code. Please try again later.';
-      setError(errorMessage);
-      dispatch({ type: 'SET_QRCODE_URL', value: '' });
+      setGenericErrorMessage(setError);
+      dispatchClearQRCodeUrl(dispatch);
       resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
     }
   };
