@@ -10,9 +10,11 @@ declare -r BACKEND_DIR="$PROJECT_DIR/backend"
 declare -r FRONTEND_DIR="$PROJECT_DIR/frontend"
 declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 
+declare -r LETS_ENCRYPT_LIVE_DIR="$PROJECT_DIR/docker-volumes/etc/letsencrypt/live"
+declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/docker-volumes/etc/letsencrypt/archive"
 declare -r LETS_ENCRYPT_DIR="$PROJECT_DIR/docker-volumes/etc/letsencrypt"
 declare -r LETS_ENCRYPT_LIB_DIR="$PROJECT_DIR/docker-volumes/var/lib/letsencrypt"
-declare -r LETS_ENCRYPT_DH_PARAM="$FRONTEND_DIR/dh-param"
+declare -r LETS_ENCRYPT_DH_PARAM="$PROJECT_DIR/dh-param"
 declare -r DH_PARAM_FILE="$LETS_ENCRYPT_DH_PARAM/dhparam-2048.pem"
 
 # Configuration-related constants.
@@ -30,6 +32,19 @@ SUBDOMAIN="www"
 USE_LETS_ENCRYPT="no"
 DOCKER_HOST=""
 BACKEND_FILES=""
+DNS_RESOLVER="8.8.8.8"
+
+# Let's Encrypt configuration constants.
+EMAIL="--email"
+ADMIN_EMAIL="example@example.com"
+WITH_EMAIL="--email $ADMIN_EMAIL"
+STAGING="--staging"
+TOS="--agree-tos"
+NO_EFF_EMAIL="--no-eff-email"
+INTERACTIVE="--non-interactive"
+WITHOUT_EMAIL="--register-unsafely-without-email"
+FORCE_RENEWAL="--force-renewal"
+WEBROOT_PATH="/data/letsencrypt"
 
 # ---- Helper Functions ---- #
 
@@ -101,10 +116,31 @@ bring_down_docker_compose() {
 
 produce_docker_logs() {
   if docker_compose_exists; then
-    docker compose -f "$PROJECT_DIR/docker-compose.yml" logs
+    # Define the path to your Docker Compose file
+    local COMPOSE_FILE="$PROJECT_DIR/docker-compose.yml"
+
+    # Check if the Compose file exists
+    if [ ! -f "$COMPOSE_FILE" ]; then
+      echo "Docker Compose file not found: $COMPOSE_FILE"
+      return 1
+    fi
+
+    # Get a list of services defined in the Compose file
+    local SERVICES
+    local service
+
+    SERVICES=$(docker compose -f "$COMPOSE_FILE" config --services)
+
+    # Loop through each service and produce logs
+    for service in $SERVICES; do
+      echo "Logs for service: $service"
+      docker compose -f "$COMPOSE_FILE" logs "$service"
+      echo "--------------------------------------------"
+    done
+  else
+    echo "Docker Compose not found. Please install Docker Compose."
   fi
 }
-
 is_port_in_use() {
   local port="$1"
   if lsof -i :"$port" >/dev/null 2>&1; then
@@ -221,21 +257,15 @@ setup_letsencrypt_directories() {
 
 # ---- Let's Encrypt Functions ---- #
 
-generate_dhparam() {
-  echo "Generating Diffie-Hellman parameters..."
+generate_dummy_certificates() {
+  local cert_dir="$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
+  mkdir -p "$cert_dir"
 
-  if [[ -d $LETS_ENCRYPT_DH_PARAM ]]; then
-    openssl dhparam -out "$DH_PARAM_FILE" 2048
-  else
-    echo "Error: $LETS_ENCRYPT_DH_PARAM does not exist. Ensure setup_letsencrypt_directories() is run."
-    exit 1
-  fi
-}
+  # Generate self-signed certificates for staging
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "$cert_dir/privkey.pem" -out "$cert_dir/fullchain.pem" -subj "/CN=$DOMAIN_NAME"
+  openssl dhparam -out "$DH_PARAM_FILE" 2048
 
-letsencrypt_setup() {
-  echo "Setting up Let's Encrypt..."
-  setup_letsencrypt_directories
-  generate_dhparam
+  echo "Dummy certificates generated for staging in $cert_dir."
 }
 
 # ---- User Input ---- #
@@ -284,7 +314,8 @@ prompt_for_letsencrypt_setup() {
 
   if [[ "$user_response" == "yes" ]]; then
     USE_LETS_ENCRYPT="yes"
-    letsencrypt_setup
+    echo "Setting up directories for Let's Encrypt..."
+    setup_letsencrypt_directories
   else
     echo "Skipping Let's Encrypt setup."
   fi
@@ -311,15 +342,39 @@ configure_nginx() {
   local server_name_directive="server_name $DOMAIN_NAME;"
 
   # if subdomain is not specified, use the domain name
-  if [[ "$SUBDOMAIN" == "www" ]]; then
-    server_name_directive="server_name $DOMAIN_NAME;"
+  if [[ "$SUBDOMAIN" == "www" || -z $SUBDOMAIN ]]; then
+    local server_name_directive="server_name $DOMAIN_NAME;"
   else
-    server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
+    local server_name_directive="server_name $SUBDOMAIN.$DOMAIN_NAME;"
   fi
 
   # LetsEncrypt-specific configurations
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     backend_scheme="https"
+
+    local missing_files=()
+    [[ ! -f "$DH_PARAM_FILE" ]] && missing_files+=("$DH_PARAM_FILE")
+    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem")
+    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem")
+
+    local file
+    local answer
+
+    if [[ ${#missing_files[@]} -gt 0 ]]; then
+      echo "Error: The following files were not found:"
+      for file in "${missing_files[@]}"; do
+        echo "$file"
+      done
+
+      echo "Do you want to generate dummy certificates for staging? (yes/no)"
+      read -r answer
+      if [[ "$answer" == "yes" ]]; then
+        generate_dummy_certificates
+      else
+        echo "Please place the required files in the expected directories or generate them."
+        return 1
+      fi
+    fi
 
     # Directly assign the multiline string to the variable
     ssl_config="
@@ -332,20 +387,25 @@ configure_nginx() {
     ssl_session_tickets off;
     ssl_stapling on;
     ssl_stapling_verify on;
-    resolver 8.8.8.8;
+    resolver $DNS_RESOLVER valid=300s;
 
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
+    ssl_certificate $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem;
+    ssl_certificate_key $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem;"
 
     token_directive="server_tokens off;"
     listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
     letsencrypt_challenge="location ~ /.well-known/acme-challenge { allow all; root /usr/share/nginx/html; }"
-    server_name_directive="server_name $DOMAIN_NAME www.$DOMAIN_NAME;"
+    server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
+  fi
+
+  if [[ -f "$PROJECT_DIR/nginx.conf" ]]; then
+    cp "$PROJECT_DIR/nginx.conf" "$PROJECT_DIR/nginx.conf.bak"
+    echo "Backup created at $PROJECT_DIR/nginx.conf.bak"
   fi
 
   # Write configurations to nginx.conf
   cat <<EOF >"$PROJECT_DIR/nginx.conf"
-worker_processes 1;
+worker_processes auto;
 events {
     worker_connections 1024;
 }
@@ -394,6 +454,10 @@ http {
     }
 }
 EOF
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to write nginx configuration."
+    return 1
+  fi
 
   echo "nginx configuration written to $PROJECT_DIR/nginx.conf"
 }
@@ -515,18 +579,18 @@ configure_docker_compose() {
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
 
-    if [[ ! -d "$PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME" ]]; then
-      echo "Directory $PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME does not exist. Creating now..."
-      mkdir -p "$PROJECT_DIR"/docker-volumes/etc/letsencrypt/live/"$DOMAIN_NAME"
+    if [[ ! -d "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME" ]]; then
+      echo "Directory $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME does not exist. Creating now..."
+      mkdir -p "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
     fi
 
-    if [[ ! -d "$PROJECT_DIR/docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME" ]]; then
-      echo "Directory $PROJECT_DIR/docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME does not exist. Creating now..."
-      mkdir -p "$PROJECT_DIR"/docker-volumes/etc/letsencrypt/archive/"$DOMAIN_NAME"
+    if [[ ! -d "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME" ]]; then
+      echo "Directory $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME does not exist. Creating now..."
+      mkdir -p "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME"
     fi
 
-    mount_extras="      - $PROJECT_DIR/docker-volumes/etc/letsencrypt/live/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME"
-    mount_extras="$mount_extras\n      - $PROJECT_DIR/docker-volumes/etc/letsencrypt/archive/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
+    mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
+      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
   fi
 
   # Creating the Docker Compose file
@@ -561,10 +625,13 @@ EOF
 
   # Add the certbot service to the Docker Compose file if Let's Encrypt is enabled
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+    local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
+    local CERTBOT_COMMAND="certonly --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
+
     cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
   certbot:
     image: certbot/certbot
-    command: certonly --webroot --webroot-path=/data/letsencrypt --email you@example.com --agree-tos --no-eff-email --staging
+    command: $CERTBOT_COMMAND
     volumes:
       - $LETS_ENCRYPT_DIR:/etc/letsencrypt
       - $LETS_ENCRYPT_LIB_DIR:/var/lib/letsencrypt
@@ -606,6 +673,7 @@ dump_logs() {
 
   produce_docker_logs >"$log_file" && {
     echo "Docker logs dumped to $log_file"
+    cat "$log_file"
   }
 }
 
@@ -688,6 +756,7 @@ build_and_run_docker() {
     exit 1
   }
   docker compose ps
+  dump_logs
 }
 
 # ---- Main Function/Entry ---- #
@@ -713,7 +782,7 @@ user_prompt() {
     "Run Setup"
     "Cleanup"
     "Reload/Refresh"
-    "Stop docker-compose and dump logs"
+    "Dump logs"
     "Update Project"
     "Enable SSL with Let's Encrypt"
     "Dump Docker Logs"
@@ -732,8 +801,8 @@ user_prompt() {
       cleanup
       break
       ;;
-    "Stop docker-compose and dump logs")
-      bring_down_docker_compose
+    "Dump logs")
+      #      bring_down_docker_compose
       dump_logs
       break
       ;;
