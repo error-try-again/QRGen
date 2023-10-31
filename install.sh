@@ -626,6 +626,7 @@ configure_docker_compose() {
   local shared_volume=""
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
+    ssl_port_directive+="\n      - \"80:80\""
 
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
     ensure_directory_exists "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
