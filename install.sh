@@ -537,6 +537,9 @@ FROM nginx:alpine
 # Copy the build files to the nginx directory
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 
+# Create .well-known and .well-known/acme-challenge directories
+RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge
+
 # Set the nginx port
 EXPOSE $NGINX_PORT
 
