@@ -16,7 +16,7 @@ declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/letsencrypt/archive"
 
 # Configuration-related constants.
 BACKEND_PORT=3001
-NGINX_PORT=8081
+NGINX_PORT=8080
 NGINX_SSL_PORT=443
 BACKEND_SCHEME="http"
 DOMAIN_NAME="localhost"
@@ -35,7 +35,7 @@ DNS_RESOLVER="8.8.8.8"
 EMAIL="--email"
 ADMIN_EMAIL="example@example.com"
 WITH_EMAIL="--email $ADMIN_EMAIL"
-STAGING="--staging"
+STAGING="--staging certificates"
 TOS="--agree-tos"
 NO_EFF_EMAIL="--no-eff-email"
 INTERACTIVE="--non-interactive"
@@ -648,7 +648,7 @@ EOF
     cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
   certbot:
     image: certbot/certbot
-    command: $PRODUCTION_CERTBOT
+    command: $STAGE_CERTBOT
     volumes:
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
