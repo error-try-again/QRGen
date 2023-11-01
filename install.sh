@@ -636,7 +636,8 @@ EOF
   # Add the certbot service to the Docker Compose file if Let's Encrypt is enabled
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
-    local CERTBOT_COMMAND="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
+    local STAGE_CERTBOT="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
+    local PRODUCTION_CERTBOT="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITH_EMAIL $TOS $NO_EFF_EMAIL $INTERACTIVE $NAME_SECTION"
 
     if ! ls "$FRONTEND_DIR"; then
       echo "Error: $FRONTEND_DIR does not exist."
@@ -646,7 +647,7 @@ EOF
     cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
   certbot:
     image: certbot/certbot
-    command: $CERTBOT_COMMAND
+    command: $PRODUCTION_CERTBOT
     volumes:
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
