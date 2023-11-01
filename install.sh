@@ -260,18 +260,6 @@ generate_dummy_certificates() {
   echo "Dummy certificates generated for staging in $cert_dir."
 }
 
-enter_cert_mode() {
-  CERT_MODE="yes"
-  configure_docker_compose
-  docker-compose up -d
-}
-
-exit_cert_mode() {
-  CERT_MODE="no"
-  configure_docker_compose
-  docker-compose up -d
-}
-
 # ---- User Input ---- #
 
 # Prompts the user for domain and subdomain details.
