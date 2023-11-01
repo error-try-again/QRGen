@@ -83,6 +83,10 @@ setup_user() {
     echo "$USER_NAME:test" | sudo chpasswd
   fi
 
+  is_port_exposable() {
+    nc -zv 127.0.0.1 "$1" &>/dev/null
+  }
+
   # Check and adjust port 443
   if ! is_port_exposable 443; then
     adjust_sysctl_for_port 443
@@ -100,7 +104,7 @@ remove_user() {
 
   if pgrep -u "$USER_NAME" >/dev/null; then
     echo "There are active processes running under the $USER_NAME user."
-    read -r -p "Would you like to kill all processes and continue with user removal? (y/N) " response
+    read -r "Would you like to kill all processes and continue with user removal? (y/N) " response
     if [[ "$response" =~ ^[Yy][Ee]?[Ss]?$ ]]; then
       pkill -u "$USER_NAME"
     else

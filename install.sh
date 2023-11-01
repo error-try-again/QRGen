@@ -34,6 +34,7 @@ USE_CUSTOM_DOMAIN="no"
 DOCKER_HOST=""
 BACKEND_FILES=""
 DNS_RESOLVER="8.8.8.8"
+TIMEOUT="7s"
 
 # Let's Encrypt configuration constants.
 EMAIL="--email"
@@ -356,7 +357,7 @@ configure_nginx() {
     local missing_files=()
     local file
     for file in "dh/dhparam-2048.pem" "fullchain.pem" "privkey.pem"; do
-      [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/$file" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/$file")
+      [[ ! -f "$DEFAULT_CERTS_DIR/$file" ]] && missing_files+=("$DEFAULT_CERTS_DIR/$file")
     done
 
     if [[ ${#missing_files[@]} -gt 0 ]]; then
@@ -376,6 +377,18 @@ configure_nginx() {
       fi
     fi
 
+    local certs
+
+    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]]; then
+      certs="ssl_certificate /etc/letsencrypt/live/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/privkey.pem;
+ssl_trusted_certificate /etc/letsencrypt/live/fullchain.pem;"
+    else
+      certs="ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
+ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;"
+    fi
+
     # SSL configuration
     ssl_config="
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -388,8 +401,8 @@ configure_nginx() {
     ssl_stapling on;
     ssl_stapling_verify on;
     resolver $DNS_RESOLVER valid=300s;
-    ssl_certificate /etc/letsencrypt/live/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/privkey.pem;"
+    resolver_timeout $TIMEOUT;
+    $certs"
   fi
 
   # Main server block
@@ -507,7 +520,7 @@ FROM nginx:alpine
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 
 # Create .well-known and .well-known/acme-challenge directories
-RUN mkdir /usr/share/nginx/html/.well-known
+RUN mkdir /usr/share/nginx/html/.well-known/
 RUN mkdir /usr/share/nginx/html/.well-known/acme-challenge
 RUN chmod -R 777 /usr/share/nginx/html/.well-known
 
@@ -602,9 +615,14 @@ configure_docker_compose() {
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
     ensure_directory_exists "$LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME"
 
-    ssl_certs="      - $DEFAULT_CERTS_DH_DIR:/etc/ssl/certs/
-      - $LETS_ENCRYPT_LIVE_DIR/:/etc/letsencrypt/live/
-      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/"
+    # Check if LETS_ENCRYPT_LIVE_DIR is empty and set ssl_certs accordingly
+    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]]; then
+      ssl_certs="      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/"
+    else
+      ssl_certs="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/:/etc/letsencrypt/live/$DOMAIN_NAME/"
+    fi
+    ssl_certs+="      - $DEFAULT_CERTS_DH_DIR:/etc/ssl/certs/
+      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME/:/etc/letsencrypt/archive/$DOMAIN_NAME/"
 
     shared_volume="      - nginx-shared-volume:$WEBROOT_PATH"
   fi
@@ -654,7 +672,7 @@ EOF
     command: $STAGE_CERTBOT
     volumes:
       - $DEFAULT_CERTS_DH_DIR/:/etc/ssl/certs/
-      - $LETS_ENCRYPT_LIVE_DIR/:/etc/letsencrypt/live/:rw
+      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/:rw
       - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/:rw
       - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
       - nginx-shared-volume:$WEBROOT_PATH
@@ -871,4 +889,3 @@ user_prompt() {
 
 # Serves as the entry point to the script.
 user_prompt
-# Run docker compose using authbind
