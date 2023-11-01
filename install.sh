@@ -382,11 +382,11 @@ configure_nginx() {
     if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]] || [[ ! "$(ls -A "$LETS_ENCRYPT_LIVE_DIR")" ]]; then
       certs="ssl_certificate /etc/letsencrypt/live/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/chain.pem;"
+    ssl_trusted_certificate /etc/letsencrypt/live/fullchain.pem;"
     else
       certs="ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/chain.pem;"
+    ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;"
     fi
 
     # SSL configuration
