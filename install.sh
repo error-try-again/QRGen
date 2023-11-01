@@ -382,11 +382,11 @@ configure_nginx() {
     if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]] || [[ ! "$(ls -A "$LETS_ENCRYPT_LIVE_DIR")" ]]; then
       certs="ssl_certificate /etc/letsencrypt/live/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/fullchain.pem;"
+    ssl_trusted_certificate /etc/letsencrypt/live/chain.pem;"
     else
       certs="ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;"
+    ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/chain.pem;"
     fi
 
     # SSL configuration
@@ -670,7 +670,7 @@ EOF
     cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
   certbot:
     image: certbot/certbot
-    command: $STAGE_CERTBOT
+    command: $PRODUCTION_CERTBOT
     volumes:
       - $DEFAULT_CERTS_DH_DIR/:/etc/ssl/certs/
       - $LETS_ENCRYPT_LIVE_DIR:/etc/letsencrypt/live/:rw
