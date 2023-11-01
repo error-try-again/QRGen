@@ -348,9 +348,9 @@ configure_nginx() {
     token_directive="server_tokens off;"
     server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
     listen_directive="listen $NGINX_PORT;
-  listen [::]:$NGINX_PORT;
-  listen $NGINX_SSL_PORT ssl;
-  listen [::]:$NGINX_SSL_PORT ssl;"
+    listen [::]:$NGINX_PORT;
+    listen $NGINX_SSL_PORT ssl;
+    listen [::]:$NGINX_SSL_PORT ssl;"
 
     # Check for missing files
     local missing_files=()
@@ -388,8 +388,8 @@ configure_nginx() {
     ssl_stapling on;
     ssl_stapling_verify on;
     resolver $DNS_RESOLVER valid=300s;
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
+    ssl_certificate /etc/letsencrypt/live/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/privkey.pem;"
   fi
 
   # Main server block
@@ -591,7 +591,7 @@ configure_docker_compose() {
   }
 
   # Configure SSL if Let's Encrypt is used.
-  local mount_extras=""
+  local ssl_certs=""
   local ssl_port_directive=""
   local shared_volume=""
 
@@ -602,9 +602,9 @@ configure_docker_compose() {
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
     ensure_directory_exists "$LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME"
 
-    mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
-      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
-      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
+    ssl_certs="      - $DEFAULT_CERTS_DH_DIR:/etc/ssl/certs/
+      - $LETS_ENCRYPT_LIVE_DIR/:/etc/letsencrypt/live/
+      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/"
 
     shared_volume="      - nginx-shared-volume:$WEBROOT_PATH"
   fi
@@ -631,7 +631,7 @@ $ssl_port_directive
     volumes:
       - ./frontend:/usr/app
       - ./nginx.conf:/etc/nginx/nginx.conf
-$mount_extras
+$ssl_certs
 $shared_volume
     networks:
       - qrgen
@@ -657,7 +657,7 @@ EOF
       - $LETS_ENCRYPT_LIVE_DIR/:/etc/letsencrypt/live/:rw
       - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/:rw
       - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
-      - nginx-shared-volume:$WEBROOT_PATH:
+      - nginx-shared-volume:$WEBROOT_PATH
     depends_on:
       - frontend
 networks:
