@@ -330,7 +330,8 @@ configure_nginx() {
   local backend_scheme="http"
   local ssl_config=""
   local token_directive=""
-  local listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;"
+  local listen_directive="listen $NGINX_PORT;
+listen [::]:$NGINX_PORT;"
   local server_name_directive="server_name $DOMAIN_NAME;"
 
   # Handle subdomain configuration
@@ -343,7 +344,10 @@ configure_nginx() {
     backend_scheme="https"
     token_directive="server_tokens off;"
     server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
-    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
+    listen_directive="listen $NGINX_PORT;
+listen [::]:$NGINX_PORT;
+listen $NGINX_SSL_PORT ssl;
+listen [::]:$NGINX_SSL_PORT ssl;"
 
     # Check for missing files
     local missing_files=()
@@ -401,7 +405,6 @@ server {
         add_header X-Content-Type-Options nosniff always;
         add_header X-XSS-Protection \"1; mode=block\" always;
         add_header Referrer-Policy \"strict-origin-when-cross-origin\" always;
-        add_header Content-Security-Policy \"default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';\";
     }
     location /qr/generate {
         proxy_pass $backend_scheme://backend:$BACKEND_PORT;
