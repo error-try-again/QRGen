@@ -13,6 +13,7 @@ declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
 declare -r LETS_ENCRYPT_DIR="$PROJECT_DIR/letsencrypt"
 declare -r LETS_ENCRYPT_LIVE_DIR="$PROJECT_DIR/letsencrypt/live"
 declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/letsencrypt/archive"
+declare -r LETS_ENCRYPT_LOGS_DIR="$PROJECT_DIR/letsencrypt/logs"
 
 # Configuration-related constants.
 BACKEND_PORT=3001
@@ -598,6 +599,7 @@ configure_docker_compose() {
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
     ensure_directory_exists "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
     ensure_directory_exists "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME"
+    ensure_directory_exists "$LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME"
 
     mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
@@ -651,8 +653,9 @@ EOF
     command: $STAGE_CERTBOT
     volumes:
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
-      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
-      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME
+      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/
+      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/
+      - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
       - nginx-shared-volume:$WEBROOT_PATH
     depends_on:
       - frontend
