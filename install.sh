@@ -668,17 +668,17 @@ EOF
     fi
 
     cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
-  certbot:
-    image: certbot/certbot
-    command: $STAGE_CERTBOT
-    volumes:
-      - $DEFAULT_CERTS_DH_DIR/:/etc/ssl/certs/
-      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/:rw
-      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/:rw
-      - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
-      - nginx-shared-volume:$WEBROOT_PATH
-    depends_on:
-      - frontend
+certbot:
+  image: certbot/certbot
+  command: $STAGE_CERTBOT
+  volumes:
+    - $DEFAULT_CERTS_DH_DIR/:/etc/ssl/certs/
+    - $LETS_ENCRYPT_LIVE_DIR:/etc/letsencrypt/live/:rw
+    - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/:rw
+    - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
+    - nginx-shared-volume:$WEBROOT_PATH
+  depends_on:
+    - frontend
 networks:
   qrgen:
     driver: bridge
@@ -686,7 +686,6 @@ networks:
 volumes:
   nginx-shared-volume:
 EOF
-
     cat "$PROJECT_DIR"/docker-compose.yml
   else
     echo -e "networks:\n  qrgen:\n    driver: bridge" >>"$PROJECT_DIR/docker-compose.yml"
