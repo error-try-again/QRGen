@@ -654,8 +654,8 @@ EOF
     command: $STAGE_CERTBOT
     volumes:
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
-      - $LETS_ENCRYPT_LIVE_DIR/:/etc/letsencrypt/live/
-      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/
+      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/:rw
+      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/:rw
       - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
       - nginx-shared-volume:$WEBROOT_PATH
     depends_on:
