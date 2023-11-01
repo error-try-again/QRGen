@@ -660,7 +660,7 @@ EOF
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
     local STAGE_CERTBOT="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
-    local PRODUCTION_CERTBOT="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITH_EMAIL $TOS $NO_EFF_EMAIL $INTERACTIVE $NAME_SECTION"
+    local PRODUCTION_CERTBOT="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $INTERACTIVE $NAME_SECTION"
 
     if ! ls "$FRONTEND_DIR"; then
       echo "Error: $FRONTEND_DIR does not exist."
