@@ -379,14 +379,14 @@ configure_nginx() {
 
     local certs
 
-    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]]; then
+    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]] || [[ ! "$(ls -A "$LETS_ENCRYPT_LIVE_DIR")" ]]; then
       certs="ssl_certificate /etc/letsencrypt/live/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/privkey.pem;
-ssl_trusted_certificate /etc/letsencrypt/live/fullchain.pem;"
+    ssl_certificate_key /etc/letsencrypt/live/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/fullchain.pem;"
     else
       certs="ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;"
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;"
     fi
 
     # SSL configuration
@@ -616,7 +616,7 @@ configure_docker_compose() {
     ensure_directory_exists "$LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME"
 
     # Check if LETS_ENCRYPT_LIVE_DIR is empty and set ssl_certs accordingly
-    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]]; then
+    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]] || [[ ! "$(ls -A "$LETS_ENCRYPT_LIVE_DIR")" ]]; then
       ssl_certs+="      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/"$'\n'
     else
       ssl_certs+="      - $LETS_ENCRYPT_LIVE_DIR:/etc/letsencrypt/live/"$'\n'
