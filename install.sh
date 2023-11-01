@@ -538,7 +538,9 @@ FROM nginx:alpine
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 
 # Create .well-known and .well-known/acme-challenge directories
-RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge
+RUN mkdir /usr/share/nginx/html/.well-known/
+RUN mkdir /usr/share/nginx/html/.well-known/acme-challenge
+RUN ls /usr/share/nginx/html/.well-known/acme-challenge
 
 # Set the nginx port
 EXPOSE $NGINX_PORT
@@ -685,7 +687,7 @@ EOF
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
       - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME
-      - nginx-shared-volume:/usr/share/nginx/html
+      - nginx-shared-volume:$WEBROOT_PATH
     depends_on:
       - frontend
 networks:
