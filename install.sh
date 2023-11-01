@@ -333,19 +333,19 @@ configure_nginx() {
   local listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;"
   local server_name_directive="server_name $DOMAIN_NAME;"
 
+  # Handle subdomain configuration
   if [[ "$SUBDOMAIN" != "www" && -n $SUBDOMAIN ]]; then
     server_name_directive="server_name $SUBDOMAIN.$DOMAIN_NAME;"
   fi
 
-  # Check if Let's Encrypt is in use and handle accordingly
+  # Handle Let's Encrypt configuration
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     backend_scheme="https"
     token_directive="server_tokens off;"
     server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
+    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT; listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
 
-    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;
-                          listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
-
+    # Check for missing files
     local missing_files=()
     local file
     for file in "dh/dhparam-2048.pem" "fullchain.pem" "privkey.pem"; do
@@ -369,81 +369,68 @@ configure_nginx() {
       fi
     fi
 
-    ssl_config=$(
-      cat <<-EOF
-ssl_protocols TLSv1.2 TLSv1.3;
-ssl_prefer_server_ciphers on;
-ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
-ssl_buffer_size 8k;
-ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
-ssl_ecdh_curve secp384r1;
-ssl_session_tickets off;
-ssl_stapling on;
-ssl_stapling_verify on;
-resolver $DNS_RESOLVER valid=300s;
-ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-EOF
-    )
+    # SSL configuration
+    ssl_config="
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
+    ssl_buffer_size 8k;
+    ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
+    ssl_ecdh_curve secp384r1;
+    ssl_session_tickets off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver $DNS_RESOLVER valid=300s;
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
   fi
 
-  # Create server blocks
-  local https_server_block
-  https_server_block=$(
-    cat <<-EOF
-$ssl_config
+  # Main server block
+  local main_server_block="
 server {
     $listen_directive
     $token_directive
     $server_name_directive
+    $ssl_config
     location / {
         root /usr/share/nginx/html;
         index index.html index.htm;
         try_files \$uri \$uri/ /index.html;
-        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-        add_header X-Frame-Options "DENY" always;
+        add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;
+        add_header X-Frame-Options \"DENY\" always;
         add_header X-Content-Type-Options nosniff always;
-        add_header X-XSS-Protection "1; mode=block" always;
-        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-        add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';";
+        add_header X-XSS-Protection \"1; mode=block\" always;
+        add_header Referrer-Policy \"strict-origin-when-cross-origin\" always;
+        add_header Content-Security-Policy \"default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';\";
     }
-EOF
-  )
-  local endpoint
-  for endpoint in "qr/generate" "qr/batch"; do
-    https_server_block+=$(
-      cat <<-EOF
-    location /$endpoint {
+    location /qr/generate {
         proxy_pass $backend_scheme://backend:$BACKEND_PORT;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-EOF
-    )
-  done
+    location /qr/batch {
+        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+}"
 
-  local letsencrypt_challenge="location /.well-known/acme-challenge/ {
-        allow all;
-        root /usr/share/nginx/html;
-    }"
-
-  local location_rewrite="location / {
-        rewrite ^ https://\$host\$request_uri? permanent;
-    }"
-
-  local letsencrypt_server_block
-  letsencrypt_server_block=$(
-    cat <<-EOF
+  # Let's Encrypt challenge server block
+  local letsencrypt_server_block="
 server {
     listen 80;
     listen [::]:80;
     $server_name_directive
-    $location_rewrite
-    $letsencrypt_challenge
-}
-EOF
-  )
+    location / {
+        rewrite ^ https://\$host\$request_uri? permanent;
+    }
+    location /.well-known/acme-challenge/ {
+        allow all;
+        root /usr/share/nginx/html;
+    }
+}"
 
   # Backup existing configuration
   if [[ -f "$PROJECT_DIR/nginx.conf" ]]; then
@@ -460,8 +447,7 @@ events {
 http {
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
-
-    $https_server_block
+    $main_server_block
     $letsencrypt_server_block
 }
 EOF
