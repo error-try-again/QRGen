@@ -617,12 +617,13 @@ configure_docker_compose() {
 
     # Check if LETS_ENCRYPT_LIVE_DIR is empty and set ssl_certs accordingly
     if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]]; then
-      ssl_certs="      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/"
+      ssl_certs+="      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/"$'\n'
     else
-      ssl_certs="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/:/etc/letsencrypt/live/$DOMAIN_NAME/"
+      ssl_certs+="      - $LETS_ENCRYPT_LIVE_DIR:/etc/letsencrypt/live/"$'\n'
     fi
-    ssl_certs+="      - $DEFAULT_CERTS_DH_DIR:/etc/ssl/certs/
-      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME/:/etc/letsencrypt/archive/$DOMAIN_NAME/"
+
+    ssl_certs+="      - $DEFAULT_CERTS_DH_DIR:/etc/ssl/certs/"$'\n'
+    ssl_certs+="      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/"$'\n'
 
     shared_volume="      - nginx-shared-volume:$WEBROOT_PATH"
   fi
