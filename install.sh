@@ -31,7 +31,6 @@ USE_CUSTOM_DOMAIN="no"
 DOCKER_HOST=""
 BACKEND_FILES=""
 DNS_RESOLVER="8.8.8.8"
-CERT_MODE="no"
 
 # Let's Encrypt configuration constants.
 EMAIL="--email"
@@ -331,34 +330,29 @@ configure_nginx() {
   local backend_scheme="http"
   local ssl_config=""
   local token_directive=""
-
-  local letsencrypt_challenge="location /.well-known/acme-challenge/ {
-        root /usr/share/nginx/html;
-    }"
-
-  local location_rewrite="location / {
-        rewrite ^ https://\$host\$request_uri? permanent;
-    }"
-
   local listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;"
   local server_name_directive="server_name $DOMAIN_NAME;"
 
-  if [[ "$SUBDOMAIN" == "www" || -z $SUBDOMAIN ]]; then
-    server_name_directive="server_name $DOMAIN_NAME;"
-  else
+  if [[ "$SUBDOMAIN" != "www" && -n $SUBDOMAIN ]]; then
     server_name_directive="server_name $SUBDOMAIN.$DOMAIN_NAME;"
   fi
 
+  # Check if Let's Encrypt is in use and handle accordingly
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     backend_scheme="https"
+    token_directive="server_tokens off;"
+    server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
+
+    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;
+                          listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
 
     local missing_files=()
-    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/dhparam-2048.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/dhparam-2048.pem")
-    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/fullchain.pem")
-    [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/privkey.pem")
+    local file
+    for file in "dh/dhparam-2048.pem" "fullchain.pem" "privkey.pem"; do
+      [[ ! -f "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/$file" ]] && missing_files+=("$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/$file")
+    done
 
     if [[ ${#missing_files[@]} -gt 0 ]]; then
-      local file
       echo "Error: The following files were not found:"
       for file in "${missing_files[@]}"; do
         echo "$file"
@@ -375,7 +369,8 @@ configure_nginx() {
       fi
     fi
 
-    ssl_config="
+    ssl_config=$(
+      cat <<-EOF
 ssl_protocols TLSv1.2 TLSv1.3;
 ssl_prefer_server_ciphers on;
 ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
@@ -386,30 +381,16 @@ ssl_session_tickets off;
 ssl_stapling on;
 ssl_stapling_verify on;
 resolver $DNS_RESOLVER valid=300s;
-
 ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
-
-    local http_server_block=""
-
-    token_directive="server_tokens off;"
-
-    server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
-
-    listen_directive="listen $NGINX_PORT;
-    listen [::]:$NGINX_PORT;
-    listen $NGINX_SSL_PORT ssl;
-    listen [::]:$NGINX_SSL_PORT ssl;"
+ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
+EOF
+    )
   fi
 
-  if [[ -f "$PROJECT_DIR/nginx.conf" ]]; then
-    cp "$PROJECT_DIR/nginx.conf" "$PROJECT_DIR/nginx.conf.bak"
-    echo "Backup created at $PROJECT_DIR/nginx.conf.bak"
-  fi
-
-  local https_server_block=""
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-    https_server_block="
+  # Create server blocks
+  local https_server_block
+  https_server_block=$(
+    cat <<-EOF
 $ssl_config
 server {
     $listen_directive
@@ -419,64 +400,59 @@ server {
         root /usr/share/nginx/html;
         index index.html index.htm;
         try_files \$uri \$uri/ /index.html;
-        add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;
-        add_header X-Frame-Options \"DENY\" always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Frame-Options "DENY" always;
         add_header X-Content-Type-Options nosniff always;
-        add_header X-XSS-Protection \"1; mode=block\" always;
-        add_header Referrer-Policy \"strict-origin-when-cross-origin\" always;
-        add_header Content-Security-Policy \"default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';\";
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval';";
     }
-    location /qr/generate {
+EOF
+  )
+  local endpoint
+  for endpoint in "qr/generate" "qr/batch"; do
+    https_server_block+=$(
+      cat <<-EOF
+    location /$endpoint {
         proxy_pass $backend_scheme://backend:$BACKEND_PORT;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-    location /qr/batch {
-        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-}"
-  else
-    http_server_block="
-server {
-    $listen_directive
-    $token_directive
-    $server_name_directive
-    location / {
-        root /usr/share/nginx/html;
-        index index.html index.htm;
-        try_files \$uri \$uri/ /index.html;
-    }
-    location /qr/generate {
-        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-    location /qr/batch {
-        proxy_pass $backend_scheme://backend:$BACKEND_PORT;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-}"
-  fi
+EOF
+    )
+  done
 
-  local letsencrypt_server_block="
+  local letsencrypt_challenge="location /.well-known/acme-challenge/ {
+        allow all;
+        root /usr/share/nginx/html;
+    }"
+
+  local location_rewrite="location / {
+        rewrite ^ https://\$host\$request_uri? permanent;
+    }"
+
+  local letsencrypt_server_block
+  letsencrypt_server_block=$(
+    cat <<-EOF
 server {
     listen 80;
     listen [::]:80;
-    server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;
+    $server_name_directive
     $location_rewrite
     $letsencrypt_challenge
-}"
+}
+EOF
+  )
 
-  local combined_server_blocks="$http_server_block $https_server_block $letsencrypt_server_block"
+  # Backup existing configuration
+  if [[ -f "$PROJECT_DIR/nginx.conf" ]]; then
+    cp "$PROJECT_DIR/nginx.conf" "$PROJECT_DIR/nginx.conf.bak"
+    echo "Backup created at $PROJECT_DIR/nginx.conf.bak"
+  fi
 
-  cat <<EOF >"$PROJECT_DIR/nginx.conf"
+  # Write the final configuration
+  cat <<-EOF >"$PROJECT_DIR/nginx.conf"
 worker_processes auto;
 events {
     worker_connections 1024;
@@ -485,7 +461,8 @@ http {
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
 
-    $combined_server_blocks
+    $https_server_block
+    $letsencrypt_server_block
 }
 EOF
 
@@ -538,9 +515,9 @@ FROM nginx:alpine
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 
 # Create .well-known and .well-known/acme-challenge directories
-RUN mkdir /usr/share/nginx/html/.well-known/
+RUN mkdir /usr/share/nginx/html/.well-known
 RUN mkdir /usr/share/nginx/html/.well-known/acme-challenge
-RUN ls /usr/share/nginx/html/.well-known/acme-challenge
+RUN chmod -R 777 /usr/share/nginx/html/.well-known
 
 # Set the nginx port
 EXPOSE $NGINX_PORT
