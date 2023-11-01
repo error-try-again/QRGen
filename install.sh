@@ -1,5 +1,5 @@
 #!/bin/bash
-set -exuo pipefail
+set -euo pipefail
 
 # Change the current working directory to the script's location.
 cd "$(dirname "$0")"
@@ -812,56 +812,31 @@ build_and_run_docker() {
     exit 1
   }
 
-  # Function to check if a port is exposable
-  is_port_exposable() {
-    nc -zv 127.0.0.1 "$1" &>/dev/null
-  }
-
-  adjust_sysctl_for_port() {
-    local response
-    local port="$1"
-    local setting="net.ipv4.ip_unprivileged_port_start=$port"
-
-    # Check if the setting is already in sysctl.conf
-    if ! grep -q "^$setting$" /etc/sysctl.conf; then
-      echo "Port $port is not exposable. Do you want to adjust sysctl settings to allow this? (yes/no)"
-      read -r response
-      if [[ "$response" == "yes" ]]; then
-        echo "$setting" | sudo tee -a /etc/sysctl.conf >/dev/null && sudo sysctl -p
-      else
-        echo "Terminating the script as port $port is required."
-        exit 1
-      fi
-    fi
-  }
-
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-    # Check port 443
-    if ! is_port_exposable 443; then
-      adjust_sysctl_for_port 443
-    fi
-
-    # Check port 80
-    if ! is_port_exposable 80; then
-      adjust_sysctl_for_port 80
-    fi
-  fi
-
   # Build Docker image
   docker compose build || {
     echo "Failed to build Docker image using Docker Compose"
     exit 1
   }
 
-  # Run docker compose
   local docker_output
-  docker_output=$(docker compose up -d 2>&1) # Also capture stderr
-  local exit_status=$?
 
-  if [[ $exit_status -ne 0 ]]; then
-    echo "Failed to run Docker Compose. Below is the error output:"
-    echo "$docker_output"
-    exit 1
+  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+    docker_output=$(authbind --deep docker compose up -d 2>&1)
+    local exit_status=$?
+
+    if [[ $exit_status -ne 0 ]]; then
+      echo "Failed to run Docker Compose with authbind: "
+      echo "$docker_output"
+      exit 1
+    fi
+  else
+    docker_output=$(docker compose up -d 2>&1)
+    local exit_status=$?
+    if [[ $exit_status -ne 0 ]]; then
+      echo "Failed to run Docker Compose: "
+      echo "$docker_output"
+      exit 1
+    fi
   fi
 
   docker compose ps
@@ -948,3 +923,4 @@ user_prompt() {
 
 # Serves as the entry point to the script.
 user_prompt
+# Run docker compose using authbind
