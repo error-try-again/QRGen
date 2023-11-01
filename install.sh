@@ -15,6 +15,9 @@ declare -r LETS_ENCRYPT_LIVE_DIR="$PROJECT_DIR/letsencrypt/live"
 declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/letsencrypt/archive"
 declare -r LETS_ENCRYPT_LOGS_DIR="$PROJECT_DIR/letsencrypt/logs"
 
+declare -r DEFAULT_CERTS_DIR="$PROJECT_DIR/certs"
+declare -r DEFAULT_CERTS_DH_DIR="$DEFAULT_CERTS_DIR/dh"
+
 # Configuration-related constants.
 BACKEND_PORT=3001
 NGINX_PORT=8080
@@ -247,17 +250,16 @@ setup_docker_rootless() {
 
 # ---- Let's Encrypt Functions ---- #
 
-generate_dummy_certificates() {
-  local cert_dir="$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
+generate_default_certificates() {
 
-  ensure_directory_exists "$cert_dir"
-  ensure_directory_exists "$cert_dir/dh"
+  ensure_directory_exists "$DEFAULT_CERTS_DIR"
+  ensure_directory_exists "$DEFAULT_CERTS_DH_DIR"
 
   # Generate self-signed certificates for staging
-  openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "$cert_dir/privkey.pem" -out "$cert_dir/fullchain.pem" -subj "/CN=$DOMAIN_NAME"
-  openssl dhparam -out "$cert_dir"/dh/dhparam-2048.pem 2048
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "$DEFAULT_CERTS_DIR"/privkey.pem -out "$DEFAULT_CERTS_DIR"/fullchain.pem -subj "/CN=localhost"
+  openssl dhparam -out "$DEFAULT_CERTS_DH_DIR"/dhparam-2048.pem 2048
 
-  echo "Dummy certificates generated for staging in $cert_dir."
+  echo "Dummy certificates generated for staging in $DEFAULT_CERTS_DIR"
 }
 
 # ---- User Input ---- #
@@ -367,7 +369,7 @@ configure_nginx() {
       local answer
       read -r answer
       if [[ "$answer" == "yes" ]]; then
-        generate_dummy_certificates
+        generate_default_certificates
       else
         echo "Please place the required files in the expected directories or generate them."
         return 1
@@ -598,8 +600,6 @@ configure_docker_compose() {
     ssl_port_directive+=$'\n      - "80:80"'
 
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
-    ensure_directory_exists "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
-    ensure_directory_exists "$LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME"
     ensure_directory_exists "$LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME"
 
     mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
@@ -653,11 +653,11 @@ EOF
     image: certbot/certbot
     command: $STAGE_CERTBOT
     volumes:
-      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
-      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/:rw
-      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/:rw
+      - $DEFAULT_CERTS_DH_DIR/:/etc/ssl/certs/
+      - $LETS_ENCRYPT_LIVE_DIR/:/etc/letsencrypt/live/:rw
+      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/:rw
       - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
-      - nginx-shared-volume:$WEBROOT_PATH
+      - nginx-shared-volume:$WEBROOT_PATH:
     depends_on:
       - frontend
 networks:
