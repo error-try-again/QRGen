@@ -31,7 +31,7 @@ install_packages() {
   echo "Installing required packages..."
 
   sudo apt-get update -y
-  sudo apt-get install -y ca-certificates curl gnupg uidmap authbind
+  sudo apt-get install -y ca-certificates curl gnupg uidmap
 
   sudo install -m 0755 -d /etc/apt/keyrings
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -63,15 +63,15 @@ uninstall_packages() {
 
 # ---- Helper Functions ---- #
 
-is_port_exposable() {
-  nc -zv 127.0.0.1 "$1" &>/dev/null
-}
-
-setup_authbind_for_port() {
+adjust_sysctl_for_port() {
   local port="$1"
-  sudo touch "/etc/authbind/byport/$port"
-  sudo chown "$USER_NAME" "/etc/authbind/byport/$port"
-  sudo chmod 755 "/etc/authbind/byport/$port"
+  local setting="net.ipv4.ip_unprivileged_port_start=$port"
+
+  # Automatically adjust sysctl settings if not set
+  if ! grep -q "^$setting$" /etc/sysctl.conf; then
+    echo "Adjusting sysctl settings to expose port $port..."
+    echo "$setting" | sudo tee -a /etc/sysctl.conf >/dev/null && sudo sysctl -p
+  fi
 }
 
 # ---- User Functions ---- #
@@ -83,13 +83,15 @@ setup_user() {
     echo "$USER_NAME:test" | sudo chpasswd
   fi
 
-  # Authbind ports 80 and 443 for HTTP01 Challenge (Certbot)
-  local port
-  for port in 80 443; do
-    if ! is_port_exposable "$port"; then
-      setup_authbind_for_port "$port"
-    fi
-  done
+  # Check and adjust port 443
+  if ! is_port_exposable 443; then
+    adjust_sysctl_for_port 443
+  fi
+
+  # Check and adjust port 80
+  if ! is_port_exposable 80; then
+    adjust_sysctl_for_port 80
+  fi
 }
 
 remove_user() {
@@ -98,7 +100,7 @@ remove_user() {
 
   if pgrep -u "$USER_NAME" >/dev/null; then
     echo "There are active processes running under the $USER_NAME user."
-    read -r "Would you like to kill all processes and continue with user removal? (y/N) " response
+    read -r -p "Would you like to kill all processes and continue with user removal? (y/N) " response
     if [[ "$response" =~ ^[Yy][Ee]?[Ss]?$ ]]; then
       pkill -u "$USER_NAME"
     else

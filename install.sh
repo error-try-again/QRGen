@@ -632,6 +632,7 @@ configure_docker_compose() {
   local mount_extras=""
   local ssl_port_directive=""
   local shared_volume=""
+
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
     ssl_port_directive+=$'\n      - "80:8080"'
@@ -818,26 +819,10 @@ build_and_run_docker() {
     exit 1
   }
 
-  local docker_output
-
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-    docker_output=$(authbind --deep docker compose up -d 2>&1)
-    local exit_status=$?
-
-    if [[ $exit_status -ne 0 ]]; then
-      echo "Failed to run Docker Compose with authbind: "
-      echo "$docker_output"
-      exit 1
-    fi
-  else
-    docker_output=$(docker compose up -d 2>&1)
-    local exit_status=$?
-    if [[ $exit_status -ne 0 ]]; then
-      echo "Failed to run Docker Compose: "
-      echo "$docker_output"
-      exit 1
-    fi
-  fi
+  docker compose up -d || {
+    echo "Failed to run Docker Compose"
+    exit 1
+  }
 
   docker compose ps
   dump_logs
