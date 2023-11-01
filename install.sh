@@ -249,8 +249,9 @@ setup_docker_rootless() {
 
 generate_dummy_certificates() {
   local cert_dir="$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
-  mkdir -p "$cert_dir"
-  mkdir -p "$cert_dir/dh"
+
+  ensure_directory_exists "$cert_dir"
+  ensure_directory_exists "$cert_dir/dh"
 
   # Generate self-signed certificates for staging
   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "$cert_dir/privkey.pem" -out "$cert_dir/fullchain.pem" -subj "/CN=$DOMAIN_NAME"
@@ -653,8 +654,8 @@ EOF
     command: $STAGE_CERTBOT
     volumes:
       - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
-      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/
-      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/
+      - $LETS_ENCRYPT_LIVE_DIR/:/etc/letsencrypt/live/
+      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/
       - $LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME:/var/log/letsencrypt
       - nginx-shared-volume:$WEBROOT_PATH
     depends_on:
