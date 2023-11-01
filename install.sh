@@ -603,8 +603,8 @@ configure_docker_compose() {
     ensure_directory_exists "$LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME"
 
     mount_extras="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/dh/:/etc/ssl/certs
-      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/
-      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/"
+      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/live/$DOMAIN_NAME
+      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME:/etc/letsencrypt/archive/$DOMAIN_NAME"
 
     shared_volume="      - nginx-shared-volume:$WEBROOT_PATH"
   fi
