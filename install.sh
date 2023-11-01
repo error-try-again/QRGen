@@ -331,7 +331,7 @@ configure_nginx() {
   local ssl_config=""
   local token_directive=""
   local listen_directive="listen $NGINX_PORT;
-listen [::]:$NGINX_PORT;"
+  listen [::]:$NGINX_PORT;"
   local server_name_directive="server_name $DOMAIN_NAME;"
 
   # Handle subdomain configuration
@@ -345,9 +345,9 @@ listen [::]:$NGINX_PORT;"
     token_directive="server_tokens off;"
     server_name_directive="server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;"
     listen_directive="listen $NGINX_PORT;
-listen [::]:$NGINX_PORT;
-listen $NGINX_SSL_PORT ssl;
-listen [::]:$NGINX_SSL_PORT ssl;"
+  listen [::]:$NGINX_PORT;
+  listen $NGINX_SSL_PORT ssl;
+  listen [::]:$NGINX_SSL_PORT ssl;"
 
     # Check for missing files
     local missing_files=()
@@ -638,7 +638,7 @@ EOF
   # Add the certbot service to the Docker Compose file if Let's Encrypt is enabled
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
-    local CERTBOT_COMMAND="certonly --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
+    local CERTBOT_COMMAND="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
 
     if ! ls "$FRONTEND_DIR"; then
       echo "Error: $FRONTEND_DIR does not exist."
