@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -exuo pipefail
 
 # Change the current working directory to the script's location.
 cd "$(dirname "$0")"
@@ -17,8 +17,8 @@ declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/letsencrypt/archive"
 # Configuration-related constants.
 BACKEND_PORT=3001
 NGINX_PORT=8081
-NGINX_SSL_PROXY_PORT=8443
-NGINX_SSL_PORT=443
+NGINX_SSL_PROXY_PORT=443
+NGINX_SSL_PORT=8443
 BACKEND_SCHEME="http"
 DOMAIN_NAME="localhost"
 ORIGIN_URL="$BACKEND_SCHEME://$DOMAIN_NAME"
@@ -343,18 +343,13 @@ configure_nginx() {
   local backend_scheme="http"
   local ssl_config=""
   local token_directive=""
+
   local letsencrypt_challenge="location /.well-known/acme-challenge/ {
         root /usr/share/nginx/html;
     }"
 
   local location_rewrite="location / {
         rewrite ^ https://\$host\$request_uri? permanent;
-    }"
-
-  local redirect_http_to_https="server {
-        listen 80;
-        server_name $DOMAIN_NAME $SUBDOMAIN.$DOMAIN_NAME;
-        return 301 https://\$host\$request_uri;
     }"
 
   local listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;"
@@ -639,7 +634,7 @@ configure_docker_compose() {
   local shared_volume=""
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
     ssl_port_directive="      - \"${NGINX_SSL_PROXY_PORT}:${NGINX_SSL_PORT}\""
-    ssl_port_directive+=$'\n      - "8080:80"'
+    ssl_port_directive+=$'\n      - "80:8080"'
 
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
     ensure_directory_exists "$LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME"
@@ -811,19 +806,64 @@ quit() {
 
 build_and_run_docker() {
   echo "Building and running Docker setup..."
-  # Move to the project directory before invoking Docker commands.
+
   cd "$PROJECT_DIR" || {
     echo "Failed to change directory to $PROJECT_DIR"
     exit 1
   }
+
+  # Function to check if a port is exposable
+  is_port_exposable() {
+    nc -zv 127.0.0.1 "$1" &>/dev/null
+  }
+
+  adjust_sysctl_for_port() {
+    local response
+    local port="$1"
+    local setting="net.ipv4.ip_unprivileged_port_start=$port"
+
+    # Check if the setting is already in sysctl.conf
+    if ! grep -q "^$setting$" /etc/sysctl.conf; then
+      echo "Port $port is not exposable. Do you want to adjust sysctl settings to allow this? (yes/no)"
+      read -r response
+      if [[ "$response" == "yes" ]]; then
+        echo "$setting" | sudo tee -a /etc/sysctl.conf >/dev/null && sudo sysctl -p
+      else
+        echo "Terminating the script as port $port is required."
+        exit 1
+      fi
+    fi
+  }
+
+  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+    # Check port 443
+    if ! is_port_exposable 443; then
+      adjust_sysctl_for_port 443
+    fi
+
+    # Check port 80
+    if ! is_port_exposable 80; then
+      adjust_sysctl_for_port 80
+    fi
+  fi
+
+  # Build Docker image
   docker compose build || {
     echo "Failed to build Docker image using Docker Compose"
     exit 1
   }
-  docker compose up -d || {
-    echo "Failed to run Docker Compose"
+
+  # Run docker compose
+  local docker_output
+  docker_output=$(docker compose up -d 2>&1) # Also capture stderr
+  local exit_status=$?
+
+  if [[ $exit_status -ne 0 ]]; then
+    echo "Failed to run Docker Compose. Below is the error output:"
+    echo "$docker_output"
     exit 1
-  }
+  fi
+
   docker compose ps
   dump_logs
 }
