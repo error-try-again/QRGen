@@ -679,12 +679,12 @@ EOF
       - nginx-shared-volume:$WEBROOT_PATH
     depends_on:
       - frontend
-  networks:
-    qrgen:
-      driver: bridge
+networks:
+  qrgen:
+    driver: bridge
 
-  volumes:
-    nginx-shared-volume:
+volumes:
+  nginx-shared-volume:
 EOF
     cat "$PROJECT_DIR"/docker-compose.yml
   else
