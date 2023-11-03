@@ -632,6 +632,10 @@ services:
       dockerfile: ./frontend/Dockerfile
     ports:
       - "${NGINX_PORT}:${NGINX_PORT}"
+    networks:
+      - qrgen
+    depends_on:
+      - backend
 $ssl_port_directive
     volumes:
       - ./frontend:/usr/app
