@@ -91,6 +91,7 @@ This should be changed in production environments.
 * Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content persistence, content expiry, etc.)
 * Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code generation history, dynamic QR code
   generation, etc.)
+* Rewrite the installer in Python
 
 # Example
 

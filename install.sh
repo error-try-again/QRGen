@@ -1,52 +1,47 @@
 #!/bin/bash
 set -euo pipefail
+set -a # automatically export all variables
+set +a
 
 # Change the current working directory to the script's location.
 cd "$(dirname "$0")"
 
-# Define constants and directory paths.
-declare -r PROJECT_DIR="$HOME/QRGen-FullStack"
-declare -r BACKEND_DIR="$PROJECT_DIR/backend"
-declare -r FRONTEND_DIR="$PROJECT_DIR/frontend"
-declare -r SERVER_DIR="$PROJECT_DIR/saved_qrcodes"
+source .env
 
-declare -r LETS_ENCRYPT_DIR="$PROJECT_DIR/letsencrypt"
-declare -r LETS_ENCRYPT_LIVE_DIR="$PROJECT_DIR/letsencrypt/live"
-declare -r LETS_ENCRYPT_ARCHIVE_DIR="$PROJECT_DIR/letsencrypt/archive"
-declare -r LETS_ENCRYPT_LOGS_DIR="$PROJECT_DIR/letsencrypt/logs"
+# ---- Environment Setup ---- #
 
-declare -r DEFAULT_CERTS_DIR="$PROJECT_DIR/certs"
-declare -r DEFAULT_CERTS_DH_DIR="$DEFAULT_CERTS_DIR/dh"
+configure_volume_environment() {
+  # Prompt the user for the environment type
+  read -rp "Enter the environment (local, staging, production): " ENVIRONMENT
 
-# Configuration-related constants.
-BACKEND_PORT=3001
-NGINX_PORT=8080
-NGINX_SSL_PORT=443
-BACKEND_SCHEME="http"
-DOMAIN_NAME="localhost"
-ORIGIN_URL="$BACKEND_SCHEME://$DOMAIN_NAME"
-ORIGIN_PORT="$NGINX_PORT"
-ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
-NODE_VERSION="20.8.0"
-SUBDOMAIN="www"
-USE_LETS_ENCRYPT="no"
-USE_CUSTOM_DOMAIN="no"
-DOCKER_HOST=""
-BACKEND_FILES=""
-DNS_RESOLVER="8.8.8.8"
-TIMEOUT="7s"
+  # Adjustments for environment-specific SSL configurations
+  case "$ENVIRONMENT" in
+  local)
+    # Use self-signed certificates
+    certs="ssl_certificate /etc/ssl/certs/localhost/fullchain.pem;
+    ssl_certificate_key /etc/ssl/certs/localhost/privkey.pem;"
+    ;;
+  staging)
+    # Use staging Let's Encrypt certificates
+    certs="ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;"
+    ;;
+  production)
+    # Use production Let's Encrypt certificates
+    certs="ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/chain.pem;"
+    ;;
+  *)
+    echo "Invalid environment. Please enter 'local', 'staging', or 'production'."
+    return 1
+    ;;
+  esac
 
-# Let's Encrypt configuration constants.
-EMAIL="--email"
-ADMIN_EMAIL="example@example.com"
-WITH_EMAIL="--email $ADMIN_EMAIL"
-STAGING="--staging"
-TOS="--agree-tos"
-NO_EFF_EMAIL="--no-eff-email"
-INTERACTIVE="--non-interactive"
-WITHOUT_EMAIL="--register-unsafely-without-email"
-FORCE_RENEWAL="--force-renewal"
-WEBROOT_PATH="/usr/share/nginx/html"
+  # Certs for all environments
+  echo "$certs"
+  echo "$ENVIRONMENT"
+}
 
 # ---- Helper Functions ---- #
 
@@ -320,6 +315,7 @@ prompt_for_letsencrypt_setup() {
 # Prompts the user for domain details and Let's Encrypt setup.
 prompt_for_domain_and_letsencrypt() {
   prompt_for_domain_details
+  configure_volume_environment
   if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
     prompt_for_letsencrypt_setup
   fi
@@ -375,18 +371,6 @@ configure_nginx() {
         echo "Please place the required files in the expected directories or generate them."
         return 1
       fi
-    fi
-
-    local certs
-
-    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]] || [[ ! "$(ls -A "$LETS_ENCRYPT_LIVE_DIR")" ]]; then
-      certs="ssl_certificate /etc/letsencrypt/live/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/fullchain.pem;"
-    else
-      certs="ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;"
     fi
 
     # SSL configuration
@@ -615,16 +599,18 @@ configure_docker_compose() {
     ensure_directory_exists "$LETS_ENCRYPT_DIR"
     ensure_directory_exists "$LETS_ENCRYPT_LOGS_DIR/$DOMAIN_NAME"
 
-    # Check if LETS_ENCRYPT_LIVE_DIR is empty and set ssl_certs accordingly
-    if [[ -z "$LETS_ENCRYPT_LIVE_DIR" ]] || [[ ! "$(ls -A "$LETS_ENCRYPT_LIVE_DIR")" ]]; then
-      ssl_certs+="      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/"$'\n'
-    else
-      ssl_certs+="      - $LETS_ENCRYPT_LIVE_DIR:/etc/letsencrypt/live/"$'\n'
-    fi
-
     ssl_certs+="      - $DEFAULT_CERTS_DH_DIR:/etc/ssl/certs/"$'\n'
     ssl_certs+="      - $LETS_ENCRYPT_ARCHIVE_DIR/:/etc/letsencrypt/archive/"$'\n'
 
+    echo "Creating volumes for Let's Encrypt... $ENVIRONMENT"
+    if [[ "$ENVIRONMENT" == "local" ]]; then
+      # Volumes for self-signed certificates
+      ssl_certs="      - $DEFAULT_CERTS_DIR:/etc/letsencrypt/live/"$'\n'
+    elif [[ "$ENVIRONMENT" == "staging" ]]; then
+      # Volumes for staging
+      ssl_certs+="      - $LETS_ENCRYPT_LIVE_DIR/$DOMAIN_NAME/:/etc/letsencrypt/live/$DOMAIN_NAME"$'\n'
+      ssl_certs+="      - $LETS_ENCRYPT_ARCHIVE_DIR/$DOMAIN_NAME/:/etc/letsencrypt/archive/$DOMAIN_NAME/"$'\n'
+    fi
     shared_volume="      - nginx-shared-volume:$WEBROOT_PATH"
   fi
 
@@ -652,25 +638,34 @@ $ssl_port_directive
       - ./nginx.conf:/etc/nginx/nginx.conf
 $ssl_certs
 $shared_volume
-    networks:
-      - qrgen
 EOF
 
   # Add the certbot service to the Docker Compose file if Let's Encrypt is enabled
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-    local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
-    local STAGE_CERTBOT="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $STAGING $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
-    local PRODUCTION_CERTBOT="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $INTERACTIVE $NAME_SECTION"
+
+    # Adjust certbot service configuration based on environment
+    local CERTBOT_COMMAND=""
+
+    if [[ "$ENVIRONMENT" == "staging" ]]; then
+      local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
+      CERTBOT_COMMAND="certonly --staging -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $INTERACTIVE $FORCE_RENEWAL $NAME_SECTION"
+    elif [[ "$ENVIRONMENT" == "production" ]]; then
+      local NAME_SECTION="-d $DOMAIN_NAME -d $SUBDOMAIN.$DOMAIN_NAME"
+      CERTBOT_COMMAND="certonly -v --webroot --webroot-path=$WEBROOT_PATH $WITHOUT_EMAIL $TOS $NO_EFF_EMAIL $INTERACTIVE $NAME_SECTION"
+    fi
 
     if ! ls "$FRONTEND_DIR"; then
       echo "Error: $FRONTEND_DIR does not exist."
       return 1
     fi
 
-    cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
+    if [[ $CERTBOT_COMMAND == "" ]]; then
+      echo "Skipping certbot service configuration."
+    else
+      cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
   certbot:
     image: certbot/certbot
-    command: $PRODUCTION_CERTBOT
+    command: $CERTBOT_COMMAND
     volumes:
       - $DEFAULT_CERTS_DH_DIR/:/etc/ssl/certs/
       - $LETS_ENCRYPT_LIVE_DIR:/etc/letsencrypt/live/:rw
@@ -679,19 +674,23 @@ EOF
       - nginx-shared-volume:$WEBROOT_PATH
     depends_on:
       - frontend
+EOF
+    fi
+  fi
+
+  cat <<EOF >>"$PROJECT_DIR/docker-compose.yml"
 networks:
   qrgen:
     driver: bridge
 
 volumes:
   nginx-shared-volume:
+    driver: local
 EOF
-    cat "$PROJECT_DIR"/docker-compose.yml
-  else
-    echo -e "networks:\n  qrgen:\n    driver: bridge" >>"$PROJECT_DIR/docker-compose.yml"
-  fi
 
+  cat "$PROJECT_DIR"/docker-compose.yml
   echo "Docker Compose file written to $PROJECT_DIR/docker-compose.yml"
+
 }
 
 # Produces server-side configuration files essential for backend and frontend operations.
