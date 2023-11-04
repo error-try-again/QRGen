@@ -286,6 +286,28 @@ networks:
   qrgen:
     driver: bridge"
 
+  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+
+    local use_shared_volume="
+volumes:
+  nginx-shared-volume:
+    driver: local"
+
+    shared_volume="- nginx-shared-volume:${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]}"
+    certbot_command="certonly --webroot --webroot-path=${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]} ${STAGING} ${WITHOUT_EMAIL} ${TOS} ${NO_EFF_EMAIL} ${KEEP_UNTIL_EXPIRY} ${FORCE_RENEWAL} ${RSA_KEY_SIZE_FLAG} --domains ${DOMAIN_NAME} --domains ${SUBDOMAIN}.${DOMAIN_NAME} --dry-run"
+
+    certbot_service="certbot:
+    image: certbot/certbot
+    command: ${certbot_command}
+    volumes:
+      - ${CERTBOT_LETS_ENCRYPT_VOLUME_MAPPING}:rw
+      - ${CERTBOT_LETS_ENCRYPT_LOGS_VOLUME_MAPPING}:rw
+      - ${CERTBOT_CERTS_DH_VOLUME_MAPPING}:ro
+      $shared_volume:rw
+    depends_on:
+    - frontend"
+  fi
+
   if [[ "$USE_BACKEND" == "yes" ]]; then
     backend_service="backend:
     build:
@@ -298,6 +320,12 @@ networks:
   fi
 
   if [[ "$USE_FRONTEND" == "yes" ]]; then
+
+    if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+      http01_challenge_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
+      http01_challenge_ports+=$'\n      - "80:80"'
+    fi
+
     frontend_service="frontend:
     build:
       context: .
@@ -315,31 +343,6 @@ networks:
       $shared_volume
     depends_on:
       - backend"
-  fi
-
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
-
-    local use_shared_volume="
-volumes:
-  nginx-shared-volume:
-    driver: local"
-
-    http01_challenge_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
-    http01_challenge_ports+=$'\n      - "80:80"'
-    shared_volume="- nginx-shared-volume:${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]}"
-
-    certbot_command="certonly --webroot --webroot-path=${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]} ${WITHOUT_EMAIL} ${TOS} ${NO_EFF_EMAIL} ${KEEP_UNTIL_EXPIRY} ${FORCE_RENEWAL} ${RSA_KEY_SIZE_FLAG} --domains ${DOMAIN_NAME} --domains ${SUBDOMAIN}.${DOMAIN_NAME}"
-
-    certbot_service="certbot:
-    image: certbot/certbot
-    command: ${certbot_command}
-    volumes:
-      - ${CERTBOT_LETS_ENCRYPT_VOLUME_MAPPING}
-      - ${CERTBOT_LETS_ENCRYPT_LOGS_VOLUME_MAPPING}
-      - ${CERTBOT_CERTS_DH_VOLUME_MAPPING}
-      $shared_volume
-    depends_on:
-    - frontend"
   fi
 
   cat <<-EOF >"${PROJECT_ROOT_DIR}/docker-compose.yml"
