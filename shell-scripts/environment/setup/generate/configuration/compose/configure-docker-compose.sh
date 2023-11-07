@@ -44,10 +44,10 @@ volumes:
       with_email="${WITHOUT_EMAIL}"
     fi
 
-    certbot_command="certonly --webroot
-    --webroot-path=${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]} ${with_email} ${TOS}
-    ${NO_EFF_EMAIL} ${FORCE_RENEWAL}  ${RSA_KEY_SIZE_FLAG} --domains
-    ${DOMAIN_NAME} --domains ${SUBDOMAIN}.${DOMAIN_NAME}"
+    certbot_command="certonly --webroot \
+--webroot-path=${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]} ${with_email} ${TOS} \
+${NO_EFF_EMAIL} ${FORCE_RENEWAL} ${RSA_KEY_SIZE_FLAG} --domains \
+${DOMAIN_NAME} --domains ${SUBDOMAIN}.${DOMAIN_NAME}"
 
     if [[ $USE_PRODUCTION_SSL == "no" ]]; then
       certbot_command+=" ${STAGING_FLAG}"

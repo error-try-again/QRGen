@@ -6,12 +6,9 @@
 dump_logs() {
   test_docker_env
 
-  local log_file
-  log_file="$PROJECT_ROOT_DIR/docker_logs_$(date +"%Y%m%d_%H%M%S").txt"
-
-  produce_docker_logs >"$log_file" && {
-    echo "Docker logs dumped to $log_file"
-    cat "$log_file"
+  produce_docker_logs >"$PROJECT_LOGS_DIR" && {
+    echo "Docker logs dumped to $PROJECT_LOGS_DIR"
+    cat "$PROJECT_LOGS_DIR"
   }
 }
 
