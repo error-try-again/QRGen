@@ -41,7 +41,6 @@ cd "$(dirname "$0")"
 . ./shell-scripts/environment/setup/generate/configuration/frontend/configure-frontend-docker.sh
 . ./shell-scripts/environment/setup/generate/configuration/frontend/configure-nginx.sh
 . ./shell-scripts/environment/setup/generate/configuration/ssl/generate-self-signed-certificates.sh
-. ./shell-scripts/environment/setup/generate/configuration/ssl/handle-missing-certificates.sh
 . ./shell-scripts/environment/setup/generate/configuration/compose/configure-docker-compose.sh
 . ./shell-scripts/prompts/user-input.sh
 
@@ -86,7 +85,7 @@ declare -A CERTBOT_VOLUME_MAPPINGS=(
   [WEBROOT_VOLUME_MAPPING]="${DIRS[WEBROOT_DIR]}:${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]}"
 )
 
-update_ssl_paths() {
+update_internal_ssl_paths() {
   SSL_PATHS[PRIVKEY_PATH]="${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem"
   SSL_PATHS[FULLCHAIN_PATH]="${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem"
   SSL_PATHS[DH_PARAMS_PATH]="${INTERNAL_DIRS[INTERNAL_CERTS_DH_DIR]}/dhparam-2048.pem"

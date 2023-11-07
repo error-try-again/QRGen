@@ -29,7 +29,8 @@ configure_nginx() {
     ssl_listen_directive="listen $NGINX_SSL_PORT ssl;
         listen [::]:$NGINX_SSL_PORT ssl;"
 
-    handle_missing_certificates
+    update_internal_ssl_paths
+    generate_self_signed_certificates
 
     # Bind the SSL paths updated in handle_missing_certificates
     local FULLCHAIN_PATH="${SSL_PATHS[FULLCHAIN_PATH]}"
