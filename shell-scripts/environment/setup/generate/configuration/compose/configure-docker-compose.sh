@@ -53,7 +53,7 @@ ${DOMAIN_NAME} --domains ${SUBDOMAIN}.${DOMAIN_NAME}"
       certbot_command+=" ${STAGING_FLAG}"
     fi
 
-    if [[ $DRY_RUN_FLAG == "yes" ]]; then
+    if [[ $USE_DRY_RUN == "yes" ]]; then
       certbot_command+=" ${DRY_RUN_FLAG}"
     fi
 

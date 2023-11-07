@@ -52,6 +52,7 @@ cleanup() {
 }
 
 update_project() {
+  git stash
   git pull
 }
 

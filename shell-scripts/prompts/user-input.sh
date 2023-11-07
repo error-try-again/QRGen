@@ -116,9 +116,9 @@ prompt_for_dry_run() {
   read -rp "$dry_run_prompt" user_input
 
   if [[ "$user_input" == "yes" ]]; then
-    DRY_RUN_FLAG="yes"
+    USE_DRY_RUN="yes"
   else
-    DRY_RUN_FLAG="no"
+    USE_DRY_RUN="no"
   fi
 }
 
