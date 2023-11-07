@@ -213,7 +213,7 @@ prompt_for_letsencrypt_setup() {
   if [[ "$user_response" == "yes" ]]; then
     USE_LETS_ENCRYPT="yes"
     echo "Setting up with Let's Encrypt SSL."
-    elseh
+  else
     echo "Skipping Let's Encrypt setup."
   fi
 }
