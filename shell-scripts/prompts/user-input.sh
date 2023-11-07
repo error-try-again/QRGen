@@ -65,6 +65,63 @@ user_prompt() {
   done
 }
 
+prompt_for_ssl_environment() {
+  local user_input=""
+  local environment_prompt="would you like to use a production ssl certificate? (yes/no): "
+
+  read -rp "$environment_prompt" user_input
+
+  if [[ "$user_input" == "yes" ]]; then
+    USE_PRODUCTION_SSL="yes"
+    prompt_for_auto_renew_ssl
+  else
+    USE_PRODUCTION_SSL="no"
+  fi
+}
+
+prompt_for_auto_renew_ssl() {
+  local user_input=""
+  local auto_renew_prompt="would you like to automatically renew your ssl certificate? (yes/no): "
+
+  read -rp "$auto_renew_prompt" user_input
+
+  if [[ "$user_input" == "yes" ]]; then
+    AUTO_RENEW_SSL_FLAG="yes"
+    prompt_for_letsencrypt_email
+  else
+    AUTO_RENEW_SSL_FLAG="no"
+  fi
+}
+
+prompt_for_letsencrypt_email() {
+  local user_input=""
+  local email_prompt="please enter your email address (or type 'skip' to skip): "
+
+  read -rp "$email_prompt" user_input
+
+  if [[ "$user_input" == "skip" ]]; then
+    LETSENCRYPT_EMAIL=""
+  elif [[ -z "$user_input" ]]; then
+    echo "Error: Email address cannot be empty."
+    prompt_for_letsencrypt_email
+  else
+    LETSENCRYPT_EMAIL="$user_input"
+  fi
+}
+
+prompt_for_dry_run() {
+  local user_input=""
+  local dry_run_prompt="would you like to run a dry run? (yes/no): "
+
+  read -rp "$dry_run_prompt" user_input
+
+  if [[ "$user_input" == "yes" ]]; then
+    DRY_RUN_FLAG="yes"
+  else
+    DRY_RUN_FLAG="no"
+  fi
+}
+
 # ---- User Input ---- #
 # Prompts user with a message and ensures a non-empty response.
 # Returns the response when it's non-empty.
@@ -102,7 +159,7 @@ prompt_for_default_certs() {
   read -rp "$default_certs_prompt" user_response
 
   if [[ "$user_response" == "yes" ]]; then
-    generate_default_certificates
+    generate_self_signed_certificates
   else
     echo "Please place the required files in the expected directories or generate them."
     return 1
@@ -156,7 +213,7 @@ prompt_for_letsencrypt_setup() {
   if [[ "$user_response" == "yes" ]]; then
     USE_LETS_ENCRYPT="yes"
     echo "Setting up with Let's Encrypt SSL."
-  else
+    elseh
     echo "Skipping Let's Encrypt setup."
   fi
 }
