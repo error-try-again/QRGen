@@ -4,7 +4,7 @@ setup_project_directories() {
   echo "Staging project directories..."
 
   local directory
-  for directory in "$SERVER_DIR" "$FRONTEND_DIR" "$BACKEND_DIR"; do
+  for directory in "$SERVER_DIR" "$FRONTEND_DIR" "$BACKEND_DIR" "$CERTBOT_DIR"; do
     create_directory "$directory"
   done
 
@@ -14,7 +14,6 @@ setup_project_directories() {
     copy_server_files
   else
     echo "Error: $SRC_DIR does not exist. Attempting to create."
-
     if mkdir -p "$SRC_DIR"; then
       echo "Source directory $SRC_DIR created."
       copy_server_files

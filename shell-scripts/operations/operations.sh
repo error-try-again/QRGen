@@ -5,7 +5,6 @@
 # Dumps logs of all containers orchestrated by the Docker Compose file.
 dump_logs() {
   test_docker_env
-
   produce_docker_logs >"$PROJECT_LOGS_DIR" && {
     echo "Docker logs dumped to $PROJECT_LOGS_DIR"
     cat "$PROJECT_LOGS_DIR"

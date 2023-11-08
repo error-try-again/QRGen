@@ -58,7 +58,9 @@ ${DOMAIN_NAME} --domains ${SUBDOMAIN}.${DOMAIN_NAME}"
     fi
 
     certbot_service="certbot:
-    image: certbot/certbot
+    build:
+      context: .
+      dockerfile: ./certbot/Dockerfile
     command: ${certbot_command}
     volumes:
       - ${CERTBOT_LETS_ENCRYPT_VOLUME_MAPPING}:rw

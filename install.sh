@@ -36,10 +36,11 @@ cd "$(dirname "$0")"
 
 # Configuration scripts to generate the necessary files for the project.
 . ./shell-scripts/environment/setup/generate/configuration/backend/configure-backend-tsconfig.sh
-. ./shell-scripts/environment/setup/generate/configuration/backend/configure-backend-docker.sh
+. ./shell-scripts/environment/setup/generate/configuration/backend/configure-backend-dockerfile.sh
 . ./shell-scripts/environment/setup/generate/configuration/general/configure-dotenv.sh
-. ./shell-scripts/environment/setup/generate/configuration/frontend/configure-frontend-docker.sh
+. ./shell-scripts/environment/setup/generate/configuration/frontend/configure-frontend-dockerfile.sh
 . ./shell-scripts/environment/setup/generate/configuration/frontend/configure-nginx.sh
+. ./shell-scripts/environment/setup/generate/configuration/ssl/configure-certbot-dockerfile.sh
 . ./shell-scripts/environment/setup/generate/configuration/ssl/generate-self-signed-certificates.sh
 . ./shell-scripts/environment/setup/generate/configuration/compose/configure-docker-compose.sh
 . ./shell-scripts/prompts/user-input.sh

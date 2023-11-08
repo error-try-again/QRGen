@@ -9,6 +9,8 @@ generate_server_files() {
   configure_backend_docker
   echo "Configuring the Docker NGINX Proxy..."
   configure_frontend_docker
+  echo "Configuring the Docker Certbot..."
+  configure_certbot_docker
   echo "Configuring Docker Compose..."
   configure_docker_compose
 }
