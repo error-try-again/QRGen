@@ -122,6 +122,19 @@ prompt_for_dry_run() {
   fi
 }
 
+prompt_for_overwrite_self_signed() {
+  local user_input=""
+  local overwrite_prompt="would you like to overwrite the existing self-signed certificates? (yes/no): "
+
+  read -rp "$overwrite_prompt" user_input
+
+  if [[ "$user_input" == "yes" ]]; then
+    OVERWRITE_SELF_SIGNED_CERTS="yes"
+  else
+    OVERWRITE_SELF_SIGNED_CERTS="no"
+  fi
+}
+
 # ---- User Input ---- #
 # Prompts user with a message and ensures a non-empty response.
 # Returns the response when it's non-empty.

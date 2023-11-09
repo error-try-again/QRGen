@@ -21,7 +21,7 @@ RUN mkdir -p src \
  && cp -r certbot-master/tools tools \
  && cp -r certbot-master/acme src/acme \
  && cp -r certbot-master/certbot src/certbot \
-
+ && rm -rf certbot-master.tar.gz certbot-master
 
 # Install certbot runtime dependencies
 RUN apk add --no-cache --virtual .certbot-deps \
