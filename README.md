@@ -36,6 +36,10 @@ If you encounter any bugs, please feel free to open an issue or a pull request s
 
 ## Installation Instructions:
 
+```bash
+cd ~ && git clone https://github.com/error-try-again/QRGen-FullStack.git && cd QRGen-FullStack
+```
+
 _Ensures that the host system has all the required dependencies_
 
 ```bash
@@ -56,22 +60,19 @@ project_
 ssh -t <user>@<host> "./$HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/"
 ```
 
-_update the project_
+_If you are already logged in remotely_
 
 ```bash
-machinectl shell docker-primary@ $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/
-# Select option 2 (Delete old containers and images)
-# Then run the following command
-git pull
-# Then run the following command
-machinectl shell docker-primary@ $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/
-# Select option 1 (Build and install the project)
+./install.sh
+# Select run
 ```
 
 _Uninstall the project_
 
 ```bash
 sudo ./depends.sh uninstall
+./install.sh
+# Select cleanup
 ```
 
 ## Security Notes
@@ -81,7 +82,6 @@ This should be changed in production environments.
 
 # Roadmap
 
-* Add additional support for QR code formats
 * Add additional client/server validation for QR code formats
 * Add import mechanism for QR code generation (CSV, JSON, Excel, etc.)
 * API Documentation
@@ -92,7 +92,3 @@ This should be changed in production environments.
 * Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code generation history, dynamic QR code
   generation, etc.)
 * Rewrite the installer in Python
-
-# Example
-
-![image](https://github.com/error-try-again/fullstack-qr-generator/assets/19685177/1d1ef425-5ca0-402c-b2b6-914bf4c0907d)
