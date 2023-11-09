@@ -48,7 +48,7 @@ volumes:
     local OVERWRITE_SELF_SIGNED_CERTS_FLAG=""
 
     if [[ $OVERWRITE_SELF_SIGNED_CERTS == "yes" ]]; then
-      OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite-self-signed"
+      OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite-cert-dirs"
     else
       OVERWRITE_SELF_SIGNED_CERTS_FLAG=""
     fi
