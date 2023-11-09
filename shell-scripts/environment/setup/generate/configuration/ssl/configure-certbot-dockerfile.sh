@@ -15,13 +15,13 @@ WORKDIR /opt/certbot
 
 # Retrieve certbot code
 RUN mkdir -p src \
- && wget -O certbot-$CERTBOT_VERSION.tar.gz https://github.com/error-try-again/certbot/archive/refs/heads/master.zip \
- && tar xf certbot-$CERTBOT_VERSION.tar.gz \
- && cp certbot-$CERTBOT_VERSION/CHANGELOG.md certbot-$CERTBOT_VERSION/README.rst src/ \
- && cp -r certbot-$CERTBOT_VERSION/tools tools \
- && cp -r certbot-$CERTBOT_VERSION/acme src/acme \
- && cp -r certbot-$CERTBOT_VERSION/certbot src/certbot \
- && rm -rf certbot-$CERTBOT_VERSION.tar.gz certbot-$CERTBOT_VERSION
+ && wget -O certbot-master.zip https://github.com/error-try-again/certbot/archive/refs/heads/master.zip \
+ && unzip certbot-master.zip \
+ && cp certbot-master/CHANGELOG.md certbot-master/README.rst src/ \
+ && cp -r certbot-master/tools tools \
+ && cp -r certbot-master/acme src/acme \
+ && cp -r certbot-master/certbot src/certbot \
+ && rm -rf certbot-master.tar.gz certbot-master
 
 # Install certbot runtime dependencies
 RUN apk add --no-cache --virtual .certbot-deps \
