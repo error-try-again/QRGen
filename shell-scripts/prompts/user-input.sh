@@ -25,12 +25,11 @@ user_prompt() {
       main
       break
       ;;
-    "Cleanup")
+    "Remove Project")
       cleanup
       break
       ;;
     "Dump logs")
-      #      bring_down_docker_compose
       dump_logs
       break
       ;;
@@ -40,11 +39,6 @@ user_prompt() {
       ;;
     "Update Project")
       update_project
-      break
-      ;;
-    "Enable SSL with Let's Encrypt")
-      USE_LETS_ENCRYPT="yes"
-      main
       break
       ;;
     "Stop Project Docker Containers")
