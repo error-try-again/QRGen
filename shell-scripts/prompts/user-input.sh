@@ -75,6 +75,14 @@ prompt_for_letsencrypt_email() {
   LETSENCRYPT_EMAIL=$(prompt_for_input "Please enter your email address (or type 'skip' to skip): " "Error: Email address cannot be empty." "skip")
 }
 
+prompt_for_dry_run() {
+  USE_DRY_RUN=$(
+    prompt_for_input "Would you like to run a dry run? (yes/no): " "Please answer yes or no."
+  )
+
+  [[ "$USE_DRY_RUN" == "yes" ]] && DRY_RUN_FLAG="--dry-run"
+}
+
 prompt_for_overwrite_self_signed() {
   OVERWRITE_SELF_SIGNED_CERTS_FLAG=$(prompt_for_input "Would you like to overwrite the existing self-signed certificates? (yes/no): " "Please answer yes or no.")
   if [[ "$OVERWRITE_SELF_SIGNED_CERTS_FLAG" == "yes" ]]; then
@@ -108,7 +116,7 @@ prompt_for_default_certs() {
 }
 
 prompt_for_domain_and_letsencrypt() {
-  DOMAIN_NAME=$(prompt_for_input "Enter your domain name (default http://localhost): " "Error: Domain name cannot be empty." "default")
+  DOMAIN_NAME=$(prompt_for_input "Enter your root domain name (default http://localhost): " "Error: Domain name cannot be empty." "default")
   USE_CUSTOM_DOMAIN="no"
   [[ "$DOMAIN_NAME" != "default" ]] && USE_CUSTOM_DOMAIN="yes"
   if [[ "$USE_CUSTOM_DOMAIN" == "yes" ]]; then

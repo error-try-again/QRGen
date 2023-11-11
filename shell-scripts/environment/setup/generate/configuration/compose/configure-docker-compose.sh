@@ -36,7 +36,6 @@ volumes:
 
     prompt_for_letsencrypt_email
     prompt_for_ssl_environment
-    prompt_for_dry_run
     prompt_for_overwrite_self_signed
 
     if [[ "$USE_CUSTOM_DOMAIN" == "yes" && "$LETSENCRYPT_EMAIL" != "" ]]; then
