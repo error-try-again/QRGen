@@ -76,20 +76,13 @@ prompt_for_letsencrypt_email() {
 }
 
 prompt_for_dry_run() {
-  USE_DRY_RUN=$(
-    prompt_for_input "Would you like to run a dry run? (yes/no): " "Please answer yes or no."
-  )
-
+  USE_DRY_RUN=$(prompt_for_input "Would you like to run a dry run? (yes/no): " "Please answer yes or no.")
   [[ "$USE_DRY_RUN" == "yes" ]] && DRY_RUN_FLAG="--dry-run"
 }
 
 prompt_for_overwrite_self_signed() {
   OVERWRITE_SELF_SIGNED_CERTS_FLAG=$(prompt_for_input "Would you like to overwrite the existing self-signed certificates? (yes/no): " "Please answer yes or no.")
-  if [[ "$OVERWRITE_SELF_SIGNED_CERTS_FLAG" == "yes" ]]; then
-    OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite-cert-dirs"
-  else
-    OVERWRITE_SELF_SIGNED_CERTS_FLAG=""
-  fi
+  [[ "$OVERWRITE_SELF_SIGNED_CERTS_FLAG" == "yes" ]] && OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite"
 }
 
 prompt_for_regeneration() {

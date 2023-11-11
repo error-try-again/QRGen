@@ -36,24 +36,31 @@ volumes:
 
     prompt_for_letsencrypt_email
     prompt_for_ssl_environment
+    prompt_for_dry_run
     prompt_for_overwrite_self_signed
 
     if [[ "$USE_CUSTOM_DOMAIN" == "yes" && "$LETSENCRYPT_EMAIL" != "" ]]; then
       with_email="--email ${LETSENCRYPT_EMAIL}"
     else
-      with_email="${WITHOUT_EMAIL}"
+      with_email="${WITHOUT_EMAIL_FLAG}"
     fi
 
     certbot_command="certonly \
     --webroot \
     --webroot-path=${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]} \
-   ${with_email} ${TOS} \
-   ${NO_EFF_EMAIL} \
-   ${FORCE_RENEWAL} \
-   ${RSA_KEY_SIZE_FLAG} \
-   --domains ${DOMAIN_NAME} \
-   --domains ${SUBDOMAIN}.${DOMAIN_NAME} \
-   ${OVERWRITE_SELF_SIGNED_CERTS_FLAG}"
+${with_email} ${TOS_FLAG} \
+${NO_EFF_EMAIL_FLAG} \
+${NON_INTERACTIVE_FLAG} \
+${FORCE_RENEWAL_FLAG} \
+${RSA_KEY_SIZE_FLAG} \
+${HSTS_FLAG} \
+${MUST_STAPLE_FLAG} \
+${UIR_FLAG} \
+${STAPLE_OCSP_FLAG} \
+${STRICT_PERMISSIONS_FLAG} \
+--domains ${DOMAIN_NAME} \
+--domains ${SUBDOMAIN}.${DOMAIN_NAME} \
+${OVERWRITE_SELF_SIGNED_CERTS_FLAG}"
 
     if [[ $USE_PRODUCTION_SSL == "no" ]]; then
       certbot_command+=" ${STAGING_FLAG}"
