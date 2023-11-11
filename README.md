@@ -1,8 +1,9 @@
-# QRGen-FullStack
+# QRGen
 
 ## Summary
 
-This project aims to automate the setup of a full-stack QR code generation service within rootless, dockerized
+This project aims to automate the setup of a full-stack QR code generation service
+within rootless, dockerized
 environments.
 
     Setup: Two Bash scripts used to orchestrate containers, setup enviornments, and install dependencies.
@@ -10,17 +11,22 @@ environments.
     Frontend: A Vite-React TSX application powered by NGINX proxying requests to the backend.
     SSL: NGINX reverse proxy with SSL termination using LetsEncrypt.
 
-The entire project is self-hostable and has been built over <s>a weekend</s> three weeks.
-Although it's been thoroughly tested manually at the time of writing, unit tests are still a work in progress.
+The entire project is self-hostable and has been built over <s>a weekend</s>
+about a month.
+Although it's been thoroughly tested manually at the time of writing, unit tests are
+still a work in progress.
 
-There might be some unforeseen bugs and rough edges. For the future roadmap, skip to the the bottom of this README.
-If you encounter any bugs, please feel free to open an issue or a pull request so that I can investigate further.
+There might be some unforeseen bugs and rough edges. For the future roadmap, skip to
+the the bottom of this README.
+If you encounter any bugs, please feel free to open an issue or a pull request so
+that I can investigate further.
 
 ## Features
 
 * Self-hostable QR code generation service (Docker)
 * Supports Bulk QR code generation (up to 1000 QR codes at a time)
-* Supports multiple QR code formats (URL, SMS, Email, Events, Phone, Geolocation, Wifi, Zoom, Contact, Text)
+* Supports multiple QR code formats (URL, SMS, Email, Events, Phone, Geolocation,
+  Wifi, Zoom, Contact, Text)
 * Supports multiple QR code sizes
 * Supports multiple QR code error correction levels
 * QR Generation APIs (POST /qr/generate) or (POST /qr/batch)
@@ -28,6 +34,10 @@ If you encounter any bugs, please feel free to open an issue or a pull request s
 * Responsive design
 * Mobile friendly
 * Dark mode
+
+### Live Demo
+
+[Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
 
 ### Tested on:
 
@@ -47,13 +57,15 @@ chmod +x depends.sh
 sudo ./depends.sh
 ```
 
-_If you are running the project locally, you must use the following command to build and install the core project_
+_If you are running the project locally, you must use the following command to build
+and install the core project_
 
 ```bash
 machinectl shell docker-primary@ $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/
 ```
 
-_If you are running the project on a remote server, you must use the following command to build and install the core
+_If you are running the project on a remote server, you must use the following
+command to build and install the core
 project_
 
 ```bash
@@ -88,7 +100,9 @@ This should be changed in production environments.
 * CI/CD pipeline
 * Test coverage
 * Add additional deployment options (E.g. Kubernetes, etc.)
-* Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content persistence, content expiry, etc.)
-* Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code generation history, dynamic QR code
+* Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content
+  persistence, content expiry, etc.)
+* Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code
+  generation history, dynamic QR code
   generation, etc.)
 * Rewrite the installer in Python

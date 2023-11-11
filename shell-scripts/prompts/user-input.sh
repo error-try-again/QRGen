@@ -123,9 +123,9 @@ prompt_for_overwrite_self_signed() {
   read -rp "$overwrite_prompt" user_input
 
   if [[ "$user_input" == "yes" ]]; then
-    OVERWRITE_SELF_SIGNED_CERTS="yes"
+    OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite-cert-dirs"
   else
-    OVERWRITE_SELF_SIGNED_CERTS="no"
+    OVERWRITE_SELF_SIGNED_CERTS_FLAG=""
   fi
 }
 

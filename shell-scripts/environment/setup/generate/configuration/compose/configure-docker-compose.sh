@@ -45,18 +45,16 @@ volumes:
       with_email="${WITHOUT_EMAIL}"
     fi
 
-    local OVERWRITE_SELF_SIGNED_CERTS_FLAG=""
-
-    if [[ $OVERWRITE_SELF_SIGNED_CERTS == "yes" ]]; then
-      OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite-cert-dirs"
-    else
-      OVERWRITE_SELF_SIGNED_CERTS_FLAG=""
-    fi
-
-    certbot_command="certonly --webroot \
---webroot-path=${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]} ${with_email} ${TOS} \
-${NO_EFF_EMAIL} ${FORCE_RENEWAL} ${RSA_KEY_SIZE_FLAG} --domains \
-${DOMAIN_NAME} --domains ${SUBDOMAIN}.${DOMAIN_NAME} ${OVERWRITE_SELF_SIGNED_CERTS_FLAG}"
+    certbot_command="certonly \
+    --webroot \
+    --webroot-path=${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]} \
+   ${with_email} ${TOS} \
+   ${NO_EFF_EMAIL} \
+   ${FORCE_RENEWAL} \
+   ${RSA_KEY_SIZE_FLAG} \
+   --domains ${DOMAIN_NAME} \
+   --domains ${SUBDOMAIN}.${DOMAIN_NAME} \
+   ${OVERWRITE_SELF_SIGNED_CERTS_FLAG}"
 
     if [[ $USE_PRODUCTION_SSL == "no" ]]; then
       certbot_command+=" ${STAGING_FLAG}"
