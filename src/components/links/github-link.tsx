@@ -6,7 +6,7 @@ export const GithubLink: React.FC = () => {
   return (
     <a
       style={link}
-      href="https://github.com/error-try-again/QRGen-FullStack"
+      href="https://github.com/error-try-again/QRGen"
       target="_blank"
       rel="noopener noreferrer"
     >

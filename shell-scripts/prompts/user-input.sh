@@ -20,7 +20,7 @@ user_prompt() {
   local opt
   select opt in "${options[@]}"; do
     case $opt in
-    "Run Setup") prompt_for_setup "Setup" && main ;;
+    "Run Setup") main ;;
     "Cleanup") cleanup ;;
     "Reload/Refresh") reload_project ;;
     "Dump logs") dump_logs ;;
@@ -49,7 +49,8 @@ prompt_yes_no() {
 
 # Example usage of prompt_yes_no function
 prompt_for_setup() {
-  prompt_yes_no "Would you like to run the automatic setup? (yes/no): " AUTOMATIC_SETUP
+  prompt_yes_no "Would you like to run the automatic ssl setup? (yes/no): "
+  AUTOMATIC_SETUP
 }
 
 prompt_for_ssl_environment() {

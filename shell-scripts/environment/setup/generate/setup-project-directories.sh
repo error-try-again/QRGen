@@ -8,7 +8,7 @@ setup_project_directories() {
     create_directory "$directory"
   done
 
-  local SRC_DIR="$HOME/QRGen-FullStack/src"
+  local SRC_DIR="$HOME/QRGen/src"
 
   if [[ -d "$SRC_DIR" ]]; then
     copy_server_files

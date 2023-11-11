@@ -47,7 +47,7 @@ that I can investigate further.
 ## Installation Instructions:
 
 ```bash
-cd ~ && git clone https://github.com/error-try-again/QRGen-FullStack.git && cd QRGen-FullStack
+cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen
 ```
 
 _Ensures that the host system has all the required dependencies_
@@ -61,7 +61,7 @@ _If you are running the project locally, you must use the following command to b
 and install the core project_
 
 ```bash
-machinectl shell docker-primary@ $HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/
+machinectl shell docker-primary@ $HOME/QRGen/install.sh $HOME/QRGen/
 ```
 
 _If you are running the project on a remote server, you must use the following
@@ -69,7 +69,7 @@ command to build and install the core
 project_
 
 ```bash
-ssh -t <user>@<host> "./$HOME/QRGen-FullStack/install.sh $HOME/QRGen-FullStack/"
+ssh -t <user>@<host> "./$HOME/QRGen/install.sh $HOME/QRGen/"
 ```
 
 _If you are already logged in remotely_
