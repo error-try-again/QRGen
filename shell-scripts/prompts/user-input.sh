@@ -20,7 +20,7 @@ user_prompt() {
   local opt
   select opt in "${options[@]}"; do
     case $opt in
-    "Run Setup") prompt_for_setup && main ;;
+    "Run Setup") prompt_for_setup "Setup" && main ;;
     "Cleanup") cleanup ;;
     "Reload/Refresh") reload_project ;;
     "Dump logs") dump_logs ;;
@@ -35,61 +35,100 @@ user_prompt() {
   done
 }
 
-# General-purpose prompt function for yes/no questions and simple inputs
-prompt_for_input() {
+# General-purpose prompt function for yes/no questions
+prompt_yes_no() {
   local prompt="$1"
-  local error_message="$2"
-  local skip_check="${3:-}" # Optional parameter to allow skipping input
+  local var_return="$2"
   local user_input
+  read -rp "$prompt" user_input
+  case "$user_input" in
+  [yY][eE][sS] | [yY]) eval "$var_return"="yes" ;;
+  *) eval "$var_return"="no" ;;
+  esac
+}
+
+# Example usage of prompt_yes_no function
+prompt_for_setup() {
+  prompt_yes_no "Would you like to run the automatic setup? (yes/no): " AUTOMATIC_SETUP
+}
+
+prompt_for_ssl_environment() {
+  prompt_yes_no "Would you like to use a production SSL certificate? (yes/no): " USE_PRODUCTION_SSL
+  [[ "$USE_PRODUCTION_SSL" == "yes" ]] && general_ssl_prompt
+}
+
+general_ssl_prompt() {
+  prompt_for_letsencrypt_email && prompt_for_dry_run && prompt_for_overwrite_self_signed
+}
+
+prompt_for_auto_renew_ssl() {
+  prompt_yes_no "Would you like to automatically renew your SSL certificate? (yes/no): " AUTO_RENEW_SSL
+  [[ "$AUTO_RENEW_SSL" == "yes" ]]
+}
+
+prompt_for_letsencrypt_email() {
+  local user_input=""
+  local email_prompt="please enter your email address (or type 'skip' to skip): "
+
+  read -rp "$email_prompt" user_input
+
+  if [[ "$user_input" == "skip" ]]; then
+    LETSENCRYPT_EMAIL=""
+  elif [[ -z "$user_input" ]]; then
+    echo "Error: Email address cannot be empty."
+    prompt_for_letsencrypt_email
+  else
+    LETSENCRYPT_EMAIL="$user_input"
+  fi
+}
+
+prompt_for_dry_run() {
+  local user_input=""
+  local dry_run_prompt="would you like to run a dry run? (yes/no): "
+
+  read -rp "$dry_run_prompt" user_input
+
+  if [[ "$user_input" == "yes" ]]; then
+    USE_DRY_RUN="yes"
+  else
+    USE_DRY_RUN="no"
+  fi
+}
+
+prompt_for_overwrite_self_signed() {
+  local user_input=""
+  local overwrite_prompt="would you like to overwrite the existing self-signed certificates? (yes/no): "
+
+  read -rp "$overwrite_prompt" user_input
+
+  if [[ "$user_input" == "yes" ]]; then
+    OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite-cert-dirs"
+  else
+    OVERWRITE_SELF_SIGNED_CERTS_FLAG=""
+  fi
+}
+
+prompt_with_validation() {
+  local prompt_message="$1"
+  local error_message="$2"
+  local user_input=""
 
   while true; do
-    read -rp "$prompt" user_input
-    if [[ -n "$skip_check" ]] && [[ "$user_input" == "$skip_check" ]]; then
-      echo ""
-      return 0
-    elif [[ -z "$user_input" ]]; then
+    read -rp "$prompt_message" user_input
+
+    if [[ -z "$user_input" ]]; then
       echo "$error_message"
     else
       echo "$user_input"
-      return 0
+      break
     fi
   done
 }
 
-# Refactored prompts using the generic function 'prompt_for_input'
-prompt_for_setup() {
-  AUTOMATIC_SETUP=$(prompt_for_input "Would you like to run the automatic setup? (yes/no): " "Please answer yes or no.")
-}
-
-prompt_for_ssl_environment() {
-  USE_PRODUCTION_SSL=$(prompt_for_input "Would you like to use a production SSL certificate? (yes/no): " "Please answer yes or no.")
-  [[ "$USE_PRODUCTION_SSL" == "yes" ]] && prompt_for_auto_renew_ssl
-}
-
-prompt_for_auto_renew_ssl() {
-  AUTO_RENEW_SSL=$(prompt_for_input "Would you like to automatically renew your SSL certificate? (yes/no): " "Please answer yes or no.")
-  [[ "$AUTO_RENEW_SSL" == "yes" ]] && prompt_for_letsencrypt_email
-}
-
-prompt_for_letsencrypt_email() {
-  LETSENCRYPT_EMAIL=$(prompt_for_input "Please enter your email address (or type 'skip' to skip): " "Error: Email address cannot be empty." "skip")
-}
-
-prompt_for_dry_run() {
-  USE_DRY_RUN=$(prompt_for_input "Would you like to run a dry run? (yes/no): " "Please answer yes or no.")
-  [[ "$USE_DRY_RUN" == "yes" ]] && DRY_RUN_FLAG="--dry-run"
-}
-
-prompt_for_overwrite_self_signed() {
-  OVERWRITE_SELF_SIGNED_CERTS_FLAG=$(prompt_for_input "Would you like to overwrite the existing self-signed certificates? (yes/no): " "Please answer yes or no.")
-  [[ "$OVERWRITE_SELF_SIGNED_CERTS_FLAG" == "yes" ]] && OVERWRITE_SELF_SIGNED_CERTS_FLAG="--overwrite"
-}
-
 prompt_for_regeneration() {
-  local user_response
-  user_response=$(prompt_for_input "Do you want to regenerate the certificates in $1?
-  [y/N]: " "Please answer yes or no.")
-  if [[ "$user_response" == "yes" ]]; then
+  local response
+  read -rp "Do you want to regenerate the certificates in $1? [y/N]: " response
+  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     return 0 # true, regenerate
   else
     return 1 # false, do not regenerate
@@ -97,9 +136,11 @@ prompt_for_regeneration() {
 }
 
 prompt_for_default_certs() {
-  local user_response
-  user_response=$(prompt_for_input "Would you like to generate default certificates?
-  (yes/no): " "Please answer yes or no.")
+  local user_response=""
+  local default_certs_prompt="Would you like to generate default certificates? (yes/no): "
+
+  read -rp "$default_certs_prompt" user_response
+
   if [[ "$user_response" == "yes" ]]; then
     generate_self_signed_certificates
   else
@@ -108,22 +149,38 @@ prompt_for_default_certs() {
   fi
 }
 
-prompt_for_domain_and_letsencrypt() {
-  DOMAIN_NAME=$(prompt_for_input "Enter your root domain name (default http://localhost): " "Error: Domain name cannot be empty." "default")
-  USE_CUSTOM_DOMAIN="no"
-  [[ "$DOMAIN_NAME" != "default" ]] && USE_CUSTOM_DOMAIN="yes"
+prompt_for_domain_details() {
+  prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost) (yes/no)? " USE_CUSTOM_DOMAIN
   if [[ "$USE_CUSTOM_DOMAIN" == "yes" ]]; then
+    DOMAIN_NAME=$(prompt_with_validation "Enter your domain name (e.g., example.com): " "Error: Domain name cannot be empty.")
     ORIGIN_URL="$BACKEND_SCHEME://$DOMAIN_NAME"
     ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
     echo "Using custom domain name: $ORIGIN_URL"
-    prompt_for_letsencrypt_setup
+
+    prompt_yes_no "Would you like to specify a subdomain other than the default (none) (yes/no)? " USE_SUBDOMAIN
+    if [[ "$USE_SUBDOMAIN" == "yes" ]]; then
+      SUBDOMAIN=$(prompt_with_validation "Enter your subdomain name (e.g., www): " "Error: Subdomain name cannot be empty.")
+      ORIGIN_URL="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"
+      ORIGIN="$ORIGIN_URL:$ORIGIN_PORT"
+      echo "Using custom subdomain: $ORIGIN_URL"
+    fi
   else
-    DOMAIN_NAME="http://localhost"
     echo "Using default domain name: $DOMAIN_NAME"
   fi
 }
 
 prompt_for_letsencrypt_setup() {
-  USE_LETS_ENCRYPT=$(prompt_for_input "Would you like to setup Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? " "Please answer yes or no.")
-  [[ "$USE_LETS_ENCRYPT" == "yes" ]] && echo "Setting up with Let's Encrypt SSL."
+  prompt_yes_no "Would you like to setup Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? " USE_LETS_ENCRYPT
+  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+    echo "Setting up with Let's Encrypt SSL."
+  else
+    echo "Skipping Let's Encrypt setup."
+  fi
+}
+
+prompt_for_domain_and_letsencrypt() {
+  prompt_for_domain_details
+  if [[ "$USE_CUSTOM_DOMAIN" == "yes" ]]; then
+    prompt_for_letsencrypt_setup
+  fi
 }

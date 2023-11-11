@@ -34,10 +34,7 @@ volumes:
 
     shared_volume="- nginx-shared-volume:${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]}"
 
-    prompt_for_letsencrypt_email
     prompt_for_ssl_environment
-    prompt_for_dry_run
-    prompt_for_overwrite_self_signed
 
     if [[ "$USE_CUSTOM_DOMAIN" == "yes" && "$LETSENCRYPT_EMAIL" != "" ]]; then
       with_email="--email ${LETSENCRYPT_EMAIL}"
