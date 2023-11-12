@@ -42,7 +42,7 @@ prompt_yes_no() {
   local user_input
   read -rp "$prompt" user_input
   case "$user_input" in
-  [yY][eE][sS] | [yY]) eval "$var_return"="yes" ;;
+  [yY][eE][sS] | [yY]) eval "$var_return"="eys" ;;
   *) eval "$var_return"="no" ;;
   esac
 }
@@ -98,9 +98,7 @@ prompt_for_dry_run() {
 
 prompt_for_overwrite_self_signed() {
   local user_input=""
-  local overwrite_prompt="Would you like to enable force-overwrites for
-  letsencrypt certificates? This will allow overwriting of any existing
-  certificates in the /live & /archive lineage directories. (yes/no): "
+  local overwrite_prompt="Would you like to enable force-overwrites for letsencrypt certificates? This will allow overwriting of any existing certificates in the /live & /archive lineage directories. (yes/no): "
 
   read -rp "$overwrite_prompt" user_input
 
