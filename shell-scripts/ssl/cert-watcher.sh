@@ -6,7 +6,7 @@ initialize_cert_watcher() {
   WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN_NAME}"
   COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
   CHECKSUM_FILE="${CHECKSUM_FILE:-$PROJECT_ROOT_DIR/certs/cert_checksum}"
-  LOG_FILE="$PROJECT_LOGS_DIR/service.log"
+  LOG_FILE="$PROJECT_LOGS_DIR/cert-watcher.log"
 
   # Validate required configuration
   validate_configuration() {
@@ -38,7 +38,7 @@ initialize_cert_watcher() {
     # Check if the log directory is writable
     if [[ ! -w "$PROJECT_LOGS_DIR" ]]; then
       echo "ERROR: Log directory $PROJECT_LOGS_DIR is not writable. Attempting to log to /tmp instead."
-      LOG_FILE="/tmp/service.log"
+      LOG_FILE="/tmp/cert-watcher.log"
     fi
 
     # Check if the log file is writable or can be created
