@@ -23,17 +23,7 @@ generate_self_signed_certificates() {
       -subj "/CN=${DOMAIN_NAME}"
 
     echo "Self-signed certificates for ${DOMAIN_NAME} generated at ${certs_path}."
-
-    # Generate Diffie-Hellman parameters in the background
-    echo "Generating DH parameters, this may take a while..."
-    openssl dhparam -out "${dh_params_path}" 2048 &
-
-    # Capture the PID of the DH parameters generation process
-    local dh_pid=$!
-
-    # Wait for the DH parameters to be generated before continuing
-    wait $dh_pid
-
+    openssl dhparam -out "${dh_params_path}" 2048
     echo "DH parameters generated at ${dh_params_path}."
   else
     echo "Certificates for ${DOMAIN_NAME} already exist at ${certs_path}."
