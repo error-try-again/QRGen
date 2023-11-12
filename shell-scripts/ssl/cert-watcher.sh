@@ -32,23 +32,29 @@ initialize_cert_watcher() {
 
   log_message() {
     local message="$1"
+    local datetime
+    datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
-    # Ensure logfile exists
-    if [[ ! -f "$LOG_FILE" ]]; then
-      touch "$LOG_FILE"
-    else
-      # Ensure logfile is writable
-      if [[ ! -w "$LOG_FILE" ]]; then
-        echo "ERROR: Logfile $LOG_FILE is not writable."
-        exit 1
-      fi
+    # Check if the log directory is writable
+    if [[ ! -w "$PROJECT_LOGS_DIR" ]]; then
+      echo "ERROR: Log directory $PROJECT_LOGS_DIR is not writable. Attempting to log to /tmp instead."
+      LOG_FILE="/tmp/service.log"
     fi
 
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" >>"$LOG_FILE"
+    # Check if the log file is writable or can be created
+    if [[ ! -w "$LOG_FILE" ]] && ! touch "$LOG_FILE" 2>/dev/null; then
+      echo "ERROR: Log file $LOG_FILE is not writable and cannot be created. Logging to console."
+      echo "$datetime - $message"
+      return 1
+    fi
+
+    # Write the log message to the log file
+    echo "$datetime - $message" >>"$LOG_FILE"
+
     # Implement log rotation
     local max_size=10240 # for example, 10 MB
     local filesize
-    filesize=$(stat -c "%s" "$LOG_FILE")
+    filesize=$(stat -c "%s" "$LOG_FILE" 2>/dev/null || echo "0")
     if [[ $filesize -gt $max_size ]]; then
       mv "$LOG_FILE" "$LOG_FILE.$(date '+%Y%m%d%H%M%S')"
       touch "$LOG_FILE"
@@ -111,12 +117,27 @@ initialize_cert_watcher() {
       local old_pid
       old_pid=$(cat "$pid_file")
 
-      # Check if the PID is actually running
-      if ps -p "$old_pid" >/dev/null 2>&1; then
-        echo "Found existing cert watcher with PID $old_pid. Stopping it."
-        kill "$old_pid" && echo "Existing cert watcher stopped successfully." || echo "Failed to stop existing cert watcher."
+      if [[ -n "$old_pid" && $(ps -p "$old_pid" -o comm=) =~ 'inotifywait' ]]; then
+        echo "Found existing cert watcher with PID $old_pid. Attempting to stop it."
+
+        # Attempt to terminate the process group gracefully
+        kill -- "-$old_pid"
+
+        # Wait for the process to exit
+        local count=0
+        local limit=10
+        while ps -p "$old_pid" >/dev/null 2>&1; do
+          if ((count++ >= limit)); then
+            echo "Watcher process is not terminating, attempting to kill it forcefully."
+            kill -9 -- "-$old_pid"
+            break
+          fi
+          sleep 1
+        done
+
+        echo "Existing cert watcher stopped successfully."
       else
-        echo "No existing cert watcher process found running with PID $old_pid. Starting a new one."
+        echo "No existing cert watcher process found running with PID $old_pid."
       fi
 
       # Remove the old PID file to prevent false positives in the future
@@ -129,7 +150,9 @@ initialize_cert_watcher() {
   monitor_certificates() {
     # Watch only the fullchain.pem file for close_write events
     local watched_file="$WATCHED_DIR/fullchain.pem"
-    inotifywait -m -e close_write --format '%w%f' "$watched_file" | while read -r filepath; do
+
+    # Use setsid to run in a new session, this makes it the leader of a new process group
+    setsid inotifywait -m -e close_write --format '%w%f' "$watched_file" | while read -r filepath; do
       log_message "Detected change to $(basename "$filepath"), verifying update..."
       if certificate_updated; then
         log_message "Certificate update confirmed, restarting services..."
@@ -137,7 +160,9 @@ initialize_cert_watcher() {
       else
         log_message "No update to certificate detected."
       fi
-    done
+    done &
+
+    echo $! >"./cert-watcher.pid" # Save PID in a file
   }
 
   # Initial operations
@@ -147,6 +172,5 @@ initialize_cert_watcher() {
   check_and_kill_existing_watchers
 
   # Start monitoring in the background
-  monitor_certificates &
-  echo $! >"./cert-watcher.pid" # Save PID in a file
+  monitor_certificates
 }
