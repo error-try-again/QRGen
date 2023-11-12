@@ -68,7 +68,11 @@ general_ssl_prompt() {
 
 prompt_for_auto_renew_ssl() {
   prompt_yes_no "Would you like to automatically renew your SSL certificate? (yes/no): " AUTO_RENEW_SSL
-  [[ "$AUTO_RENEW_SSL" == "yes" ]]
+  if [[ "$AUTO_RENEW_SSL" == "yes" ]]; then
+    prompt_for_auto_renew_ssl_email
+  else
+    echo "Skipping automatic SSL renewal."
+  fi
 }
 
 prompt_for_letsencrypt_email() {

@@ -73,10 +73,7 @@ quit() {
   exit 0
 }
 
-# ---- Build and Run Docker ---- #
-
-build_and_run_docker() {
-
+handle_certs() {
   # Handle Let's Encrypt configuration
   if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
 
@@ -91,6 +88,18 @@ build_and_run_docker() {
     }
 
   fi
+}
+
+# ---- Build and Run Docker ---- #
+build_and_run_docker() {
+  if [ $(docker compose ps -q | wc -l) -gt 0 ]; then
+    echo "Docker Compose is running. Bringing down services..."
+    docker compose down
+  else
+    echo "Docker Compose is not running."
+  fi
+
+  handle_certs
 
   echo "Building and running Docker setup..."
 
