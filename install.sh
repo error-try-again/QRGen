@@ -90,12 +90,6 @@ declare -A CERTBOT_VOLUME_MAPPINGS=(
   [WEBROOT_VOLUME_MAPPING]="${DIRS[WEBROOT_DIR]}:${INTERNAL_DIRS[INTERNAL_WEBROOT_DIR]}"
 )
 
-update_internal_ssl_paths() {
-  SSL_PATHS[PRIVKEY_PATH]="${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem"
-  SSL_PATHS[FULLCHAIN_PATH]="${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem"
-  SSL_PATHS[DH_PARAMS_PATH]="${INTERNAL_DIRS[INTERNAL_CERTS_DH_DIR]}/dhparam-2048.pem"
-}
-
 # ---- Main Function/Entry ---- #
 
 # Sets up the directories, configures Docker in rootless mode
@@ -108,7 +102,6 @@ main() {
   generate_server_files
   configure_nginx
   build_and_run_docker
-  dump_logs
 }
 
 user_prompt

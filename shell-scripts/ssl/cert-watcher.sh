@@ -6,7 +6,7 @@ initialize_cert_watcher() {
   WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN_NAME}"
   COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
   CHECKSUM_FILE="${CHECKSUM_FILE:-$PROJECT_ROOT_DIR/certs/cert_checksum}"
-  LOG_FILE="${LOG_FILE:-$PROJECT_ROOT_DIR/cert-reload.log}"
+  LOG_FILE="$PROJECT_LOGS_DIR/service.log"
 
   # Validate required configuration
   validate_configuration() {
@@ -32,6 +32,18 @@ initialize_cert_watcher() {
 
   log_message() {
     local message="$1"
+
+    # Ensure logfile exists
+    if [[ ! -f "$LOG_FILE" ]]; then
+      touch "$LOG_FILE"
+    else
+      # Ensure logfile is writable
+      if [[ ! -w "$LOG_FILE" ]]; then
+        echo "ERROR: Logfile $LOG_FILE is not writable."
+        exit 1
+      fi
+    fi
+
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" >>"$LOG_FILE"
     # Implement log rotation
     local max_size=10240 # for example, 10 MB
@@ -91,6 +103,29 @@ initialize_cert_watcher() {
     fi
   }
 
+  # Function to check and kill any existing watcher processes
+  check_and_kill_existing_watchers() {
+    local pid_file="./cert-watcher.pid"
+
+    if [[ -f "$pid_file" ]]; then
+      local old_pid
+      old_pid=$(cat "$pid_file")
+
+      # Check if the PID is actually running
+      if ps -p "$old_pid" >/dev/null 2>&1; then
+        echo "Found existing cert watcher with PID $old_pid. Stopping it."
+        kill "$old_pid" && echo "Existing cert watcher stopped successfully." || echo "Failed to stop existing cert watcher."
+      else
+        echo "No existing cert watcher process found running with PID $old_pid. Starting a new one."
+      fi
+
+      # Remove the old PID file to prevent false positives in the future
+      rm -f "$pid_file"
+    else
+      echo "No existing cert watcher PID file found. Starting a new watcher."
+    fi
+  }
+
   monitor_certificates() {
     # Watch only the fullchain.pem file for close_write events
     local watched_file="$WATCHED_DIR/fullchain.pem"
@@ -109,6 +144,7 @@ initialize_cert_watcher() {
   validate_configuration
   check_dependencies
   store_checksum "$(get_certificate_checksum)"
+  check_and_kill_existing_watchers
 
   # Start monitoring in the background
   monitor_certificates &

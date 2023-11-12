@@ -26,6 +26,7 @@ reload_project() {
 # Shuts down any running Docker containers associated with the project and deletes the entire project directory.
 cleanup() {
   test_docker_env
+  kill_cert_watcher
   echo "Cleaning up..."
 
   bring_down_docker_compose
@@ -57,6 +58,7 @@ update_project() {
 
 purge_builds() {
   test_docker_env
+  kill_cert_watcher
   local containers
   containers=$(docker ps -a -q)
   echo "Stopping all containers..."
@@ -72,6 +74,27 @@ purge_builds() {
 quit() {
   echo "Exiting..."
   exit 0
+}
+
+kill_cert_watcher() {
+  local pid_file="./cert-watcher.pid"
+  if [[ -f "$pid_file" ]]; then
+    local pid
+    pid=$(cat "$pid_file")
+
+    # Check if the PID is actually running
+    if ps -p "$pid" >/dev/null 2>&1; then
+      echo "Stopping cert watcher with PID $pid."
+      kill "$pid" && echo "Cert watcher stopped successfully." || echo "Failed to stop cert watcher."
+
+      # Optionally remove the PID file after killing the process
+      rm -f "$pid_file"
+    else
+      echo "No cert watcher process found running with PID $pid."
+    fi
+  else
+    echo "PID file does not exist. Cert watcher may not be running."
+  fi
 }
 
 # ---- Build and Run Docker ---- #
