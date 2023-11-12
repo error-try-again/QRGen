@@ -3,7 +3,7 @@
 initialize_cert_watcher() {
 
   # Configuration through environment variables or a default value
-  WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN_NAME/}"
+  WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN_NAME}"
   COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
   CHECKSUM_FILE="${CHECKSUM_FILE:-$PROJECT_ROOT_DIR/certs/cert_checksum}"
   LOG_FILE="${LOG_FILE:-$PROJECT_ROOT_DIR/cert-reload.log}"
