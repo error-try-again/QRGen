@@ -84,6 +84,11 @@ build_and_run_docker() {
     exit 1
   }
 
+  initialize_cert_watcher || {
+    echo "Failed to initialize cert watcher"
+    exit 1
+  }
+
   # Build Docker image
   docker compose build || {
     echo "Failed to build Docker image using Docker Compose"

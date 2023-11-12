@@ -45,6 +45,9 @@ cd "$(dirname "$0")"
 . ./shell-scripts/environment/setup/generate/configuration/compose/configure-docker-compose.sh
 . ./shell-scripts/prompts/user-input.sh
 
+# File watcher for service restarts & certificate renewal.
+. ./shell-scripts/ssl/cert-watcher.sh
+
 # The main operational scripts that carry out the required tasks.
 . ./shell-scripts/operations/operations.sh
 
@@ -105,6 +108,7 @@ main() {
   generate_server_files
   configure_nginx
   build_and_run_docker
+  dump_logs
 }
 
 user_prompt
