@@ -1,9 +1,5 @@
 #!/bin/bash
 
-pre_flight() {
-  update_internal_ssl_paths
-}
-
 configure_nginx() {
   echo "Creating NGINX configuration..."
 
@@ -33,12 +29,6 @@ configure_nginx() {
     ssl_listen_directive="listen $NGINX_SSL_PORT ssl;
         listen [::]:$NGINX_SSL_PORT ssl;"
 
-    # Bind the SSL paths updated in handle_missing_certificates
-    local FULLCHAIN_PATH="${SSL_PATHS[FULLCHAIN_PATH]}"
-    local PRIVKEY_PATH="${SSL_PATHS[PRIVKEY_PATH]}"
-
-    pre_flight
-
     # Configure the SSL settings
     ssl_config="
         ssl_protocols TLSv1.2 TLSv1.3;
@@ -54,9 +44,9 @@ configure_nginx() {
         resolver ${DNS_RESOLVER} valid=300s;
         resolver_timeout ${TIMEOUT};
 
-        ssl_certificate ${FULLCHAIN_PATH};
-        ssl_certificate_key ${PRIVKEY_PATH};
-        ssl_trusted_certificate ${FULLCHAIN_PATH};"
+        ssl_certificate ${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
+        ssl_certificate_key ${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
+        ssl_trusted_certificate ${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 
     acme_challenge_server_block="server {
         listen 80;
