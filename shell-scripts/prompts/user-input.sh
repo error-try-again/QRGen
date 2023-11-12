@@ -42,7 +42,7 @@ prompt_yes_no() {
   local user_input
   read -rp "$prompt" user_input
   case "$user_input" in
-  [yY][eE][sS] | [yY]) eval "$var_return"="eys" ;;
+  [yY][eE][sS] | [yY]) eval "$var_return"="yes" ;;
   *) eval "$var_return"="no" ;;
   esac
 }

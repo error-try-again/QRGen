@@ -42,7 +42,7 @@ cleanup() {
   for dir_name in "${!directories[@]}"; do
     dir_path="${directories[$dir_name]}"
     if [[ -d "$dir_path" ]]; then
-      rm -rf "$dir_path"
+      rm -rf "$dir_path" && cd ..
       echo "$dir_name directory $dir_path deleted."
     fi
   done
