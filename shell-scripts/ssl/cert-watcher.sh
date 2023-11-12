@@ -3,14 +3,14 @@
 initialize_cert_watcher() {
 
   # Configuration through environment variables or a default value
-  WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN/}"
+  WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN_NAME/}"
   COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
   CHECKSUM_FILE="${CHECKSUM_FILE:-/certs/cert_checksum}"
   LOG_FILE="${LOG_FILE:-$PROJECT_LOGS_DIR/cert-reload.log}"
 
   # Validate required configuration
   validate_configuration() {
-    local vars=(DOMAIN PROJECT_ROOT_DIR PROJECT_LOGS_DIR)
+    local vars=(DOMAIN_NAME PROJECT_ROOT_DIR PROJECT_LOGS_DIR)
     for var in "${vars[@]}"; do
       if [ -z "${!var}" ]; then
         echo "Configuration error: $var is not set."

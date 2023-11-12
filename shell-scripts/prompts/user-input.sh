@@ -98,7 +98,9 @@ prompt_for_dry_run() {
 
 prompt_for_overwrite_self_signed() {
   local user_input=""
-  local overwrite_prompt="would you like to overwrite the existing self-signed certificates? (yes/no): "
+  local overwrite_prompt="Would you like to enable force-overwrites for
+  letsencrypt certificates? This will allow overwriting of any existing
+  certificates in the /live & /archive lineage directories. (yes/no): "
 
   read -rp "$overwrite_prompt" user_input
 
