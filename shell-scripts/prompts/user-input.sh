@@ -55,7 +55,11 @@ prompt_for_setup() {
 
 prompt_for_ssl_environment() {
   prompt_yes_no "Would you like to use a production SSL certificate? (yes/no): " USE_PRODUCTION_SSL
-  [[ "$USE_PRODUCTION_SSL" == "yes" ]] && general_ssl_prompt
+  if [[ "$USE_PRODUCTION_SSL" == "yes" ]]; then
+    general_ssl_prompt
+  else
+    echo "Configuring for Staging & Self-Signed SSL"
+  fi
 }
 
 general_ssl_prompt() {

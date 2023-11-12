@@ -111,40 +111,17 @@ initialize_cert_watcher() {
 
   # Function to check and kill any existing watcher processes
   check_and_kill_existing_watchers() {
-    local pid_file="./cert-watcher.pid"
+    local inotify_command='inotifywait -m -e close_write --format %w%f certs/live/qr-gen.net/fullchain.pem'
 
-    if [[ -f "$pid_file" ]]; then
-      local old_pid
-      old_pid=$(cat "$pid_file")
-
-      if [[ -n "$old_pid" && $(ps -p "$old_pid" -o comm=) =~ 'inotifywait' ]]; then
-        echo "Found existing cert watcher with PID $old_pid. Attempting to stop it."
-
-        # Attempt to terminate the process group gracefully
-        kill -- "-$old_pid"
-
-        # Wait for the process to exit
-        local count=0
-        local limit=10
-        while ps -p "$old_pid" >/dev/null 2>&1; do
-          if ((count++ >= limit)); then
-            echo "Watcher process is not terminating, attempting to kill it forcefully."
-            kill -9 -- "-$old_pid"
-            break
-          fi
-          sleep 1
-        done
-
-        echo "Existing cert watcher stopped successfully."
-      else
-        echo "No existing cert watcher process found running with PID $old_pid."
-      fi
-
-      # Remove the old PID file to prevent false positives in the future
-      rm -f "$pid_file"
+    # Check if the inotifywait process is running and kill it
+    if pkill -f "$inotify_command"; then
+      echo "Existing cert watcher process found and stopped successfully."
     else
-      echo "No existing cert watcher PID file found. Starting a new watcher."
+      echo "No existing cert watcher process found or unable to stop it."
     fi
+
+    # Adding a small delay to allow the process to terminate
+    sleep 2
   }
 
   monitor_certificates() {
@@ -161,8 +138,6 @@ initialize_cert_watcher() {
         log_message "No update to certificate detected."
       fi
     done &
-
-    echo $! >"./cert-watcher.pid" # Save PID in a file
   }
 
   # Initial operations
