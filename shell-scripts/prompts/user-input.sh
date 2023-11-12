@@ -138,20 +138,6 @@ prompt_for_regeneration() {
   fi
 }
 
-prompt_for_default_certs() {
-  local user_response=""
-  local default_certs_prompt="Would you like to generate default certificates? (yes/no): "
-
-  read -rp "$default_certs_prompt" user_response
-
-  if [[ "$user_response" == "yes" ]]; then
-    generate_self_signed_certificates
-  else
-    echo "Please place the required files in the expected directories or generate them."
-    return 1
-  fi
-}
-
 prompt_for_domain_details() {
   prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost) (yes/no)? " USE_CUSTOM_DOMAIN
   if [[ "$USE_CUSTOM_DOMAIN" == "yes" ]]; then

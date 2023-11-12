@@ -5,8 +5,8 @@ initialize_cert_watcher() {
   # Configuration through environment variables or a default value
   WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN_NAME/}"
   COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
-  CHECKSUM_FILE="${CHECKSUM_FILE:-/certs/cert_checksum}"
-  LOG_FILE="${LOG_FILE:-$PROJECT_LOGS_DIR/cert-reload.log}"
+  CHECKSUM_FILE="${CHECKSUM_FILE:-$PROJECT_ROOT_DIR/certs/cert_checksum}"
+  LOG_FILE="${LOG_FILE:-$PROJECT_ROOT_DIR/cert-reload.log}"
 
   # Validate required configuration
   validate_configuration() {
@@ -110,6 +110,7 @@ initialize_cert_watcher() {
   check_dependencies
   store_checksum "$(get_certificate_checksum)"
 
-  # Start monitoring
-  monitor_certificates
+  # Start monitoring in the background
+  monitor_certificates &
+  echo $! >"./cert-watcher.pid" # Save PID in a file
 }

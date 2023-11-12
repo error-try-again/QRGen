@@ -5,9 +5,9 @@
 # Dumps logs of all containers orchestrated by the Docker Compose file.
 dump_logs() {
   test_docker_env
-  produce_docker_logs >"$PROJECT_LOGS_DIR" && {
-    echo "Docker logs dumped to $PROJECT_LOGS_DIR"
-    cat "$PROJECT_LOGS_DIR"
+  produce_docker_logs >"$PROJECT_LOGS_DIR/service.log" && {
+    echo "Docker logs dumped to $PROJECT_LOGS_DIR/service.log"
+    cat "$PROJECT_LOGS_DIR/service.log"
   }
 }
 
@@ -79,13 +79,8 @@ quit() {
 build_and_run_docker() {
   echo "Building and running Docker setup..."
 
-  cd "$PROJECT_ROOT_DIR" || {
+  cd "$PROJECT_ROOT_DIR " || {
     echo "Failed to change directory to $PROJECT_ROOT_DIR"
-    exit 1
-  }
-
-  initialize_cert_watcher || {
-    echo "Failed to initialize cert watcher"
     exit 1
   }
 
