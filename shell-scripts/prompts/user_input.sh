@@ -224,7 +224,7 @@ prompt_for_domain_details() {
       SUBDOMAIN=$(prompt_with_validation "Enter your SUBDOMAIN name (e.g., www): " "Error: SUBDOMAIN name cannot be empty.")
       origin_url="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"
       origin="$origin_url:$ORIGIN_PORT"
-      echo "Using custom SUBDOMAIN: $origin_url"
+      echo "Using custom subdomain: $origin_url"
     fi
   else
     echo "Using default domain name: $DOMAIN_NAME"
