@@ -163,7 +163,9 @@ create_certbot_service() {
   local command=$1
   local volumes=$2
   echo "  certbot:
-    image: certbot/certbot
+    build:
+      context: .
+      dockerfile: ./certbot/Dockerfile
     command: $command
     volumes:
       $volumes
