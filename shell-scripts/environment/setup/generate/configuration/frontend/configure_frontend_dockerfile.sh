@@ -1,7 +1,16 @@
 #!/bin/bash
 
+#######################################
+# description
+# Globals:
+#   FRONTEND_DIR
+#   NODE_VERSION
+#   nginx_port
+# Arguments:
+#  None
+#######################################
 configure_frontend_docker() {
-  cat <<EOF >"$FRONTEND_DIR/Dockerfile"
+  cat << EOF > "$FRONTEND_DIR/Dockerfile"
 # Use the latest version of Node.js
 FROM node:$NODE_VERSION as build
 

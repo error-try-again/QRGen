@@ -1,7 +1,17 @@
 #!/bin/bash
 
+#######################################
+# description
+# Globals:
+#   BACKEND_DIR
+#   BACKEND_PORT
+#   NODE_VERSION
+#   backend_files
+# Arguments:
+#  None
+#######################################
 configure_backend_docker() {
-  cat <<EOF >"$BACKEND_DIR/Dockerfile"
+  cat << EOF > "$BACKEND_DIR/Dockerfile"
 # Use the latest version of Node.js
 FROM node:$NODE_VERSION
 
@@ -15,7 +25,7 @@ RUN npm install -g ts-node typescript \
  && npm install --save-dev @types/express @types/cors @types/node @types/multer @types/archiver \
  && npm install --save-dev @types/express-rate-limit @types/helmet @types/qrcode @types/jest \
 
-COPY $BACKEND_FILES /usr/app
+COPY $backend_files /usr/app
 
 # Set the backend express port
 EXPOSE $BACKEND_PORT

@@ -5,7 +5,7 @@
 # Dumps logs of all containers orchestrated by the Docker Compose file.
 dump_logs() {
   test_docker_env
-  produce_docker_logs >"$PROJECT_LOGS_DIR/service.log" && {
+  produce_docker_logs > "$PROJECT_LOGS_DIR/service.log" && {
     echo "Docker logs dumped to $PROJECT_LOGS_DIR/service.log"
     cat "$PROJECT_LOGS_DIR/service.log"
   }
@@ -16,23 +16,22 @@ reload_project() {
   echo "Reloading the project..."
   test_docker_env
   setup_project_directories
-  bring_down_docker_compose
+  stop_containers
   generate_server_files
   configure_nginx
   build_and_run_docker
-  dump_logs
 }
 
 # Shuts down any running Docker containers associated with the project and deletes the entire project directory.
 cleanup() {
   test_docker_env
   echo "Cleaning up..."
-  bring_down_docker_compose
+  stop_containers
 
   declare -A directories=(
-    ["Project"]=$PROJECT_ROOT_DIR
-    ["Frontend"]=$FRONTEND_DIR
-    ["Backend"]=$BACKEND_DIR
+                                    ["Project"]=$PROJECT_ROOT_DIR
+                                    ["Frontend"]=$FRONTEND_DIR
+                                    ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -40,7 +39,7 @@ cleanup() {
 
   for dir_name in "${!directories[@]}"; do
     dir_path="${directories[$dir_name]}"
-    if [[ -d "$dir_path" ]]; then
+    if [[ -d $dir_path   ]]; then
       rm -rf "$dir_path" && cd ..
       echo "$dir_name directory $dir_path deleted."
     fi
@@ -49,11 +48,21 @@ cleanup() {
   echo "Cleanup complete."
 }
 
+#######################################
+# description
+# Arguments:
+#  None
+#######################################
 update_project() {
   git stash
   git pull
 }
 
+#######################################
+# description
+# Arguments:
+#  None
+#######################################
 purge_builds() {
   test_docker_env
   local containers
@@ -68,14 +77,26 @@ purge_builds() {
   docker system prune -a
 }
 
+#######################################
+# description
+# Arguments:
+#  None
+#######################################
 quit() {
   echo "Exiting..."
   exit 0
 }
 
+#######################################
+# description
+# Globals:
+#   USE_LETS_ENCRYPT
+# Arguments:
+#  None
+#######################################
 handle_certs() {
   # Handle Let's Encrypt configuration
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes"   ]]; then
 
     # Generate self-signed certificates if they don't exist
     generate_self_signed_certificates
@@ -92,27 +113,45 @@ handle_certs() {
 
 # ---- Build and Run Docker ---- #
 build_and_run_docker() {
-  if [ $(docker compose ps -q | wc -l) -gt 0 ]; then
+  if ! cd "$PROJECT_ROOT_DIR"; then
+    echo "Failed to change directory to $PROJECT_ROOT_DIR"
+    exit 1
+  fi
+
+  # If Docker Compose is running, bring down the services
+  if docker compose ps -q | grep -q '.'; then
     echo "Docker Compose is running. Bringing down services..."
-    docker compose down
+    if ! docker compose down; then
+      echo "Failed to bring down Docker Compose services"
+      exit 1
+    fi
   else
     echo "Docker Compose is not running."
   fi
 
-  handle_certs
+  if ! handle_certs; then
+    echo "Failed to handle certificates"
+    exit 1
+  fi
 
-  echo "Building and running Docker setup..."
-
-  # Build Docker image
-  docker compose build || {
+  # Attempt to build Docker image using Docker Compose
+  if ! docker compose build; then
     echo "Failed to build Docker image using Docker Compose"
     exit 1
-  }
+  fi
 
-  docker compose up -d || {
+  # Attempt to run Docker Compose
+  if ! docker compose up -d; then
     echo "Failed to run Docker Compose"
     exit 1
-  }
+  fi
 
-  docker compose ps
+  if ! docker compose ps; then
+    echo "Failed to list Docker Compose services"
+    exit 1
+  fi
+
+  dump_logs
+
+  quit
 }

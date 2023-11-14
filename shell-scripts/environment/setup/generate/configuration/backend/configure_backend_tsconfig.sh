@@ -2,7 +2,7 @@
 
 # Writes the TypeScript configuration file to the backend directory.
 configure_backend_tsconfig() {
-  cat <<EOF >"$BACKEND_DIR/tsconfig.json"
+  cat << EOF > "$BACKEND_DIR/tsconfig.json"
 {
   "compilerOptions": {
     "target": "ES2022",

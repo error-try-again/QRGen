@@ -1,16 +1,37 @@
 #!/bin/bash
 
+#######################################
+# description
+# Globals:
+#   checksum_file
+#   COMPOSE_FILE
+#   log_file
+#   PROJECT_LOGS_DIR
+#   PROJECT_ROOT_DIR
+#   watched_dir
+#   cmd
+#   compose_file
+#   domain_name
+#   filepath
+#   var
+# Arguments:
+#   1
+# Returns:
+#   0 ...
+#   1 ...
+#######################################
 initialize_cert_watcher() {
 
   # Configuration through environment variables or a default value
-  WATCHED_DIR="${WATCHED_DIR:-certs/live/$DOMAIN_NAME}"
-  COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
-  CHECKSUM_FILE="${CHECKSUM_FILE:-$PROJECT_ROOT_DIR/certs/cert_checksum}"
-  LOG_FILE="$PROJECT_LOGS_DIR/cert-watcher.log"
+  watched_dir="${WATCHED_DIR:-certs/live/$domain_name}"
+  compose_file="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
+  checksum_file="${CHECKSUM_FILE:-$PROJECT_ROOT_DIR/certs/cert_checksum}"
+  log_file="$PROJECT_LOGS_DIR/cert-watcher.log"
 
   # Validate required configuration
   validate_configuration() {
     local vars=(DOMAIN_NAME PROJECT_ROOT_DIR PROJECT_LOGS_DIR)
+    local var
     for var in "${vars[@]}"; do
       if [ -z "${!var}" ]; then
         echo "Configuration error: $var is not set."
@@ -22,60 +43,71 @@ initialize_cert_watcher() {
   # Check if necessary commands are available
   check_dependencies() {
     local dependencies=(inotifywait sha256sum awk)
+    local cmd
     for cmd in "${dependencies[@]}"; do
-      if ! command -v "$cmd" &>/dev/null; then
+      if ! command -v "$cmd" &> /dev/null; then
         echo "Command $cmd could not be found. Please install it."
         exit 1
       fi
     done
   }
 
+  #######################################
+  # description
+  # Globals:
+  #   log_file
+  #   PROJECT_LOGS_DIR
+  # Arguments:
+  #   1
+  # Returns:
+  #   1 ...
+  #######################################
   log_message() {
     local message="$1"
     local datetime
     datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
     # Check if the log directory is writable
-    if [[ ! -w "$PROJECT_LOGS_DIR" ]]; then
+    if [[ ! -w $PROJECT_LOGS_DIR   ]]; then
       echo "ERROR: Log directory $PROJECT_LOGS_DIR is not writable. Attempting to log to /tmp instead."
-      LOG_FILE="/tmp/cert-watcher.log"
+      log_file="/tmp/cert-watcher.log"
     fi
 
     # Check if the log file is writable or can be created
-    if [[ ! -w "$LOG_FILE" ]] && ! touch "$LOG_FILE" 2>/dev/null; then
-      echo "ERROR: Log file $LOG_FILE is not writable and cannot be created. Logging to console."
+    if [[ ! -w $log_file   ]] && ! touch "$log_file" 2> /dev/null; then
+      echo "ERROR: Log file $log_file is not writable and cannot be created. Logging to console."
       echo "$datetime - $message"
       return 1
     fi
 
     # Write the log message to the log file
-    echo "$datetime - $message" >>"$LOG_FILE"
+    echo "$datetime - $message" >> "$log_file"
 
     # Implement log rotation
     local max_size=10240 # for example, 10 MB
     local filesize
-    filesize=$(stat -c "%s" "$LOG_FILE" 2>/dev/null || echo "0")
+    filesize=$(stat -c "%s" "$log_file" 2> /dev/null || echo "0")
     if [[ $filesize -gt $max_size ]]; then
-      mv "$LOG_FILE" "$LOG_FILE.$(date '+%Y%m%d%H%M%S')"
-      touch "$LOG_FILE"
+      mv "$log_file" "$log_file.$(date '+%Y%m%d%H%M%S')"
+      touch "$log_file"
     fi
   }
 
   # Get the checksum of the certificate
   get_certificate_checksum() {
-    sha256sum "$WATCHED_DIR/fullchain.pem" | awk '{print $1}'
+    sha256sum "$watched_dir/fullchain.pem" | awk '{print $1}'
   }
 
   # Store the checksum to a file
   store_checksum() {
     local checksum="$1"
-    echo "$checksum" >"$CHECKSUM_FILE"
+    echo "$checksum" > "$checksum_file"
   }
 
   # Read the stored checksum from a file
   read_stored_checksum() {
-    if [[ -f "$CHECKSUM_FILE" ]]; then
-      cat "$CHECKSUM_FILE"
+    if [[ -f $checksum_file   ]]; then
+      cat "$checksum_file"
     else
       echo ""
     fi
@@ -88,7 +120,7 @@ initialize_cert_watcher() {
     local new_checksum
     new_checksum=$(get_certificate_checksum)
 
-    if [[ "$new_checksum" != "$last_checksum" ]]; then
+    if [[ $new_checksum != "$last_checksum"   ]]; then
       log_message "Certificate checksum has changed from $last_checksum to $new_checksum."
       store_checksum "$new_checksum"
       return 0 # True, certificate has changed
@@ -101,7 +133,7 @@ initialize_cert_watcher() {
   # Restart services with Docker Compose
   restart_services() {
     local service_name="$1"
-    if docker compose -f "$COMPOSE_FILE" up -d "$service_name"; then
+    if docker compose -f "$compose_file" up -d "$service_name"; then
       log_message "Service $service_name restarted successfully."
     else
       log_message "ERROR: Failed to restart the service $service_name."
@@ -124,9 +156,17 @@ initialize_cert_watcher() {
     sleep 2
   }
 
+  #######################################
+  # description
+  # Globals:
+  #   watched_dir
+  #   filepath
+  # Arguments:
+  #  None
+  #######################################
   monitor_certificates() {
     # Watch only the fullchain.pem file for close_write events
-    local watched_file="$WATCHED_DIR/fullchain.pem"
+    local watched_file="$watched_dir/fullchain.pem"
 
     # Use setsid to run in a new session, this makes it the leader of a new process group
     setsid inotifywait -m -e close_write --format '%w%f' "$watched_file" | while read -r filepath; do

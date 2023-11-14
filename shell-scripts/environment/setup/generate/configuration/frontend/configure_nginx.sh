@@ -1,5 +1,26 @@
 #!/bin/bash
 
+#######################################
+# description
+# Globals:
+#   BACKEND_PORT
+#   DH_PARAMS_PATH
+#   DNS_RESOLVER
+#   INTERNAL_LETS_ENCRYPT_DIR
+#   NGINX_SSL_PORT
+#   PROJECT_ROOT_DIR
+#   TIMEOUT
+#   USE_LETS_ENCRYPT
+#   domain_name
+#   internal_dirs
+#   nginx_port
+#   ssl_paths
+#   subdomain
+# Arguments:
+#  None
+# Returns:
+#   1 ...
+#######################################
 configure_nginx() {
   echo "Creating NGINX configuration..."
 
@@ -7,25 +28,25 @@ configure_nginx() {
   local backend_scheme="http"
   local ssl_config=""
   local token_directive=""
-  local server_name="${DOMAIN_NAME}"
-  local listen_directive="listen $NGINX_PORT;
-        listen [::]:$NGINX_PORT;"
+  local server_name="${domain_name}"
+  local listen_directive="listen $nginx_port;
+        listen [::]:$nginx_port;"
   local ssl_listen_directive=""
   local acme_challenge_server_block=""
 
   # Handle subdomain configuration if necessary
-  if [[ "$SUBDOMAIN" != "www" && -n "$SUBDOMAIN" ]]; then
-    server_name="${SUBDOMAIN}.${DOMAIN_NAME}"
+  if [[ $subdomain != "www" && -n $subdomain     ]]; then
+    server_name="${subdomain}.${domain_name}"
   fi
 
   # Update server_name_directive to include both domain and subdomain if using Let's Encrypt
   local server_name_directive="server_name ${server_name};"
 
   # Handle Let's Encrypt configuration
-  if [[ "$USE_LETS_ENCRYPT" == "yes" ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes"   ]]; then
     backend_scheme="https"
     token_directive="server_tokens off;"
-    server_name_directive="server_name ${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME};"
+    server_name_directive="server_name ${domain_name} ${subdomain}.${domain_name};"
     ssl_listen_directive="listen $NGINX_SSL_PORT ssl;
         listen [::]:$NGINX_SSL_PORT ssl;"
 
@@ -35,7 +56,7 @@ configure_nginx() {
         ssl_prefer_server_ciphers on;
         ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5';
         ssl_buffer_size 8k;
-        ssl_dhparam ${SSL_PATHS[DH_PARAMS_PATH]};
+        ssl_dhparam ${ssl_paths[DH_PARAMS_PATH]};
         ssl_ecdh_curve secp384r1;
         ssl_session_tickets off;
         ssl_stapling on;
@@ -44,9 +65,9 @@ configure_nginx() {
         resolver ${DNS_RESOLVER} valid=300s;
         resolver_timeout ${TIMEOUT};
 
-        ssl_certificate ${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
-        ssl_certificate_key ${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
-        ssl_trusted_certificate ${INTERNAL_DIRS[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
+        ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${domain_name}/fullchain.pem;
+        ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${domain_name}/privkey.pem;
+        ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${domain_name}/fullchain.pem;"
 
     acme_challenge_server_block="server {
         listen 80;
@@ -72,7 +93,7 @@ configure_nginx() {
   fi
 
   # Write the final configuration
-  cat <<-EOF >"${PROJECT_ROOT_DIR}/nginx.conf"
+  cat <<- EOF > "${PROJECT_ROOT_DIR}/nginx.conf"
 worker_processes auto;
 events {
     worker_connections 1024;

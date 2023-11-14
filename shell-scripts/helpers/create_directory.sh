@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#######################################
+# description
+# Arguments:
+#   1
+#######################################
 create_directory() {
   local directory="$1"
   if [ ! -d "$directory" ]; then

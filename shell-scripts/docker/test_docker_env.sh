@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#######################################
+# description
+# Globals:
+#   DOCKER_HOST
+# Arguments:
+#  None
+#######################################
 test_docker_env() {
   echo "Ensuring Docker environment variables are set..."
   local expected_docker_host

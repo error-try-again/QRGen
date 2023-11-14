@@ -1,10 +1,15 @@
 #!/bin/bash
 
+#######################################
+# description
+# Globals:
+#   CERTBOT_DIR
+#   HOME
+# Arguments:
+#  None
+#######################################
 configure_certbot_docker() {
-
-  local CERTBOT_VERSION="2.7.4"
-
-  cat <<EOF >"$CERTBOT_DIR/Dockerfile"
+  cat << EOF > "$CERTBOT_DIR/Dockerfile"
 #base image
 FROM python:3.10-alpine3.16 as certbot
 
