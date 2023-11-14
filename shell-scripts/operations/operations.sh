@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                                                 ["Project"]=$PROJECT_ROOT_DIR
-                                                 ["Frontend"]=$FRONTEND_DIR
-                                                 ["Backend"]=$BACKEND_DIR
+                                                            ["Project"]=$PROJECT_ROOT_DIR
+                                                            ["Frontend"]=$FRONTEND_DIR
+                                                            ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -134,12 +134,50 @@ remove_conflicting_containers() {
   done
 }
 
+# Function to handle ambiguous Docker networks
+handle_ambiguous_networks() {
+  echo "Searching for ambiguous Docker networks..."
+  local networks_ids
+  local network_id
+
+  # Get all custom networks (excluding default ones)
+  networks_ids=$(docker network ls --filter name=qrgen --format '{{.ID}}')
+
+  if [[ -n $networks_ids ]]; then
+    echo "Found ambiguous networks by ID:"
+    echo "$networks_ids"
+    echo "-------------------------"
+
+    # Remove each ambiguous network using its ID
+    for network_id in $networks_ids; do
+      echo "Removing network $network_id"
+      docker network rm "$network_id" || {
+        echo "Failed to remove network $network_id"
+      }
+    done
+  else
+    echo "No ambiguous networks found by name."
+  fi
+}
+
 # ---- Build and Run Docker ---- #
 build_and_run_docker() {
   if ! cd "$PROJECT_ROOT_DIR"; then
     echo "Failed to change directory to $PROJECT_ROOT_DIR"
     exit 1
   fi
+
+  # Remove containers that would conflict with `docker-compose up`
+  remove_conflicting_containers || {
+    echo "Failed to remove conflicting containers"
+    exit 1
+  }
+
+  # Handle ambiguous networks
+  handle_ambiguous_networks || {
+    echo "Failed to handle ambiguous networks"
+    exit 1
+  }
 
   # If Docker Compose is running, bring down the services
     if docker compose ps -q | grep -q '.'; then
@@ -162,9 +200,6 @@ build_and_run_docker() {
     echo "Failed to build Docker image using Docker Compose"
     exit 1
   fi
-
-  # Remove containers that would conflict with `docker-compose up`
-  remove_conflicting_containers
 
   # Attempt to run Docker Compose
   if ! docker compose up -d; then
