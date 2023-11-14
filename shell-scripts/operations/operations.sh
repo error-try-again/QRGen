@@ -12,7 +12,7 @@ dump_logs() {
 }
 
 # Cleans current Docker Compose setup, arranges directories, and reinitiates Docker services.
-reload_project() {
+reload() {
   echo "Reloading the project..."
   test_docker_env
   setup_project_directories
@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                                    ["Project"]=$PROJECT_ROOT_DIR
-                                    ["Frontend"]=$FRONTEND_DIR
-                                    ["Backend"]=$BACKEND_DIR
+                                      ["Project"]=$PROJECT_ROOT_DIR
+                                      ["Frontend"]=$FRONTEND_DIR
+                                      ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
