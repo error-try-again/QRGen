@@ -126,7 +126,7 @@ create_backend_service() {
 #######################################
 # description
 # Globals:
-#   nginx_port
+#   NGINX_PORT
 # Arguments:
 #   1
 #   2
@@ -139,7 +139,7 @@ create_frontend_service() {
       context: .
       dockerfile: ./frontend/Dockerfile
     ports:
-      - \"${nginx_port}:${nginx_port}\"
+      - \"${NGINX_PORT}:${NGINX_PORT}\"
       $ports_section
     networks:
       - qrgen
