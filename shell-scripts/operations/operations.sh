@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                                      ["Project"]=$PROJECT_ROOT_DIR
-                                      ["Frontend"]=$FRONTEND_DIR
-                                      ["Backend"]=$BACKEND_DIR
+                                               ["Project"]=$PROJECT_ROOT_DIR
+                                               ["Frontend"]=$FRONTEND_DIR
+                                               ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -111,6 +111,29 @@ handle_certs() {
   fi
 }
 
+# Function to remove containers that conflict with Docker Compose services
+remove_conflicting_containers() {
+  # Extract service names from docker-compose.yml
+  local service_names
+  service_names=$(docker-compose config --services)
+
+  # Loop through each service name to check if corresponding container exists
+  for service in $service_names; do
+    # Generate the probable container name based on the folder name and service name
+    # e.g. In this instance, since the project name is "QRGen" and the service
+    # name is "backend", the probable container name would be "QRGen_backend_1"
+    local probable_container_name="${PWD##*/}_${service}_1"
+
+    # Check if a container with the generated name exists
+    if docker ps -a --format '{{.Names}}' | grep -qw "$probable_container_name"; then
+      echo "Removing existing container that may conflict: $probable_container_name"
+      docker rm -f "$probable_container_name"
+    else
+      echo "No conflict for $probable_container_name"
+    fi
+  done
+}
+
 # ---- Build and Run Docker ---- #
 build_and_run_docker() {
   if ! cd "$PROJECT_ROOT_DIR"; then
@@ -119,7 +142,7 @@ build_and_run_docker() {
   fi
 
   # If Docker Compose is running, bring down the services
-  if docker compose ps -q | grep -q '.'; then
+    if docker compose ps -q | grep -q '.'; then
     echo "Docker Compose is running. Bringing down services..."
     if ! docker compose down; then
       echo "Failed to bring down Docker Compose services"
@@ -139,6 +162,9 @@ build_and_run_docker() {
     echo "Failed to build Docker image using Docker Compose"
     exit 1
   fi
+
+  # Remove containers that would conflict with `docker-compose up`
+  remove_conflicting_containers
 
   # Attempt to run Docker Compose
   if ! docker compose up -d; then
