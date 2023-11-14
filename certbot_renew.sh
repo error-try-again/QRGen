@@ -7,7 +7,7 @@
 mkdir -p "${PROJECT_LOGS_DIR}"
 
 # Create the certbot renew script with a heredoc
-cat <<'EOF' >"${PROJECT_ROOT_DIR}/certbot_renew.sh"
+cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
 #!/bin/bash
 
 # Load the environment variables and functions
@@ -45,14 +45,14 @@ EOF
 chmod +x "${PROJECT_ROOT_DIR}/certbot_renew.sh"
 
 # The path to the cron job script
-CRON_SCRIPT_PATH="${PROJECT_ROOT_DIR}/certbot_renew.sh"
-CRON_LOG_PATH="${PROJECT_LOGS_DIR}/certbot_cron.log"
+cron_script_path="${PROJECT_ROOT_DIR}/certbot_renew.sh"
+cron_log_path="${PROJECT_LOGS_DIR}/certbot_cron.log"
 
 # The crontab entry to be added
-CRON_JOB="0 0 * * * ${CRON_SCRIPT_PATH} >> ${CRON_LOG_PATH} 2>&1"
+cron_job="0 0 * * * ${cron_script_path} >> ${cron_log_path} 2>&1"
 
 # Add the cron job
 (
-  crontab -l 2>/dev/null
-  echo "$CRON_JOB"
+  crontab -l 2> /dev/null
+  echo "$cron_job"
 ) | crontab -

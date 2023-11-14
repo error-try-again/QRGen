@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                          ["Project"]=$PROJECT_ROOT_DIR
-                          ["Frontend"]=$FRONTEND_DIR
-                          ["Backend"]=$BACKEND_DIR
+                                ["Project"]=$PROJECT_ROOT_DIR
+                                ["Frontend"]=$FRONTEND_DIR
+                                ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -214,7 +214,8 @@ build_and_run_docker() {
     exit 1
   }
 
-  dump_logs
-
-  quit
+  dump_logs || {
+    echo "Failed to dump logs"
+    exit 1
+  }
 }
