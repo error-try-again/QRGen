@@ -216,14 +216,14 @@ prompt_for_domain_details() {
     DOMAIN_NAME=$(prompt_with_validation "Enter your domain name (e.g., example.com): " "Error: Domain name cannot be empty.")
     local origin_url
     origin_url="$BACKEND_SCHEME://$DOMAIN_NAME"
-    origin="$origin_url:$ORIGIN_PORT"
+    ORIGIN="$origin_url:$ORIGIN_PORT"
     echo "Using custom domain name: $origin_url"
 
     prompt_yes_no "Would you like to specify a SUBDOMAIN other than the default (none) (yes/no)? " USE_SUBDOMAIN
     if [[ $USE_SUBDOMAIN == "yes"   ]]; then
       SUBDOMAIN=$(prompt_with_validation "Enter your SUBDOMAIN name (e.g., www): " "Error: SUBDOMAIN name cannot be empty.")
       origin_url="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"
-      origin="$origin_url:$ORIGIN_PORT"
+      ORIGIN="$origin_url:$ORIGIN_PORT"
       echo "Using custom subdomain: $origin_url"
     fi
   else

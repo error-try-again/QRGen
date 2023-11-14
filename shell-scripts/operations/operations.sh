@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                                                            ["Project"]=$PROJECT_ROOT_DIR
-                                                            ["Frontend"]=$FRONTEND_DIR
-                                                            ["Backend"]=$BACKEND_DIR
+                          ["Project"]=$PROJECT_ROOT_DIR
+                          ["Frontend"]=$FRONTEND_DIR
+                          ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -69,7 +69,7 @@ purge_builds() {
   containers=$(docker ps -a -q)
   echo "Stopping all containers..."
   if [ -n "$containers" ]; then
-    docker stop $containers
+    docker stop "$containers"
   else
     echo "No containers to stop."
   fi
@@ -143,29 +143,38 @@ handle_ambiguous_networks() {
   # Get all custom networks (excluding default ones)
   networks_ids=$(docker network ls --filter name=qrgen --format '{{.ID}}')
 
-  if [[ -n $networks_ids ]]; then
-    echo "Found ambiguous networks by ID:"
-    echo "$networks_ids"
-    echo "-------------------------"
+  # Loop over each network ID
+  for network_id in $networks_ids; do
+    echo "Inspecting network $network_id for connected containers..."
+    local container_ids
+    local container_id
+    container_ids=$(docker network inspect "$network_id" --format '{{range .Containers}}{{.Name}} {{end}}')
 
-    # Remove each ambiguous network using its ID
-    for network_id in $networks_ids; do
-      echo "Removing network $network_id"
-      docker network rm "$network_id" || {
-        echo "Failed to remove network $network_id"
+    for container_id in $container_ids; do
+      echo "Disconnecting container $container_id from network $network_id..."
+      docker network disconnect -f "$network_id" "$container_id" || {
+        echo "Failed to disconnect container $container_id from network $network_id"
       }
     done
-  else
-    echo "No ambiguous networks found by name."
-  fi
+
+    echo "Removing network $network_id..."
+    docker network rm "$network_id" || {
+      echo "Failed to remove network $network_id"
+    }
+  done
 }
 
 # ---- Build and Run Docker ---- #
 build_and_run_docker() {
-  if ! cd "$PROJECT_ROOT_DIR"; then
+  cd "$PROJECT_ROOT_DIR" || {
     echo "Failed to change directory to $PROJECT_ROOT_DIR"
     exit 1
-  fi
+  }
+
+  handle_certs || {
+    echo "Failed to handle certs"
+    exit 1
+  }
 
   # Remove containers that would conflict with `docker-compose up`
   remove_conflicting_containers || {
@@ -180,37 +189,30 @@ build_and_run_docker() {
   }
 
   # If Docker Compose is running, bring down the services
-    if docker compose ps -q | grep -q '.'; then
-    echo "Docker Compose is running. Bringing down services..."
-    if ! docker compose down; then
-      echo "Failed to bring down Docker Compose services"
+  if docker compose ps &> /dev/null; then
+    echo "Bringing down existing Docker Compose services..."
+    docker compose down || {
+      echo "Failed to bring down existing Docker Compose services"
       exit 1
-    fi
-  else
-    echo "Docker Compose is not running."
-  fi
-
-  if ! handle_certs; then
-    echo "Failed to handle certificates"
-    exit 1
+    }
   fi
 
   # Attempt to build Docker image using Docker Compose
-  if ! docker compose build; then
-    echo "Failed to build Docker image using Docker Compose"
+  docker compose build || {
+    echo "Failed to build Docker image"
     exit 1
-  fi
+  }
 
   # Attempt to run Docker Compose
-  if ! docker compose up -d; then
+  docker compose up -d || {
     echo "Failed to run Docker Compose"
     exit 1
-  fi
+  }
 
-  if ! docker compose ps; then
+  docker compose ps || {
     echo "Failed to list Docker Compose services"
     exit 1
-  fi
+  }
 
   dump_logs
 
