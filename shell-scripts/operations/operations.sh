@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                                               ["Project"]=$PROJECT_ROOT_DIR
-                                               ["Frontend"]=$FRONTEND_DIR
-                                               ["Backend"]=$BACKEND_DIR
+                                                 ["Project"]=$PROJECT_ROOT_DIR
+                                                 ["Frontend"]=$FRONTEND_DIR
+                                                 ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -115,7 +115,7 @@ handle_certs() {
 remove_conflicting_containers() {
   # Extract service names from docker-compose.yml
   local service_names
-  service_names=$(docker-compose config --services)
+  service_names=$(docker compose config --services)
 
   # Loop through each service name to check if corresponding container exists
   for service in $service_names; do
