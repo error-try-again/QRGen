@@ -19,12 +19,12 @@ WORKDIR /usr/app
 
 # Install project dependencies
 RUN npm init -y \
- && npm install react-leaflet leaflet react react-dom typescript \
- && npm install --save-dev vite jsdom vite-tsconfig-paths vite-plugin-svgr vitest \
- && npm install --save-dev @babel/plugin-proposal-private-property-in-object \
- && npm install --save-dev @vitejs/plugin-react @testing-library/react @testing-library/jest-dom \
- && npm install @types/leaflet @types/react @types/react-dom @types/jest\
- && npx create-vite frontend --template react-ts
+&& npm install react-leaflet leaflet react react-dom typescript \
+&& npm install --save-dev vite jsdom vite-tsconfig-paths vite-plugin-svgr vitest \
+&& npm install --save-dev @babel/plugin-proposal-private-property-in-object \
+&& npm install --save-dev @vitejs/plugin-react @testing-library/react @testing-library/jest-dom \
+&& npm install @types/leaflet @types/react @types/react-dom @types/jest\
+&& npx create-vite frontend --template react-ts
 
 # Delete the default App.tsx/App.css file (does not use kebab case)
 RUN rm /usr/app/frontend/src/App.tsx
