@@ -68,7 +68,7 @@ configure_docker_compose() {
 #   NO_EFF_EMAIL_FLAG
 #   RSA_KEY_SIZE_FLAG
 #   TOS_FLAG
-#   domain_name
+#   DOMAIN_NAME
 #   dry_run_flag
 #   email_flag
 #   hsts_flag
@@ -78,7 +78,7 @@ configure_docker_compose() {
 #   overwrite_self_signed_certs_flag
 #   production_certs_flag
 #   strict_permissions_flag
-#   subdomain
+#   SUBDOMAIN
 #   uir_flag
 # Arguments:
 #  None
@@ -100,9 +100,10 @@ ${ocsp_stapling_flag} \
 ${strict_permissions_flag} \
 ${production_certs_flag} \
 ${dry_run_flag} \
---domains ${domain_name} \
---domains ${subdomain}.${domain_name} \
-${overwrite_self_signed_certs_flag}"
+${overwrite_self_signed_certs_flag}" \
+    --domains "${DOMAIN_NAME}" \
+    --domains "$SUBDOMAIN"."${DOMAIN_NAME}"
+
 }
 
 #######################################
