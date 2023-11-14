@@ -11,11 +11,11 @@
 #   PROJECT_ROOT_DIR
 #   TIMEOUT
 #   USE_LETS_ENCRYPT
-#   domain_name
+#   DOMAIN_NAME
 #   internal_dirs
 #   nginx_port
 #   ssl_paths
-#   subdomain
+#   SUBDOMAIN
 # Arguments:
 #  None
 # Returns:
@@ -28,25 +28,25 @@ configure_nginx() {
   local backend_scheme="http"
   local ssl_config=""
   local token_directive=""
-  local server_name="${domain_name}"
+  local server_name="${DOMAIN_NAME}"
   local listen_directive="listen $nginx_port;
         listen [::]:$nginx_port;"
   local ssl_listen_directive=""
   local acme_challenge_server_block=""
 
-  # Handle subdomain configuration if necessary
-  if [[ $subdomain != "www" && -n $subdomain     ]]; then
-    server_name="${subdomain}.${domain_name}"
+  # Handle SUBDOMAIN configuration if necessary
+  if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN     ]]; then
+    server_name="${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 
-  # Update server_name_directive to include both domain and subdomain if using Let's Encrypt
+  # Update server_name_directive to include both domain and SUBDOMAIN if using Let's Encrypt
   local server_name_directive="server_name ${server_name};"
 
   # Handle Let's Encrypt configuration
   if [[ $USE_LETS_ENCRYPT == "yes"   ]]; then
     backend_scheme="https"
     token_directive="server_tokens off;"
-    server_name_directive="server_name ${domain_name} ${subdomain}.${domain_name};"
+    server_name_directive="server_name ${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME};"
     ssl_listen_directive="listen $NGINX_SSL_PORT ssl;
         listen [::]:$NGINX_SSL_PORT ssl;"
 
@@ -65,9 +65,9 @@ configure_nginx() {
         resolver ${DNS_RESOLVER} valid=300s;
         resolver_timeout ${TIMEOUT};
 
-        ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${domain_name}/fullchain.pem;
-        ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${domain_name}/privkey.pem;
-        ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${domain_name}/fullchain.pem;"
+        ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
+        ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
+        ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 
     acme_challenge_server_block="server {
         listen 80;
@@ -114,7 +114,7 @@ http {
             index index.html index.htm;
             try_files \$uri \$uri/ /index.html;
             # Security headers
-            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+            add_header Strict-Transport-Security "max-age=31536000; includeSUBDOMAINs" always;
             add_header X-Frame-Options "DENY" always;
             add_header X-Content-Type-Options nosniff always;
             add_header X-XSS-Protection "1; mode=block" always;
