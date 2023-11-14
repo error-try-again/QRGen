@@ -13,7 +13,7 @@ user_prompt() {
       "Update Project") update_project ;;
       "Enable SSL with Let's Encrypt") enable_ssl ;;
       "Stop Project Docker Containers") stop_containers ;;
-      "Prune All Docker Builds - Dangerous") prune_all ;;
+      "Prune All Docker Builds - Dangerous") purge_builds ;;
       "Quit") quit ;;
       *) echo "Invalid option. Try another one." ;;
     esac
