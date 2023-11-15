@@ -5,7 +5,7 @@
 # Globals:
 #   FRONTEND_DIR
 #   NODE_VERSION
-#   nginx_port
+#   NGINX_PORT
 # Arguments:
 #  None
 #######################################

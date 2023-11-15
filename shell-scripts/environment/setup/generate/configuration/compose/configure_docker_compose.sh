@@ -18,6 +18,7 @@
 #######################################
 configure_docker_compose() {
 
+  local certbot_service_definition=""
   local http01_challenge_ports=""
   local shared_volume=""
   local certs_volume=""
@@ -33,18 +34,19 @@ configure_docker_compose() {
     shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}
     shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
 
-    certs_volume="      - nginx-shared-volume:/etc/ssl/certs:ro"
+    certs_volume="    volumes:"
+    certs_volume+=$'\n      - nginx-shared-volume:/etc/ssl/certs:ro"'
+
+    certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$shared_volume")
   fi
 
   local backend_section
   local frontend_section
-  local certbot_section
   local network_section
   local volume_section
 
   backend_section=$(create_backend_service "$certs_volume")
   frontend_section=$(create_frontend_service "$http01_challenge_ports" "$shared_volume")
-  certbot_section=$(create_certbot_service "$(generate_certbot_command)" "$shared_volume")
   network_section=$(create_network_definition)
   volume_section=$(create_volume_definition)
 
@@ -53,7 +55,7 @@ configure_docker_compose() {
     echo "services:"
     echo "$backend_section"
     echo "$frontend_section"
-    echo "$certbot_section"
+    echo "$certbot_service_definition"
     echo "$network_section"
     echo "$volume_section"
   } > "${PROJECT_ROOT_DIR}/docker-compose.yml"
@@ -125,8 +127,7 @@ create_backend_service() {
       - \"${BACKEND_PORT}:${BACKEND_PORT}\"
     networks:
       - qrgen
-    volumes:
-      $volume_section"
+    $volume_section"
 }
 
 #######################################

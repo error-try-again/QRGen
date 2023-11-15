@@ -31,7 +31,7 @@ ensure_port_available() {
     port="${input_port:-$default_port}"
   done
 
-  # Set the nginx_port to the selected port that is not in use.
-  nginx_port="$port"
-  echo "Selected port $nginx_port is available."
+  # Set the NGINX_PORT to the selected port that is not in use.
+  NGINX_PORT="$port"
+  echo "Selected port $NGINX_PORT is available."
 }

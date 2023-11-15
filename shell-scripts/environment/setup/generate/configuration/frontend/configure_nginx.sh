@@ -6,16 +6,16 @@
 #   BACKEND_PORT
 #   DH_PARAMS_PATH
 #   DNS_RESOLVER
+#   DOMAIN_NAME
 #   INTERNAL_LETS_ENCRYPT_DIR
+#   NGINX_PORT
 #   NGINX_SSL_PORT
 #   PROJECT_ROOT_DIR
+#   SUBDOMAIN
 #   TIMEOUT
 #   USE_LETS_ENCRYPT
-#   DOMAIN_NAME
 #   internal_dirs
-#   nginx_port
 #   ssl_paths
-#   SUBDOMAIN
 # Arguments:
 #  None
 # Returns:
@@ -29,8 +29,8 @@ configure_nginx() {
   local ssl_config=""
   local token_directive=""
   local server_name="${DOMAIN_NAME}"
-  local listen_directive="listen $nginx_port;
-        listen [::]:$nginx_port;"
+  local listen_directive="listen $NGINX_PORT;
+        listen [::]:$NGINX_PORT;"
   local ssl_listen_directive=""
   local acme_challenge_server_block=""
 
@@ -59,8 +59,8 @@ configure_nginx() {
         ssl_dhparam ${ssl_paths[DH_PARAMS_PATH]};
         ssl_ecdh_curve secp384r1;
         ssl_session_tickets off;
-#        ssl_stapling on;
-#        ssl_stapling_verify on;
+        ssl_stapling on;
+        ssl_stapling_verify on;
 
         resolver ${DNS_RESOLVER} valid=300s;
         resolver_timeout ${TIMEOUT};
