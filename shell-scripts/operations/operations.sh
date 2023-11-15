@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                                ["Project"]=$PROJECT_ROOT_DIR
-                                ["Frontend"]=$FRONTEND_DIR
-                                ["Backend"]=$BACKEND_DIR
+                 ["Project"]=$PROJECT_ROOT_DIR
+                 ["Frontend"]=$FRONTEND_DIR
+                 ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -164,6 +164,107 @@ handle_ambiguous_networks() {
   done
 }
 
+#######################################
+# Removes the --dry-run flag from the Certbot command
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+#######################################
+remove_dry_run_flag() {
+  local docker_compose_file="${PROJECT_ROOT_DIR}/docker-compose.yml"
+  local temp_file
+  temp_file="$(mktemp)"
+
+  echo "Checking for --dry-run flag in Certbot command..."
+
+  # Remove --dry-run from the certbot command
+  sed '/certbot:/,/command:/s/--dry-run//' "$docker_compose_file" > "$temp_file"
+
+  # Check if the flag was removed
+  if grep --quiet '--dry-run' "$temp_file"; then
+    echo "--dry-run flag removal failed."
+    rm "$temp_file"
+    exit 1
+  else
+    # Backup docker-compose.yml & overwrite existing file & select yes to overwrite
+    yes | cp -rf  "$docker_compose_file" "${docker_compose_file}.bak"
+
+    echo "--dry-run flag removed successfully."
+    mv "$temp_file" "$docker_compose_file"
+  fi
+}
+
+#######################################
+# Builds and runs the backend service
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+#######################################
+run_backend_service() {
+  echo "Building and running Backend service..."
+  docker compose build backend
+  docker compose up -d backend
+}
+
+#######################################
+# Builds and runs the frontend service
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+#######################################
+run_frontend_service() {
+  echo "Building and running Frontend service..."
+  docker compose build frontend
+  docker compose up -d frontend
+}
+
+#######################################
+# Runs the Certbot service and checks for dry run success
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+#######################################
+run_certbot_service() {
+  echo "Running Certbot service..."
+  docker compose build certbot
+
+  # Capture the output of the Certbot service
+  local certbot_output
+  certbot_output=$(docker compose run --rm certbot)
+
+  # Check for the success message in the output
+  if [[ $certbot_output == *" - The dry run was successful."* ]]; then
+    echo "Certbot dry run successful."
+    remove_dry_run_flag
+  else
+    echo "Certbot dry run failed."
+    exit 1
+  fi
+}
+
+#######################################
+# description
+# Arguments:
+#  None
+#######################################
+pre_flight() {
+  # Remove containers that would conflict with `docker-compose up`
+  remove_conflicting_containers || {
+    echo "Failed to remove conflicting containers"
+    exit 1
+  }
+
+  # Handle ambiguous networks
+  handle_ambiguous_networks || {
+    echo "Failed to handle ambiguous networks"
+    exit 1
+  }
+}
+
 # ---- Build and Run Docker ---- #
 build_and_run_docker() {
   cd "$PROJECT_ROOT_DIR" || {
@@ -176,18 +277,6 @@ build_and_run_docker() {
     exit 1
   }
 
-  # Remove containers that would conflict with `docker-compose up`
-  remove_conflicting_containers || {
-    echo "Failed to remove conflicting containers"
-    exit 1
-  }
-
-  # Handle ambiguous networks
-  handle_ambiguous_networks || {
-    echo "Failed to handle ambiguous networks"
-    exit 1
-  }
-
   # If Docker Compose is running, bring down the services
   if docker compose ps &> /dev/null; then
     echo "Bringing down existing Docker Compose services..."
@@ -197,23 +286,12 @@ build_and_run_docker() {
     }
   fi
 
-  # Attempt to build Docker image using Docker Compose
-  docker compose build || {
-    echo "Failed to build Docker image"
-    exit 1
-  }
+  # Run each service separately
+  run_backend_service
+  run_frontend_service
+  run_certbot_service
 
-  # Attempt to run Docker Compose
-  docker compose up -d || {
-    echo "Failed to run Docker Compose"
-    exit 1
-  }
-
-  docker compose ps || {
-    echo "Failed to list Docker Compose services"
-    exit 1
-  }
-
+  # Dump logs or any other post-run operations
   dump_logs || {
     echo "Failed to dump logs"
     exit 1

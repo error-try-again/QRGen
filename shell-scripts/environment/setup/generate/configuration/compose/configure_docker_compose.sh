@@ -103,7 +103,6 @@ ${dry_run_flag} \
 ${overwrite_self_signed_certs_flag}" \
     --domains "${DOMAIN_NAME}" \
     --domains "$SUBDOMAIN"."${DOMAIN_NAME}"
-
 }
 
 #######################################

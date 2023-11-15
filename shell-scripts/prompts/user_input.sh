@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# User interaction prompt.
+#######################################
+# description
+# Arguments:
+#  None
+#######################################
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
   local opt
@@ -55,6 +59,7 @@ custom_install_prompt() {
 # Arguments:
 #  None
 #######################################
+# bashsupport disable=BP5006
 automatic_selection() {
       LETSENCRYPT_EMAIL="skip"
       USE_AUTO_RENEW_SSL="yes"
@@ -88,7 +93,6 @@ prompt_for_ssl() {
       custom_install_prompt
     fi
   fi
-  construct_ssl_flags
 }
 
 #######################################
@@ -115,7 +119,7 @@ prompt_for_ssl() {
 # Arguments:
 #  None
 #######################################
-construct_ssl_flags() {
+construct_certbot_flags() {
 
   email_flag=$([[ $LETSENCRYPT_EMAIL == "skip"   ]] && echo "--register-unsafely-without-email" || echo "--email $LETSENCRYPT_EMAIL")
   production_certs_flag=$([[ $USE_PRODUCTION_SSL == "yes"   ]] && echo "" || echo "--staging")
@@ -220,7 +224,7 @@ prompt_for_domain_details() {
     echo "Using custom domain name: $origin_url"
 
     prompt_yes_no "Would you like to specify a subdomain other than the default
-    (none) (yes/no)? " USE_SUBDOMAIN
+(none) (yes/no)? " USE_SUBDOMAIN
     if [[ $USE_SUBDOMAIN == "yes"   ]]; then
       SUBDOMAIN=$(prompt_with_validation "Enter your subdomain name (e.g., www): " "Error: subdomain name cannot be empty.")
       origin_url="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"
@@ -243,6 +247,8 @@ prompt_for_domain_and_letsencrypt() {
   prompt_for_domain_details
   if [[ $USE_CUSTOM_DOMAIN == "yes"   ]]; then
     prompt_for_ssl
+    construct_certbot_flags
+    register_for_auto_renewal
   fi
 }
 

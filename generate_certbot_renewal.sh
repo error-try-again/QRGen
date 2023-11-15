@@ -1,22 +1,38 @@
 #!/bin/bash
 
-# Define the project environment variables
+# Ensure the .env file exists
+if [ ! -f .env ]; then
+  echo "The .env file does not exist, exiting..."
+  exit 1
+fi
+
+# Source the .env file to define project environment variables
 . .env
 
-# Make sure the log directory exists
+# Ensure the project root directory exists
+mkdir -p "${PROJECT_ROOT_DIR}"
+
+# Ensure the log directory exists
 mkdir -p "${PROJECT_LOGS_DIR}"
 
 # Create the certbot renew script with a heredoc
 cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
 #!/bin/bash
 
-# Load the environment variables and functions
+# Load the environment variables
 . "${PROJECT_ROOT_DIR}/.env"
-. "${PROJECT_ROOT_DIR}/shell-scripts/docker/test-docker-env.sh"
+
+# Check if the docker environment script exists before sourcing
+if [ -f "${PROJECT_ROOT_DIR}/shell-scripts/docker/test-docker-env.sh" ]; then
+  . "${PROJECT_ROOT_DIR}/shell-scripts/docker/test-docker-env.sh"
+else
+  echo "Docker environment script not found, exiting..."
+  exit 1
+fi
 
 LOG_FILE="${PROJECT_LOGS_DIR}/certbot_\$(date +'%Y%m%d_%H%M%S').log"
 
-# Create the log directory if it doesn't exist
+# Ensure the log directory exists
 mkdir -p "${PROJECT_LOGS_DIR}"
 
 # Enter the project root directory, exit if it fails
@@ -51,8 +67,10 @@ cron_log_path="${PROJECT_LOGS_DIR}/certbot_cron.log"
 # The crontab entry to be added
 cron_job="0 0 * * * ${cron_script_path} >> ${cron_log_path} 2>&1"
 
-# Add the cron job
-(
-  crontab -l 2> /dev/null
-  echo "$cron_job"
-) | crontab -
+# Check and add the cron job if it doesn't exist
+if ! crontab -l | grep -Fxq "$cron_job"; then
+  (
+    crontab -l 2> /dev/null
+    echo "$cron_job"
+  ) | crontab -
+fi
