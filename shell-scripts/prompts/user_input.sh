@@ -140,7 +140,7 @@ prompt_yes_no() {
   local yn
   echo "$prompt"
   while true; do
-    read -rp yn
+    read -r yn
     case "$yn" in
       [yY] | [yY][eE][sS])
         eval "$result_var=yes"

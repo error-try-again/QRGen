@@ -114,7 +114,7 @@ http {
             index index.html index.htm;
             try_files \$uri \$uri/ /index.html;
             # Security headers
-            add_header Strict-Transport-Security "max-age=31536000; includeSUBDOMAINs" always;
+            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
             add_header X-Frame-Options "DENY" always;
             add_header X-Content-Type-Options nosniff always;
             add_header X-XSS-Protection "1; mode=block" always;

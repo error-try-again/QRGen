@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                ["Project"]=$PROJECT_ROOT_DIR
-                ["Frontend"]=$FRONTEND_DIR
-                ["Backend"]=$BACKEND_DIR
+                 ["Project"]=$PROJECT_ROOT_DIR
+                 ["Frontend"]=$FRONTEND_DIR
+                 ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -68,45 +68,39 @@ update_project() {
 purge_builds() {
   test_docker_env
 
-  local containers_to_remove
-  local images_to_remove
-  local volumes_to_remove
-  local networks_to_remove
+  echo "Identifying and purging Docker resources associated with 'qrgen'..."
 
-  echo "Identifying Docker resources associated with 'qrgen'..."
-
-  containers_to_remove=$(docker ps -a --format '{{.Names}}' | grep '^qrgen')
-  images_to_remove=$(docker images --format '{{.Repository}}:{{.Tag}}' | grep '^qrgen')
-  volumes_to_remove=$(docker volume ls --format '{{.Name}}' | grep '^qrgen')
-  networks_to_remove=$(docker network ls --format '{{.Name}}' | grep '^qrgen')
-
-  if [ -n "$containers_to_remove" ]; then
-    echo "Stopping and removing containers: $containers_to_remove"
-    echo "$containers_to_remove" | xargs -r docker stop
-    echo "$containers_to_remove" | xargs -r docker rm
+  # Stop and remove containers
+  if docker ps -a --format '{{.Names}}' | grep -q '^qrgen'; then
+    echo "Stopping and removing 'qrgen' containers..."
+    docker ps -a --format '{{.Names}}' | grep '^qrgen' | xargs -r docker stop
+    docker ps -a --format '{{.Names}}' | grep '^qrgen' | xargs -r docker rm
   else
-    echo "No containers to stop and remove."
+    echo "No 'qrgen' containers found."
   fi
 
-  if [ -n "$images_to_remove" ]; then
-    echo "Removing images: $images_to_remove"
-    echo "$images_to_remove" | xargs -r docker rmi
+  # Remove images
+  if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q '^qrgen'; then
+    echo "Removing 'qrgen' images..."
+    docker images --format '{{.Repository}}:{{.Tag}}' | grep '^qrgen' | xargs -r docker rmi
   else
-    echo "No images to remove."
+    echo "No 'qrgen' images found."
   fi
 
-  if [ -n "$volumes_to_remove" ]; then
-    echo "Removing volumes: $volumes_to_remove"
-    echo "$volumes_to_remove" | xargs -r docker volume rm
+  # Remove volumes
+  if docker volume ls --format '{{.Name}}' | grep -q '^qrgen'; then
+    echo "Removing 'qrgen' volumes..."
+    docker volume ls --format '{{.Name}}' | grep '^qrgen' | xargs -r docker volume rm
   else
-    echo "No volumes to remove."
+    echo "No 'qrgen' volumes found."
   fi
 
-  if [ -n "$networks_to_remove" ]; then
-    echo "Removing networks: $networks_to_remove"
-    echo "$networks_to_remove" | xargs -r docker network rm
+  # Remove networks
+  if docker network ls --format '{{.Name}}' | grep -q '^qrgen'; then
+    echo "Removing 'qrgen' networks..."
+    docker network ls --format '{{.Name}}' | grep '^qrgen' | xargs -r docker network rm
   else
-    echo "No networks to remove."
+    echo "No 'qrgen' networks found."
   fi
 }
 
