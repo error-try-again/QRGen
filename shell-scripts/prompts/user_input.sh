@@ -66,12 +66,12 @@ automatic_selection() {
       REGENERATE_SSL_CERTS="yes"
       USE_HSTS="yes"
       USE_OCSP_STAPLING="yes"
-      USE_MUST_STAPLE="yes"
       USE_UIR="yes"
       USE_DRY_RUN="yes"
       OVERWRITE_SELF_SIGNED_CERTS="yes"
       USE_PRODUCTION_SSL="no"
       USE_STRICT_PERMISSIONS="no"
+      USE_MUST_STAPLE="no"
 }
 
 #######################################
@@ -120,17 +120,15 @@ prompt_for_ssl() {
 #  None
 #######################################
 construct_certbot_flags() {
-
   email_flag=$([[ $LETSENCRYPT_EMAIL == "skip"   ]] && echo "--register-unsafely-without-email" || echo "--email $LETSENCRYPT_EMAIL")
   production_certs_flag=$([[ $USE_PRODUCTION_SSL == "yes"   ]] && echo "" || echo "--staging")
   dry_run_flag=$([[ $USE_DRY_RUN == "yes"   ]] && echo "--dry-run" || echo "")
   overwrite_self_signed_certs_flag=$([[ $OVERWRITE_SELF_SIGNED_CERTS == "yes"   ]] && echo "--overwrite-cert-dirs" || echo "")
-  must_staple_flag=$([[ $USE_MUST_STAPLE == "yes"   ]] && echo "--must-staple" || echo "")
   ocsp_stapling_flag=$([[ $USE_OCSP_STAPLING == "yes"   ]] && echo "--staple-ocsp" || echo "")
+  must_staple_flag=$([[ $USE_MUST_STAPLE == "yes"   ]] && echo "--must-staple" || echo "")
   strict_permissions_flag=$([[ $USE_STRICT_PERMISSIONS == "yes"   ]] && echo "--strict-permissions" || echo "")
   hsts_flag=$([[ $USE_HSTS == "yes"   ]] && echo "--hsts" || echo "")
   uir_flag=$([[ $USE_UIR == "yes"   ]] && echo "--uir" || echo "")
-
 }
 
 # Function to prompt for yes/no answers
