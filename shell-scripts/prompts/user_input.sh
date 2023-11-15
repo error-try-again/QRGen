@@ -140,7 +140,7 @@ prompt_yes_no() {
   local yn
   echo "$prompt"
   while true; do
-    read -rp "(Yes/No): " yn
+    read -rp yn
     case "$yn" in
       [yY] | [yY][eE][sS])
         eval "$result_var=yes"
@@ -223,8 +223,7 @@ prompt_for_domain_details() {
     ORIGIN="$origin_url:$ORIGIN_PORT"
     echo "Using custom domain name: $origin_url"
 
-    prompt_yes_no "Would you like to specify a subdomain other than the default
-(none) (yes/no)? " USE_SUBDOMAIN
+    prompt_yes_no "Would you like to specify a subdomain other than the default (none) (yes/no)? " USE_SUBDOMAIN
     if [[ $USE_SUBDOMAIN == "yes"   ]]; then
       SUBDOMAIN=$(prompt_with_validation "Enter your subdomain name (e.g., www): " "Error: subdomain name cannot be empty.")
       origin_url="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"
