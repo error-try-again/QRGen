@@ -29,9 +29,9 @@ uninstall() {
   purge_builds
 
   declare -A directories=(
-                           ["Project"]=$PROJECT_ROOT_DIR
-                           ["Frontend"]=$FRONTEND_DIR
-                           ["Backend"]=$BACKEND_DIR
+                             ["Project"]=$PROJECT_ROOT_DIR
+                             ["Frontend"]=$FRONTEND_DIR
+                             ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -317,7 +317,6 @@ run_certbot_service() {
     echo "Certbot dry run successful."
     echo "Removing dry-run and staging flags from docker-compose.yml..."
     remove_dry_run_flag
-    remove_staging_flag
 
     # Rebuild and rerun the Certbot service without the dry-run flag
     docker compose build certbot
