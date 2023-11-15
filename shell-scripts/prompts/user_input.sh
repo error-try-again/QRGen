@@ -248,7 +248,6 @@ prompt_for_domain_and_letsencrypt() {
   if [[ $USE_CUSTOM_DOMAIN == "yes"   ]]; then
     prompt_for_ssl
     construct_certbot_flags
-    register_for_auto_renewal
   fi
 }
 

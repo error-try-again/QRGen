@@ -173,7 +173,7 @@ initialize_cert_watcher() {
       log_message "Detected change to $(basename "$filepath"), verifying update..."
       if certificate_updated; then
         log_message "Certificate update confirmed, restarting services..."
-        restart_services "certbot"
+        restart_services "frontend"
       else
         log_message "No update to certificate detected."
       fi

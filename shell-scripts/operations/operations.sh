@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                 ["Project"]=$PROJECT_ROOT_DIR
-                 ["Frontend"]=$FRONTEND_DIR
-                 ["Backend"]=$BACKEND_DIR
+      ["Project"]=$PROJECT_ROOT_DIR
+      ["Frontend"]=$FRONTEND_DIR
+      ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -182,13 +182,13 @@ remove_dry_run_flag() {
   sed '/certbot:/,/command:/s/--dry-run//' "$docker_compose_file" > "$temp_file"
 
   # Check if the flag was removed
-  if grep --quiet '--dry-run' "$temp_file"; then
+  if grep --quiet -- '--dry-run' "$temp_file"; then
     echo "--dry-run flag removal failed."
     rm "$temp_file"
     exit 1
   else
-    # Backup docker-compose.yml & overwrite existing file & select yes to overwrite
-    yes | cp -rf  "$docker_compose_file" "${docker_compose_file}.bak"
+    # Backup docker-compose.yml & overwrite existing file
+    cp -rf "$docker_compose_file" "${docker_compose_file}.bak"
 
     echo "--dry-run flag removed successfully."
     mv "$temp_file" "$docker_compose_file"
@@ -222,7 +222,7 @@ run_frontend_service() {
 }
 
 #######################################
-# Runs the Certbot service and checks for dry run success
+# Runs the Certbot service, checks for dry run success, and reruns services
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:
@@ -237,9 +237,18 @@ run_certbot_service() {
   certbot_output=$(docker compose run --rm certbot)
 
   # Check for the success message in the output
-  if [[ $certbot_output == *" - The dry run was successful."* ]]; then
+  if [[ $certbot_output == *"The dry run was successful."* ]]; then
     echo "Certbot dry run successful."
     remove_dry_run_flag
+
+    # Rebuild and rerun the Certbot service without the dry-run flag
+    docker compose build certbot
+    docker compose up -d certbot
+
+    # Optionally, restart other services if needed
+    echo "Restarting other services..."
+    docker compose restart backend
+    docker compose restart frontend
   else
     echo "Certbot dry run failed."
     exit 1

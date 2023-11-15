@@ -28,7 +28,7 @@ produce_docker_logs() {
 
     # Loop through each service and produce logs
     for service in $services; do
-      echo "Logs for service: $service"
+      echo "Logs for service: $service" "@" "$(date)"
       docker compose -f "$compose_file" logs "$service"
       echo "--------------------------------------------"
     done
