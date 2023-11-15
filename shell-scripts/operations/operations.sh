@@ -29,9 +29,9 @@ uninstall() {
   purge_builds
 
   declare -A directories=(
-                     ["Project"]=$PROJECT_ROOT_DIR
-                     ["Frontend"]=$FRONTEND_DIR
-                     ["Backend"]=$BACKEND_DIR
+                           ["Project"]=$PROJECT_ROOT_DIR
+                           ["Frontend"]=$FRONTEND_DIR
+                           ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -377,6 +377,11 @@ build_and_run_docker() {
   run_backend_service
   run_frontend_service
   run_certbot_service
+
+  if [[ $USE_AUTO_RENEW_SSL == "yes"   ]]; then
+    echo "Using auto-renewal for SSL certificates."
+    generate_certbot_renewal_job
+  fi
 
   # Dump logs or any other post-run operations
   dump_logs || {

@@ -247,10 +247,6 @@ prompt_for_domain_and_letsencrypt() {
   if [[ $USE_CUSTOM_DOMAIN == "yes"   ]]; then
     prompt_for_ssl
     construct_certbot_flags
-    if [[ $USE_AUTO_RENEW_SSL == "yes"   ]]; then
-      echo "Using auto-renewal for SSL certificates."
-      generate_certbot_renewal_job
-    fi
   fi
 }
 
