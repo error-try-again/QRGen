@@ -8,10 +8,10 @@
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
   local opt
-  select opt in "Run Setup" "Cleanup" "Reload/Refresh" "Dump logs" "Update Project" "Enable SSL with Let's Encrypt" "Stop Project Docker Containers" "Prune All Docker Builds - Dangerous" "Quit"; do
+  select opt in "Run Setup" "Uninstall" "Reload/Refresh" "Dump logs" "Update Project" "Enable SSL with Let's Encrypt" "Stop Project Docker Containers" "Prune All Docker Builds - Dangerous" "Quit"; do
     case $opt in
       "Run Setup") setup ;;
-      "Cleanup") cleanup ;;
+      "Uninstall") uninstall ;;
       "Reload/Refresh") reload ;;
       "Dump logs") dump_logs ;;
       "Update Project") update_project ;;
@@ -40,6 +40,8 @@ custom_install_prompt() {
     prompt_yes_no "Would you like to enable Must Staple? (yes/no): " USE_MUST_STAPLE
     prompt_yes_no "Would you like to enable Strict Permissions? (yes/no): " USE_STRICT_PERMISSIONS
     prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no): " USE_UIR
+    prompt_yes_no "Would you like to overwrite self-signed certificates? (yes/no): " OVERWRITE_SELF_SIGNED_CERTS
+    prompt_yes_no "Would you like to enable auto-renewal of SSL certificates? (yes/no): " USE_AUTO_RENEW_SSL
 }
 
 #######################################
@@ -245,6 +247,10 @@ prompt_for_domain_and_letsencrypt() {
   if [[ $USE_CUSTOM_DOMAIN == "yes"   ]]; then
     prompt_for_ssl
     construct_certbot_flags
+    if [[ $USE_AUTO_RENEW_SSL == "yes"   ]]; then
+      echo "Using auto-renewal for SSL certificates."
+      generate_certbot_renewal_job
+    fi
   fi
 }
 

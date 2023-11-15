@@ -23,15 +23,15 @@ reload() {
 }
 
 # Shuts down any running Docker containers associated with the project and deletes the entire project directory.
-cleanup() {
+uninstall() {
   test_docker_env
   echo "Cleaning up..."
-  stop_containers
+  purge_builds
 
   declare -A directories=(
-                      ["Project"]=$PROJECT_ROOT_DIR
-                      ["Frontend"]=$FRONTEND_DIR
-                      ["Backend"]=$BACKEND_DIR
+                     ["Project"]=$PROJECT_ROOT_DIR
+                     ["Frontend"]=$FRONTEND_DIR
+                     ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name

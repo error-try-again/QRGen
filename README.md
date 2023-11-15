@@ -84,7 +84,7 @@ _Uninstall the project_
 ```bash
 sudo ./depends.sh uninstall
 ./install.sh
-# Select cleanup
+# Select Uninstall
 ```
 
 ## Security Notes
