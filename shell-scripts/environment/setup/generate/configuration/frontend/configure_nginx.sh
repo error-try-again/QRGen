@@ -59,8 +59,8 @@ configure_nginx() {
         ssl_dhparam ${ssl_paths[DH_PARAMS_PATH]};
         ssl_ecdh_curve secp384r1;
         ssl_session_tickets off;
-        ssl_stapling on;
-        ssl_stapling_verify on;
+#        ssl_stapling on;
+#        ssl_stapling_verify on;
 
         resolver ${DNS_RESOLVER} valid=300s;
         resolver_timeout ${TIMEOUT};

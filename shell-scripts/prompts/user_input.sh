@@ -67,12 +67,12 @@ automatic_selection() {
       USE_AUTO_RENEW_SSL="yes"
       REGENERATE_SSL_CERTS="yes"
       USE_HSTS="yes"
-      USE_OCSP_STAPLING="yes"
       USE_UIR="yes"
       USE_DRY_RUN="yes"
       OVERWRITE_SELF_SIGNED_CERTS="yes"
       USE_PRODUCTION_SSL="no"
       USE_STRICT_PERMISSIONS="no"
+      USE_OCSP_STAPLING="no"
       USE_MUST_STAPLE="no"
 }
 
