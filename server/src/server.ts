@@ -5,6 +5,8 @@ import { qrCodeRoutes } from "./routes/qr-code-routes";
 import { JSON_BODY_LIMIT, ORIGIN, PORT, TRUST_PROXY } from "./config";
 import { rateLimiters } from "./middleware/rate-limiters";
 import dotenv from "dotenv";
+import fs from "node:fs";
+import https from "node:https";
 
 // Initialize express
 export const app = express();
@@ -26,7 +28,13 @@ app.use('/batch', rateLimiters.batchQRCode);
 // Routes
 app.use('/qr', qrCodeRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Define SSL/TLS options
+const sslOptions = {
+  key: fs.readFileSync('/etc/ssl/certs/privkey.pem'),
+  cert: fs.readFileSync('/etc/ssl/certs/cert.pem')
+};
+
+// Start HTTPS server
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`Server running on https://localhost:${PORT}`);
 });

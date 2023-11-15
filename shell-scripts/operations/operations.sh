@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-      ["Project"]=$PROJECT_ROOT_DIR
-      ["Frontend"]=$FRONTEND_DIR
-      ["Backend"]=$BACKEND_DIR
+                      ["Project"]=$PROJECT_ROOT_DIR
+                      ["Frontend"]=$FRONTEND_DIR
+                      ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -45,12 +45,6 @@ cleanup() {
       echo "$dir_name directory $dir_path deleted."
     fi
   done
-
-  echo "Cleanup complete. Returning to the home directory."
-  cd ~ || {
-    echo "Failed to change directory to home directory"
-    exit 1
-  }
 }
 
 #######################################
@@ -202,6 +196,8 @@ handle_ambiguous_networks() {
 #   PROJECT_ROOT_DIR
 # Arguments:
 #   1 - Flag to remove
+# Returns:
+#   Path to the temporary modified file
 #######################################
 modify_docker_compose() {
   local flag_to_remove=$1
@@ -209,9 +205,10 @@ modify_docker_compose() {
   local temp_file
   temp_file="$(mktemp)"
 
-  echo "Modifying docker-compose.yml to remove the $flag_to_remove flag..."
+  # Perform the modification
   sed "/certbot:/,/command:/s/$flag_to_remove//" "$docker_compose_file" > "$temp_file"
 
+  # Output only the path to the temporary file
   echo "$temp_file"
 }
 
@@ -239,7 +236,7 @@ check_flag_removal() {
 #######################################
 # Backs up the original file and replaces it with the modified version
 # Globals:
-#   PROJECT_ROOT_DIR
+#   None
 # Arguments:
 #   1 - Original file
 #   2 - Modified file
@@ -256,31 +253,19 @@ backup_and_replace_file() {
   echo "File updated and original version backed up."
 }
 
-#######################################
-# Removes the --dry-run flag from the docker-compose.yml file
-# Globals:
-#   PROJECT_ROOT_DIR
-# Arguments:
-#   None
-#######################################
 remove_dry_run_flag() {
   local temp_file
 
+  echo "Removing --dry-run flag from docker-compose.yml..."
   temp_file=$(modify_docker_compose '--dry-run')
   check_flag_removal "$temp_file" '--dry-run'
   backup_and_replace_file "${PROJECT_ROOT_DIR}/docker-compose.yml" "$temp_file"
 }
 
-#######################################
-# Removes the --staging flag from the docker-compose.yml file
-# Globals:
-#   PROJECT_ROOT_DIR
-# Arguments:
-#   None
-#######################################
 remove_staging_flag() {
   local temp_file
 
+  echo "Removing --staging flag from docker-compose.yml..."
   temp_file=$(modify_docker_compose '--staging')
   check_flag_removal "$temp_file" '--staging'
   backup_and_replace_file "${PROJECT_ROOT_DIR}/docker-compose.yml" "$temp_file"

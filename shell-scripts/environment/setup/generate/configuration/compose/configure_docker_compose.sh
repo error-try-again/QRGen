@@ -20,6 +20,7 @@ configure_docker_compose() {
 
   local http01_challenge_ports=""
   local shared_volume=""
+  local certs_volume=""
 
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
 
@@ -31,6 +32,8 @@ configure_docker_compose() {
     shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}
     shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}
     shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
+
+    certs_volume="      - nginx-shared-volume:/etc/ssl/certs:ro"
   fi
 
   local backend_section
@@ -39,7 +42,7 @@ configure_docker_compose() {
   local network_section
   local volume_section
 
-  backend_section=$(create_backend_service)
+  backend_section=$(create_backend_service "$certs_volume")
   frontend_section=$(create_frontend_service "$http01_challenge_ports" "$shared_volume")
   certbot_section=$(create_certbot_service "$(generate_certbot_command)" "$shared_volume")
   network_section=$(create_network_definition)
@@ -110,9 +113,10 @@ ${overwrite_self_signed_certs_flag}" \
 # Globals:
 #   BACKEND_PORT
 # Arguments:
-#  None
+#   1
 #######################################
 create_backend_service() {
+  local volume_section=$1
   echo "  backend:
     build:
       context: .
@@ -120,7 +124,9 @@ create_backend_service() {
     ports:
       - \"${BACKEND_PORT}:${BACKEND_PORT}\"
     networks:
-      - qrgen"
+      - qrgen
+    volumes:
+      $volume_section"
 }
 
 #######################################
@@ -158,7 +164,6 @@ create_frontend_service() {
 #   2
 #######################################
 create_certbot_service() {
-
   local command=$1
   local volumes=$2
   echo "  certbot:
