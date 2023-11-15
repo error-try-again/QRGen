@@ -46,43 +46,48 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   . ./shell-scripts/environment/setup/generate/configuration/ssl/configure_certbot_dockerfile.sh
   . ./shell-scripts/environment/setup/generate/configuration/ssl/generate_self_signed_certificates.sh
   . ./shell-scripts/environment/setup/generate/configuration/compose/configure_docker_compose.sh
+
+  # Helper scripts for user prompts and input.
   . ./shell-scripts/prompts/user_input.sh
 
   # File watcher for service restarts & certificate renewal.
   . ./shell-scripts/ssl/cert_file_watcher.sh
+
+  # Generate the certificate renewal script for cron.
+  . ./shell-scripts/ssl/generate_certbot_renewal.sh
 
   # The main operational scripts that carry out the required tasks.
   . ./shell-scripts/operations/operations.sh
 
   # Define global associative arrays.
   dirs=(
-                [BACKEND_DIR]="${PROJECT_ROOT_DIR}/backend"
-                [FRONTEND_DIR]="${PROJECT_ROOT_DIR}/frontend"
-                [SERVER_DIR]="${PROJECT_ROOT_DIR}/server"
-                [CERTBOT_DIR]="${PROJECT_ROOT_DIR}/certbot"
-                [CERTS_DIR]="${PROJECT_ROOT_DIR}/certs"
-                [WEBROOT_DIR]="${PROJECT_ROOT_DIR}/webroot"
-                [CERTS_DH_DIR]="${PROJECT_ROOT_DIR}/certs/dhparam"
+                   [BACKEND_DIR]="${PROJECT_ROOT_DIR}/backend"
+                   [FRONTEND_DIR]="${PROJECT_ROOT_DIR}/frontend"
+                   [SERVER_DIR]="${PROJECT_ROOT_DIR}/server"
+                   [CERTBOT_DIR]="${PROJECT_ROOT_DIR}/certbot"
+                   [CERTS_DIR]="${PROJECT_ROOT_DIR}/certs"
+                   [WEBROOT_DIR]="${PROJECT_ROOT_DIR}/webroot"
+                   [CERTS_DH_DIR]="${PROJECT_ROOT_DIR}/certs/dhparam"
   )
 
   internal_dirs=(
-                [INTERNAL_LETS_ENCRYPT_DIR]="/etc/letsencrypt"
-                [INTERNAL_LETS_ENCRYPT_LOGS_DIR]="/var/log/letsencrypt"
-                [INTERNAL_WEBROOT_DIR]="/usr/share/nginx/html"
-                [INTERNAL_CERTS_DH_DIR]="/etc/ssl/certs/dhparam"
+                   [INTERNAL_LETS_ENCRYPT_DIR]="/etc/letsencrypt"
+                   [INTERNAL_LETS_ENCRYPT_LOGS_DIR]="/var/log/letsencrypt"
+                   [INTERNAL_WEBROOT_DIR]="/usr/share/nginx/html"
+                   [INTERNAL_CERTS_DH_DIR]="/etc/ssl/certs/dhparam"
   )
 
   ssl_paths=(
-                [PRIVKEY_PATH]="${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem"
-                [FULLCHAIN_PATH]="${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem"
-                [DH_PARAMS_PATH]="${internal_dirs[INTERNAL_CERTS_DH_DIR]}/dhparam-2048.pem"
+                   [PRIVKEY_PATH]="${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem"
+                   [FULLCHAIN_PATH]="${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem"
+                   [DH_PARAMS_PATH]="${internal_dirs[INTERNAL_CERTS_DH_DIR]}/dhparam-2048.pem"
   )
 
   certbot_volume_mappings=(
-                [LETS_ENCRYPT_VOLUME_MAPPING]="${dirs[CERTS_DIR]}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}"
-                [LETS_ENCRYPT_LOGS_VOLUME_MAPPING]="${dirs[CERTBOT_DIR]}/logs:${internal_dirs[INTERNAL_LETS_ENCRYPT_LOGS_DIR]}"
-                [CERTS_DH_VOLUME_MAPPING]="${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}"
-                [WEBROOT_VOLUME_MAPPING]="${dirs[WEBROOT_DIR]}:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
+                   [LETS_ENCRYPT_VOLUME_MAPPING]="${dirs[CERTS_DIR]}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}"
+                   [LETS_ENCRYPT_LOGS_VOLUME_MAPPING]="${dirs[CERTBOT_DIR]}/logs:${internal_dirs[INTERNAL_LETS_ENCRYPT_LOGS_DIR]}"
+                   [CERTS_DH_VOLUME_MAPPING]="${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}"
+                   [WEBROOT_VOLUME_MAPPING]="${dirs[WEBROOT_DIR]}:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
   )
 fi
 
