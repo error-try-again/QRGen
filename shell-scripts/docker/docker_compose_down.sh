@@ -17,10 +17,13 @@ stop_containers() {
     docker-compose..."
     docker compose -f "$docker_compose_file" down
   else
-    echo "docker-compose.yml does not exist. Attempting to stop containers
-    starting with 'qrgen'..."
+    echo "docker-compose.yml does not exist. Stopping all Docker containers starting with 'qrgen'..."
 
-    # Get all running containers that start with 'qrgen' and stop them
-    docker ps --format '{{.Names}}' | grep '^qrgen' | xargs -r docker stop
+    if [[ $(docker ps -a | grep -c qrgen) -gt 0 ]]; then
+      docker ps -a | grep qrgen | awk '{print $1}' | xargs docker stop
+    else
+      echo "No containers to stop."
+    fi
+
   fi
 }
