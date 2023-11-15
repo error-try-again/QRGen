@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. .env
+
 #######################################
 # description
 # Arguments:
@@ -21,8 +23,9 @@ user_prompt() {
       "Quit") quit ;;
       *) echo "Invalid option. Try another one." ;;
     esac
-    (($? == 0)) && break # Break the loop if the function executed successfully.
+    (($? == 0)) && break
   done
+  echo "Thanks for using the QR Code Generator setup script!"
 }
 
 #######################################

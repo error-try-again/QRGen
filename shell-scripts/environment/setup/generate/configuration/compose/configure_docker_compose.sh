@@ -1,34 +1,33 @@
 #!/bin/bash
 
-#######################################
-# description
+################################################
+# Sets up the Docker Compose configuration for the application.
+# This includes configuring services for the backend, frontend, and optionally Certbot for Let's Encrypt SSL.
+#
 # Globals:
-#   CERTBOT_VOLUME_MAPPINGS
-#   CERTS_DH_VOLUME_MAPPING
-#   INTERNAL_WEBROOT_DIR
-#   LETS_ENCRYPT_LOGS_VOLUME_MAPPING
-#   LETS_ENCRYPT_VOLUME_MAPPING
-#   NGINX_SSL_PORT
-#   PROJECT_ROOT_DIR
-#   USE_LETS_ENCRYPT
-#   certbot_volume_mappings
-#   internal_dirs
+#   CERTBOT_VOLUME_MAPPINGS, CERTS_DH_VOLUME_MAPPING, INTERNAL_WEBROOT_DIR,
+#   LETS_ENCRYPT_LOGS_VOLUME_MAPPING, LETS_ENCRYPT_VOLUME_MAPPING,
+#   NGINX_SSL_PORT, PROJECT_ROOT_DIR, USE_LETS_ENCRYPT
+#   certbot_volume_mappings, internal_dirs
 # Arguments:
-#  None
-#######################################
+#   None
+################################################
 configure_docker_compose() {
-
+  # Local variables for service definitions and volume mappings
   local certbot_service_definition=""
   local http01_challenge_ports=""
   local shared_volume=""
   local certs_volume=""
 
+  # Configure for Let's Encrypt if enabled
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
-
     echo "Configuring Docker Compose for Let's Encrypt..."
+
+    # Ports for HTTP-01 challenge
     http01_challenge_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
     http01_challenge_ports+=$'\n      - "80:80"'
 
+    # Shared volumes for Let's Encrypt and SSL certificates
     shared_volume="- nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
     shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}
     shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}
@@ -37,6 +36,7 @@ configure_docker_compose() {
     certs_volume="    volumes:"
     certs_volume+=$'\n      - nginx-shared-volume:/etc/ssl/certs:ro"'
 
+    # Generate Certbot service definition
     certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$shared_volume")
   fi
 
@@ -45,11 +45,13 @@ configure_docker_compose() {
   local network_section
   local volume_section
 
+  # Assembling Docker Compose sections
   backend_section=$(create_backend_service "$certs_volume")
   frontend_section=$(create_frontend_service "$http01_challenge_ports" "$shared_volume")
   network_section=$(create_network_definition)
   volume_section=$(create_volume_definition)
 
+  # Write Docker Compose file
   {
     echo "version: '3.8'"
     echo "services:"
@@ -60,34 +62,23 @@ configure_docker_compose() {
     echo "$volume_section"
   } > "${PROJECT_ROOT_DIR}/docker-compose.yml"
 
+  # Display the generated Docker Compose file
   cat "${PROJECT_ROOT_DIR}/docker-compose.yml"
   echo "Docker Compose configuration written to ${PROJECT_ROOT_DIR}/docker-compose.yml"
 }
 
-#######################################
-# description
+################################################
+# Generates the command to be used with Certbot for SSL certificate generation.
+#
 # Globals:
-#   FORCE_RENEWAL_FLAG
-#   INTERNAL_WEBROOT_DIR
-#   NON_INTERACTIVE_FLAG
-#   NO_EFF_EMAIL_FLAG
-#   RSA_KEY_SIZE_FLAG
-#   TOS_FLAG
-#   DOMAIN_NAME
-#   dry_run_flag
-#   email_flag
-#   hsts_flag
-#   internal_dirs
-#   must_staple_flag
-#   ocsp_stapling_flag
-#   overwrite_self_signed_certs_flag
-#   production_certs_flag
-#   strict_permissions_flag
-#   SUBDOMAIN
-#   uir_flag
+#   FORCE_RENEWAL_FLAG, INTERNAL_WEBROOT_DIR, NON_INTERACTIVE_FLAG,
+#   NO_EFF_EMAIL_FLAG, RSA_KEY_SIZE_FLAG, TOS_FLAG, DOMAIN_NAME,
+#   dry_run_flag, email_flag, hsts_flag, internal_dirs, must_staple_flag,
+#   ocsp_stapling_flag, overwrite_self_signed_certs_flag, production_certs_flag,
+#   strict_permissions_flag, SUBDOMAIN, uir_flag
 # Arguments:
-#  None
-#######################################
+#   None
+################################################
 generate_certbot_command() {
   echo "certonly \
 --webroot \

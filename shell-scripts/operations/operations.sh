@@ -1,17 +1,43 @@
 #!/bin/bash
 
-# --- User Actions --- #
+#######################################
+# Setup project directories and configurations.
+# Globals:
+#   NGINX_PORT
+# Arguments:
+#  None
+#######################################
+setup() {
+    setup_project_directories
+    setup_docker_rootless
+    ensure_port_available "$NGINX_PORT"
+    prompt_for_domain_and_letsencrypt
+    generate_server_files
+    configure_nginx
+    build_and_run_docker
+}
 
+#######################################
 # Dumps logs of all containers orchestrated by the Docker Compose file.
+# Globals:
+#   PROJECT_LOGS_DIR
+# Arguments:
+#  None
+#######################################
 dump_logs() {
   test_docker_env
+  mkdir -p "$PROJECT_LOGS_DIR"
   produce_docker_logs > "$PROJECT_LOGS_DIR/service.log" && {
     echo "Docker logs dumped to $PROJECT_LOGS_DIR/service.log"
     cat "$PROJECT_LOGS_DIR/service.log"
   }
 }
 
+#######################################
 # Cleans current Docker Compose setup, arranges directories, and reinitiates Docker services.
+# Arguments:
+#  None
+#######################################
 reload() {
   echo "Reloading the project..."
   test_docker_env
@@ -22,33 +48,28 @@ reload() {
   build_and_run_docker
 }
 
+#######################################
 # Shuts down any running Docker containers associated with the project and deletes the entire project directory.
+# Arguments:
+#  None
+#######################################
 uninstall() {
   test_docker_env
   echo "Cleaning up..."
   purge_builds
 
-  declare -A directories=(
-                                  ["Project"]=$PROJECT_ROOT_DIR
-                                  ["Frontend"]=$FRONTEND_DIR
-                                  ["Backend"]=$BACKEND_DIR
-  )
+  # Directly delete the project root directory
+  if [[ -d $PROJECT_ROOT_DIR ]]; then
+    echo "Deleting Project directory $PROJECT_ROOT_DIR..."
+    rm -rf "$PROJECT_ROOT_DIR"
+    echo "Project directory $PROJECT_ROOT_DIR deleted."
+  fi
 
-  local dir_name
-  local dir_path
-
-  for dir_name in "${!directories[@]}"; do
-    dir_path="${directories[$dir_name]}"
-    if [[ -d $dir_path ]]; then
-      echo "Deleting $dir_name directory $dir_path..."
-      rm -rf "$dir_path"
-      echo "$dir_name directory $dir_path deleted."
-    fi
-  done
+  echo "Uninstallation complete."
 }
 
 #######################################
-# description
+# Moves user changes to stash and pulls latest changes from the remote repository.
 # Arguments:
 #  None
 #######################################
@@ -109,7 +130,7 @@ purge_builds() {
 #  None
 #######################################
 quit() {
-  echo "Exiting..."
+  echo "Quitting..."
   exit 0
 }
 
@@ -253,6 +274,13 @@ backup_and_replace_file() {
   echo "File updated and original version backed up."
 }
 
+#######################################
+# description
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+#######################################
 remove_dry_run_flag() {
   local temp_file
 
@@ -262,6 +290,13 @@ remove_dry_run_flag() {
   backup_and_replace_file "${PROJECT_ROOT_DIR}/docker-compose.yml" "$temp_file"
 }
 
+#######################################
+# description
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+#######################################
 remove_staging_flag() {
   local temp_file
 
