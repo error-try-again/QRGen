@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-       ["Project"]=$PROJECT_ROOT_DIR
-       ["Frontend"]=$FRONTEND_DIR
-       ["Backend"]=$BACKEND_DIR
+      ["Project"]=$PROJECT_ROOT_DIR
+      ["Frontend"]=$FRONTEND_DIR
+      ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -39,17 +39,18 @@ cleanup() {
 
   for dir_name in "${!directories[@]}"; do
     dir_path="${directories[$dir_name]}"
-    if [[ -d $dir_path   ]]; then
+    if [[ -d $dir_path ]]; then
+      echo "Deleting $dir_name directory $dir_path..."
       rm -rf "$dir_path"
-      cd "$HOME" || {
-        echo "Failed to change directory to $HOME"
-        exit 1
-      }
       echo "$dir_name directory $dir_path deleted."
     fi
   done
 
-  echo "Cleanup complete."
+  echo "Cleanup complete. Returning to the home directory."
+  cd ~ || {
+    echo "Failed to change directory to home directory"
+    exit 1
+  }
 }
 
 #######################################
