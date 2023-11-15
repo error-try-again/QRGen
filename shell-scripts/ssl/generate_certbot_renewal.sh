@@ -21,7 +21,7 @@ generate_certbot_renewal_job() {
 set -e
 
 # Load the environment variables
-source "${PROJECT_ROOT_DIR}/.env" || { echo "Failed to load .env file"; exit 1; }
+source "../.env" || { echo "Failed to load .env file"; exit 1; }
 
 # Ensure the log directory exists
 mkdir -p "${PROJECT_LOGS_DIR}" || { echo "Failed to create logs directory"; exit 1; }
@@ -50,7 +50,7 @@ renew_certbot() {
 
 # Start logging
 {
-  echo "Running certbot renewal script on \$(date)"
+  echo "Running certbot renewal script on $(date)"
   renew_certbot
 } | tee -a "\${LOG_FILE}" # Append output to log file
 EOF
