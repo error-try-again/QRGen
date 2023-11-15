@@ -29,9 +29,9 @@ cleanup() {
   stop_containers
 
   declare -A directories=(
-                 ["Project"]=$PROJECT_ROOT_DIR
-                 ["Frontend"]=$FRONTEND_DIR
-                 ["Backend"]=$BACKEND_DIR
+                        ["Project"]=$PROJECT_ROOT_DIR
+                        ["Frontend"]=$FRONTEND_DIR
+                        ["Backend"]=$BACKEND_DIR
   )
 
   local dir_name
@@ -192,34 +192,93 @@ handle_ambiguous_networks() {
 }
 
 #######################################
-# Removes the --dry-run flag from the Certbot command
+# Modifies the docker-compose.yml file to remove specified flags
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:
-#  None
+#   1 - Flag to remove
 #######################################
-remove_dry_run_flag() {
+modify_docker_compose() {
+  local flag_to_remove=$1
   local docker_compose_file="${PROJECT_ROOT_DIR}/docker-compose.yml"
   local temp_file
   temp_file="$(mktemp)"
 
-  echo "Checking for --dry-run flag in Certbot command..."
+  echo "Modifying docker-compose.yml to remove the $flag_to_remove flag..."
+  sed "/certbot:/,/command:/s/$flag_to_remove//" "$docker_compose_file" > "$temp_file"
 
-  # Remove --dry-run from the certbot command
-  sed '/certbot:/,/command:/s/--dry-run//' "$docker_compose_file" > "$temp_file"
+  echo "$temp_file"
+}
 
-  # Check if the flag was removed
-  if grep --quiet -- '--dry-run' "$temp_file"; then
-    echo "--dry-run flag removal failed."
-    rm "$temp_file"
+#######################################
+# Checks if the specified flag is removed from the file
+# Globals:
+#   None
+# Arguments:
+#   1 - File to check
+#   2 - Flag to check for
+#######################################
+check_flag_removal() {
+  local file=$1
+  local flag=$2
+
+  if grep --quiet -- "$flag" "$file"; then
+    echo "$flag removal failed."
+    rm "$file"
     exit 1
   else
-    # Backup docker-compose.yml & overwrite existing file
-    cp -rf "$docker_compose_file" "${docker_compose_file}.bak"
-
-    echo "--dry-run flag removed successfully."
-    mv "$temp_file" "$docker_compose_file"
+    echo "$flag removed successfully."
   fi
+}
+
+#######################################
+# Backs up the original file and replaces it with the modified version
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#   1 - Original file
+#   2 - Modified file
+#######################################
+backup_and_replace_file() {
+  local original_file=$1
+  local modified_file=$2
+
+  # Backup the original file
+  cp -rf "$original_file" "${original_file}.bak"
+
+  # Replace the original file with the modified version
+  mv "$modified_file" "$original_file"
+  echo "File updated and original version backed up."
+}
+
+#######################################
+# Removes the --dry-run flag from the docker-compose.yml file
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#   None
+#######################################
+remove_dry_run_flag() {
+  local temp_file
+
+  temp_file=$(modify_docker_compose '--dry-run')
+  check_flag_removal "$temp_file" '--dry-run'
+  backup_and_replace_file "${PROJECT_ROOT_DIR}/docker-compose.yml" "$temp_file"
+}
+
+#######################################
+# Removes the --staging flag from the docker-compose.yml file
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#   None
+#######################################
+remove_staging_flag() {
+  local temp_file
+
+  temp_file=$(modify_docker_compose '--staging')
+  check_flag_removal "$temp_file" '--staging'
+  backup_and_replace_file "${PROJECT_ROOT_DIR}/docker-compose.yml" "$temp_file"
 }
 
 #######################################
@@ -266,7 +325,9 @@ run_certbot_service() {
   # Check for the success message in the output
   if [[ $certbot_output == *"The dry run was successful."* ]]; then
     echo "Certbot dry run successful."
+    echo "Removing dry-run and staging flags from docker-compose.yml..."
     remove_dry_run_flag
+    remove_staging_flag
 
     # Rebuild and rerun the Certbot service without the dry-run flag
     docker compose build certbot
