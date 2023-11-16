@@ -44,7 +44,6 @@ custom_install_prompt() {
     prompt_yes_no "Would you like to enable Strict Permissions? (yes/no): " USE_STRICT_PERMISSIONS
     prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no): " USE_UIR
     prompt_yes_no "Would you like to overwrite self-signed certificates? (yes/no): " USE_OVERWRITE_SELF_SIGNED_CERTS
-    prompt_yes_no "Would you like to enable auto-renewal of SSL certificates? (yes/no): " USE_AUTO_RENEW_SSL
 }
 
 #######################################
@@ -87,7 +86,6 @@ automatic_selection() {
 # bashsupport disable=BP2001
 set_ssl_flag() {
    USE_SSL="true"
-   echo "SSL is set to $USE_SSL"
 }
 
 #######################################

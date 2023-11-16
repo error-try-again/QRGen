@@ -340,34 +340,32 @@ run_frontend_service() {
 #  None
 #######################################
 run_certbot_service() {
-  echo "Running Certbot service..."
-  docker compose build certbot
-
-  # Capture the output of the Certbot service
-  local certbot_output
-  certbot_output=$(docker compose run --rm certbot)
-
-  # Check for the success message in the output
-  if [[ $certbot_output == *"The dry run was successful."* ]]; then
-    echo "Certbot dry run successful."
-    echo "Removing dry-run and staging flags from docker-compose.yml..."
-    remove_dry_run_flag
-
-    if [[ $USE_PRODUCTION_SSL == "yes"   ]]; then
-      remove_staging_flag
-    fi
-
-    # Rebuild and rerun the Certbot service without the dry-run flag
+    echo "Running Certbot service..."
     docker compose build certbot
+
+    # Run Certbot and wait for it to complete
     docker compose up -d certbot
 
-    # Optionally, restart other services if needed
-    echo "Restarting other services..."
-    docker compose restart backend
-    docker compose restart frontend
+    # Wait for Certbot to complete and check status
+    echo "Waiting for Certbot to complete..."
+    while :; do
+        [[ "$(docker compose ps -q certbot | xargs docker inspect -f '{{.State.Status}}')" == "exited" ]] && break
+        sleep 5 # Wait for 5 seconds before rechecking
+  done
+
+    # Check if Certbot was successful
+    local certbot_logs
+    certbot_logs=$(docker compose logs certbot)
+    if [[ $certbot_logs == *"Renewing an existing certificate"* ]]; then
+        echo "Certbot process completed."
+
+        # Restart other services
+        echo "Restarting other services..."
+        docker compose restart backend
+        docker compose restart frontend
   else
-    echo "Certbot dry run failed."
-    exit 1
+        echo "Certbot process failed."
+        exit 1
   fi
 }
 
@@ -419,6 +417,7 @@ build_and_run_docker() {
     run_certbot_service
     echo "Using auto-renewal for SSL certificates."
     generate_certbot_renewal_job
+
   fi
 
   # Dump logs or any other post-run operations
