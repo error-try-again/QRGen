@@ -34,7 +34,7 @@ configure_docker_compose() {
     frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
 
     certs_volume="    volumes:"
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}:ro
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:/etcs/ssl/certs:ro
 
     # Generate Certbot service definition
     certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$frontend_certbot_shared_volume")
@@ -49,7 +49,7 @@ configure_docker_compose() {
     frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}:ro
 
     certs_volume="    volumes:"
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}:ro
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:/etcs/ssl/certs:ro
 
   else
     echo "Configuring Docker Compose without SSL certificates..."

@@ -67,7 +67,7 @@ configure_nginx() {
         resolver ${DNS_RESOLVER} valid=300s;
         resolver_timeout ${TIMEOUT};"
 
-    certs="ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/fullchain.pem;
+        certs="ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/fullchain.pem;
         ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/privkey.pem;
         ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/fullchain.pem;"
 
@@ -78,7 +78,7 @@ configure_nginx() {
 
     # Conditionally set security headers
     if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
-      certs="ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
+        certs="ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
         ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
         ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 
