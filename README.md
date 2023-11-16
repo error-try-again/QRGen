@@ -112,3 +112,39 @@ This should be changed in production environments.
 * Rewrite the installer in Python
 * Colour QR codes, logos & other customizations
 * Add additional QR code formats (E.g. Google Reviews, etc.)
+
+# Desktop Examples
+
+### Firefox Dark
+
+![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
+
+### Firefox Light
+
+![Demo1.png](images%2FDemo%2FDemo1.png)
+
+# Setup Screenshots
+
+### TUI
+
+![run-setup.png](images%2FGeneral%2Frun-setup.png)
+
+### Staging environment
+
+![auto-setup-staging.png](images%2FGeneral%2Fauto-setup-staging.png)
+
+### Production environment
+
+![select-production.png](images%2FGeneral%2Fselect-production.png)
+
+### Self-signed SSL certificate
+
+![regen-self-signed.png](images%2FGeneral%2Fregen-self-signed.png)
+
+### Machinectl
+
+![machinectl.png](images%2FLocal%2Fmachinectl.png)
+
+# Error Screenshots
+
+![rate-limit-error.png](images%2FGeneral%2Frate-limit-error.png)

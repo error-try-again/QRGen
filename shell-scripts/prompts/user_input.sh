@@ -88,7 +88,7 @@ prompt_for_ssl() {
   # Handling the decision for Let's Encrypt SSL
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     set_ssl_flag
-    prompt_yes_no "Would you like to run auto-setup for Let's Encrypt SSL (yes/no)(Recommended)? " USE_AUTO_SETUP
+    prompt_yes_no "Would you like to run automatic staging setup for Let's Encrypt SSL (yes/no)(Recommended)? " USE_AUTO_SETUP
     if [[ $USE_AUTO_SETUP == "yes" ]]; then
       automatic_selection
     else
