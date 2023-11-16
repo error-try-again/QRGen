@@ -143,7 +143,7 @@ quit() {
 #######################################
 handle_certs() {
   # Handle Let's Encrypt configuration
-  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
 
     # Generate self-signed certificates if they don't exist
     generate_self_signed_certificates

@@ -36,14 +36,14 @@ configure_nginx() {
 
   # Handle SUBDOMAIN configuration if necessary
   if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN     ]]; then
-    server_name="${SUBDOMAIN}.${DOMAIN_NAME}"
+    server_name="${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 
   # Update server_name_directive to include both domain and SUBDOMAIN if using Let's Encrypt
   local server_name_directive="server_name ${server_name};"
 
   # Handle Let's Encrypt configuration
-  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     backend_scheme="https"
     token_directive="server_tokens off;"
     server_name_directive="server_name ${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME};"

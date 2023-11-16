@@ -130,7 +130,7 @@ create_backend_service() {
       - \"${BACKEND_PORT}:${BACKEND_PORT}\"
     networks:
       - qrgen
-    $volume_section"
+$volume_section"
 }
 
 #######################################
