@@ -348,7 +348,7 @@ run_certbot_service() {
     run_certbot_dry_run || exit 1
     rebuild_and_rerun_certbot || exit 1
     wait_for_certbot_completion || exit 1
-    check_certbot_success && restart_services || exit 1
+    check_certbot_success || exit 1
 
     echo "Certbot process completed successfully."
 }
@@ -433,11 +433,19 @@ check_certbot_success() {
     local certbot_logs
     certbot_logs=$(docker compose logs certbot)
     echo "Certbot logs: $certbot_logs"
-    if [[ $certbot_logs != *'Renewing an existing certificate'* ]]; then
+
+    # Check for specific messages indicating certificate renewal success or failure
+    if [[ $certbot_logs == *'Certificate not yet due for renewal'* ]]; then
+        echo "Certificate is not yet due for renewal."
+        return 0
+  elif   [[ $certbot_logs == *'Renewing an existing certificate'* ]]; then
+        echo "Certificate renewal successful."
+       restart_services
+       return 0
+  else
         echo "Certbot process failed."
         return 1
   fi
-    return 0
 }
 
 restart_services() {
