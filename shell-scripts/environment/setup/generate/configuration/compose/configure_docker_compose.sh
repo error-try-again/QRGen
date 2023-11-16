@@ -105,8 +105,8 @@ ${email_flag} \
 ${TOS_FLAG} \
 ${NO_EFF_EMAIL_FLAG} \
 ${NON_INTERACTIVE_FLAG} \
-${FORCE_RENEWAL_FLAG} \
 ${RSA_KEY_SIZE_FLAG} \
+${force_renew_flag} \
 ${hsts_flag} \
 ${must_staple_flag} \
 ${uir_flag} \

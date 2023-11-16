@@ -133,7 +133,7 @@ initialize_cert_watcher() {
   # Restart services with Docker Compose
   restart_services() {
     echo "Restarting backend and frontend services..."
-    if ! docker compose restart backend || ! docker compose restart frontend; then
+    if ! docker compose restart frontend; then
         echo "Failed to restart services."
         return 1
     fi

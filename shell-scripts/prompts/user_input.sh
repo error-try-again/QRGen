@@ -37,6 +37,7 @@ custom_install_prompt() {
     prompt_for_input "Please enter your Let's Encrypt email or type 'skip' to skip: " "Error: Email address cannot be empty." LETSENCRYPT_EMAIL
     prompt_yes_no "Would you like to use a production SSL certificate? (yes/no): " USE_PRODUCTION_SSL
     prompt_yes_no "Would you like to use a dry run? (yes/no): " USE_DRY_RUN
+    prompt_yes_no "Would you like to force current certificate renewal? (yes/no): " USE_FORCE_RENEW
     prompt_yes_no "Would you like to automatically renew your SSL certificate? (yes/no): " USE_AUTO_RENEW_SSL
     prompt_yes_no "Would you like to enable HSTS? (yes/no): " USE_HSTS
     prompt_yes_no "Would you like to enable OCSP Stapling? (yes/no): " USE_OCSP_STAPLING
@@ -46,23 +47,6 @@ custom_install_prompt() {
     prompt_yes_no "Would you like to overwrite self-signed certificates? (yes/no): " USE_OVERWRITE_SELF_SIGNED_CERTS
 }
 
-#######################################
-# description
-# Globals:
-#   LETSENCRYPT_EMAIL
-#   USE_OVERWRITE_SELF_SIGNED_CERTS
-#   REGENERATE_SSL_CERTS
-#   USE_AUTO_RENEW_SSL
-#   USE_DRY_RUN
-#   USE_HSTS
-#   USE_MUST_STAPLE
-#   USE_OCSP_STAPLING
-#   USE_PRODUCTION_SSL
-#   USE_STRICT_PERMISSIONS
-#   USE_UIR
-# Arguments:
-#  None
-#######################################
 # bashsupport disable=BP5006
 automatic_selection() {
       LETSENCRYPT_EMAIL="skip"
@@ -125,16 +109,18 @@ prompt_for_ssl() {
 # description
 # Globals:
 #   LETSENCRYPT_EMAIL
-#   USE_OVERWRITE_SELF_SIGNED_CERTS
 #   USE_DRY_RUN
+#   USE_FORCE_RENEW
 #   USE_HSTS
 #   USE_MUST_STAPLE
 #   USE_OCSP_STAPLING
+#   USE_OVERWRITE_SELF_SIGNED_CERTS
 #   USE_PRODUCTION_SSL
 #   USE_STRICT_PERMISSIONS
 #   USE_UIR
 #   dry_run_flag
 #   email_flag
+#   force_renew_flag
 #   hsts_flag
 #   must_staple_flag
 #   ocsp_stapling_flag
@@ -149,6 +135,7 @@ construct_certbot_flags() {
   email_flag=$([[ $LETSENCRYPT_EMAIL == "skip"   ]] && echo "--register-unsafely-without-email" || echo "--email $LETSENCRYPT_EMAIL")
   production_certs_flag=$([[ $USE_PRODUCTION_SSL == "yes"   ]] && echo "" || echo "--staging")
   dry_run_flag=$([[ $USE_DRY_RUN == "yes"   ]] && echo "--dry-run" || echo "")
+  force_renew_flag=$([[ $USE_FORCE_RENEW == "yes"   ]] && echo "--force-renewal" || echo "")
   overwrite_self_signed_certs_flag=$([[ $USE_OVERWRITE_SELF_SIGNED_CERTS == "yes"   ]] && echo "--overwrite-cert-dirs" || echo "")
   ocsp_stapling_flag=$([[ $USE_OCSP_STAPLING == "yes"   ]] && echo "--staple-ocsp" || echo "")
   must_staple_flag=$([[ $USE_MUST_STAPLE == "yes"   ]] && echo "--must-staple" || echo "")
