@@ -136,7 +136,8 @@ initialize_cert_watcher() {
     if ! docker compose restart backend || ! docker compose restart frontend; then
         echo "Failed to restart services."
         return 1
-  fi
+    fi
+  }
 
   # Function to check and kill any existing watcher processes
   check_and_kill_existing_watchers() {
