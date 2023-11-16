@@ -48,7 +48,7 @@ const startHttpsServer = () => {
 };
 
 // Start server based on SSL configuration
-if (USE_SSL === 'true') {
+if (USE_SSL) {
   startHttpsServer();
 } else {
   http.createServer(app).listen(PORT, () => {
