@@ -46,8 +46,8 @@ configure_docker_compose() {
     http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
     http01_ports+=$'\n      - "80:80"'
 
-    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:${internal_dirs[INTERNAL_CERTS_DIR]}/privkey.pem:ro
-    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:${internal_dirs[INTERNAL_CERTS_DIR]}/fullchain.pem:ro
+    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem:ro
+    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem:ro
     frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}:ro
 
     certs_volume="    volumes:"

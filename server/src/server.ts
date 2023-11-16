@@ -28,7 +28,7 @@ app.use('/batch', rateLimiters.batchQRCode);
 app.use('/qr', qrCodeRoutes);
 
 // Check if USE_SSL string is not false
-const useSSL = process.env['USE_SSL'] !== 'false';
+const useSSL = process.env['USE_SSL'] === 'true';
 
 // Function to start HTTPS server
 const startHttpsServer = () => {

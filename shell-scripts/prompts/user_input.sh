@@ -87,6 +87,7 @@ automatic_selection() {
 # bashsupport disable=BP2001
 set_ssl_flag() {
    USE_SSL="true"
+   echo "SSL is set to $USE_SSL"
 }
 
 #######################################
