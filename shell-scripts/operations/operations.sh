@@ -135,7 +135,8 @@ quit() {
 }
 
 #######################################
-# description
+# Checks whether certs are required, if so, generates them.
+# Initializes cert file watcher to watch for changes to the certs.
 # Globals:
 #   USE_LETS_ENCRYPT
 # Arguments:
@@ -482,12 +483,8 @@ build_and_run_docker() {
     exit 1
   }
 
-  handle_certs || {
-    echo "Failed to handle certs"
-    exit 1
-  }
-
   # If Docker Compose is running, bring down the services
+  # Ensure that old services are brought down before proceeding
   if docker compose ps &> /dev/null; then
     echo "Bringing down existing Docker Compose services..."
     docker compose down || {
@@ -496,7 +493,12 @@ build_and_run_docker() {
     }
   fi
 
-  # Run each service separately
+  handle_certs || {
+    echo "Failed to handle certs"
+    exit 1
+  }
+
+  # Run each service separately - must be active for certbot to work
   run_backend_service
   run_frontend_service
 
