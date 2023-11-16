@@ -14,6 +14,7 @@
 #   SUBDOMAIN
 #   TIMEOUT
 #   USE_LETS_ENCRYPT
+#   USE_SELF_SIGNED_CERTS
 #   internal_dirs
 #   ssl_paths
 # Arguments:
@@ -33,24 +34,24 @@ configure_nginx() {
         listen [::]:$NGINX_PORT;"
   local ssl_listen_directive=""
   local acme_challenge_server_block=""
+  local security_headers=""
 
-  # Handle SUBDOMAIN configuration if necessary
-  if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN     ]]; then
+  # Handle SUBDOMAIN configuration
+  if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
     server_name="${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 
-  # Update server_name_directive to include both domain and SUBDOMAIN if using Let's Encrypt
+  # Set server_name_directive
   local server_name_directive="server_name ${server_name};"
 
-  # Handle Let's Encrypt configuration
-  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
+  # Handle HTTPS configuration
+  if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     backend_scheme="https"
     token_directive="server_tokens off;"
-    server_name_directive="server_name ${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME};"
     ssl_listen_directive="listen $NGINX_SSL_PORT ssl;
         listen [::]:$NGINX_SSL_PORT ssl;"
 
-    # Configure the SSL settings
+    # SSL Configuration
     ssl_config="
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_prefer_server_ciphers on;
@@ -61,29 +62,39 @@ configure_nginx() {
         ssl_session_tickets off;
         ssl_stapling on;
         ssl_stapling_verify on;
-
         resolver ${DNS_RESOLVER} valid=300s;
         resolver_timeout ${TIMEOUT};
-
         ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
         ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
         ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 
-    acme_challenge_server_block="server {
-        listen 80;
-        listen [::]:80;
-        server_name ${server_name};
+    security_headers="
+            add_header X-Frame-Options 'DENY' always;
+            add_header X-Content-Type-Options nosniff always;
+            add_header X-XSS-Protection '1; mode=block' always;"
 
-        location / {
-            return 301 https://\$host\$request_uri;
-        }
+    # Conditionally set security headers
+    if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
+      security_headers="
+            add_header Strict-Transport-Security 'max-age=31536000; includeSubDomains' always;
+            add_header Referrer-Policy 'strict-origin-when-cross-origin' always;"
+    fi
 
-        location /.well-known/acme-challenge/ {
-            allow all;
-            root /usr/share/nginx/html;
-        }
-    }"
-
+    # ACME Challenge Block for Let's Encrypt
+    if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
+      acme_challenge_server_block="server {
+          listen 80;
+          listen [::]:80;
+          server_name ${server_name};
+          location / {
+              return 301 https://\$host\$request_uri;
+          }
+          location /.well-known/acme-challenge/ {
+              allow all;
+              root /usr/share/nginx/html;
+          }
+      }"
+    fi
   fi
 
   # Backup existing configuration
@@ -113,12 +124,8 @@ http {
             root /usr/share/nginx/html;
             index index.html index.htm;
             try_files \$uri \$uri/ /index.html;
-            # Security headers
-            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-            add_header X-Frame-Options "DENY" always;
-            add_header X-Content-Type-Options nosniff always;
-            add_header X-XSS-Protection "1; mode=block" always;
-            add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+            ${security_headers}
         }
 
         location /qr/ {
@@ -128,17 +135,16 @@ http {
             proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         }
     }
-    $acme_challenge_server_block
+    ${acme_challenge_server_block}
  }
 EOF
 
-  # Check for errors in writing the configuration
+  # Check for errors and output result
   if [[ $? -ne 0 ]]; then
     echo "Error: Failed to write NGINX configuration."
     return 1
   fi
 
   cat "${PROJECT_ROOT_DIR}/nginx.conf"
-  # Output the result
   echo "NGINX configuration written to ${PROJECT_ROOT_DIR}/nginx.conf"
 }

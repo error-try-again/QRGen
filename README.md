@@ -29,11 +29,16 @@ that I can investigate further.
   Wifi, Zoom, Contact, Text)
 * Supports multiple QR code sizes
 * Supports multiple QR code error correction levels
-* QR Generation APIs (POST /qr/generate) or (POST /qr/batch)
-* CORS support, Rate limiting, and other security features
 * Responsive design
 * Mobile friendly
 * Dark mode
+* QR Generation APIs (POST /qr/generate) or (POST /qr/batch)
+* CORS support, Rate limiting, and other security features
+* Supports Custom Domains & Subdomains
+* Supports SSL termination using LetsEncrypt with automatic SSL certificate
+  installation
+* Supports automatic SSL certificate renewal (via cronjob)
+* Supports Self-signed SSL certificates (for development environments)
 
 ### Live Demo
 
@@ -98,11 +103,12 @@ This should be changed in production environments.
 * Add import mechanism for QR code generation (CSV, JSON, Excel, etc.)
 * API Documentation
 * CI/CD pipeline
-* Test coverage
+* Improved test coverage
 * Add additional deployment options (E.g. Kubernetes, etc.)
 * Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content
   persistence, content expiry, etc.)
 * Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code
-  generation history, dynamic QR code
-  generation, etc.)
+  generation history, dynamic QR code generation, etc.)
 * Rewrite the installer in Python
+* Colour QR codes, logos & other customizations
+* Add additional QR code formats (E.g. Google Reviews, etc.)
