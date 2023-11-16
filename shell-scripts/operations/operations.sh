@@ -143,7 +143,7 @@ quit() {
 #######################################
 handle_certs() {
   # Handle Let's Encrypt configuration
-  if [[ $USE_LETS_ENCRYPT == "yes"   ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
 
     # Generate self-signed certificates if they don't exist
     generate_self_signed_certificates
@@ -352,6 +352,10 @@ run_certbot_service() {
     echo "Certbot dry run successful."
     echo "Removing dry-run and staging flags from docker-compose.yml..."
     remove_dry_run_flag
+
+    if [[ $USE_PRODUCTION_SSL == "yes"   ]]; then
+      remove_staging_flag
+    fi
 
     # Rebuild and rerun the Certbot service without the dry-run flag
     docker compose build certbot

@@ -15,8 +15,8 @@
 configure_docker_compose() {
   # Local variables for service definitions and volume mappings
   local certbot_service_definition=""
-  local http01_challenge_ports=""
-  local shared_volume=""
+  local http01_ports=""
+  local frontend_certbot_shared_volume=""
   local certs_volume=""
 
   # Configure for Let's Encrypt if enabled
@@ -24,20 +24,32 @@ configure_docker_compose() {
     echo "Configuring Docker Compose for Let's Encrypt..."
 
     # Ports for HTTP-01 challenge
-    http01_challenge_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
-    http01_challenge_ports+=$'\n      - "80:80"'
+    http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
+    http01_ports+=$'\n      - "80:80"'
 
     # Shared volumes for Let's Encrypt and SSL certificates
-    shared_volume="- nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
-    shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}
-    shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}
-    shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
+    frontend_certbot_shared_volume="- nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
+    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}
+    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}
+    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
 
     certs_volume="    volumes:"
     certs_volume+=$'\n      - nginx-shared-volume:/etc/ssl/certs:ro"'
 
     # Generate Certbot service definition
-    certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$shared_volume")
+    certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$frontend_certbot_shared_volume")
+
+  elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
+    echo "Configuring Docker Compose for self-signed certificates..."
+
+    http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
+    http01_ports+=$'\n      - "80:80"'
+
+    certs_volume="    volumes:"
+    certs_volume+=$'\n      - nginx-shared-volume:/etc/ssl/certs:ro"'
+
+  else
+    echo "Configuring Docker Compose without SSL certificates..."
   fi
 
   local backend_section
@@ -47,7 +59,7 @@ configure_docker_compose() {
 
   # Assembling Docker Compose sections
   backend_section=$(create_backend_service "$certs_volume")
-  frontend_section=$(create_frontend_service "$http01_challenge_ports" "$shared_volume")
+  frontend_section=$(create_frontend_service "$http01_ports" "$frontend_certbot_shared_volume")
   network_section=$(create_network_definition)
   volume_section=$(create_volume_definition)
 
@@ -102,7 +114,7 @@ ${overwrite_self_signed_certs_flag}" \
 }
 
 #######################################
-# description
+# Generates the backend service definition for Docker Compose.
 # Globals:
 #   BACKEND_PORT
 # Arguments:
@@ -122,7 +134,7 @@ create_backend_service() {
 }
 
 #######################################
-# description
+# Generates the frontend service definition for Docker Compose.
 # Globals:
 #   NGINX_PORT
 # Arguments:
@@ -150,7 +162,7 @@ create_frontend_service() {
 }
 
 #######################################
-# description
+# Generates the Certbot service definition for Docker Compose.
 # Arguments:
 #   1
 #   2
@@ -170,7 +182,7 @@ create_certbot_service() {
 }
 
 #######################################
-# description
+# Generates the network definition for Docker Compose.
 # Arguments:
 #  None
 #######################################
@@ -181,14 +193,14 @@ create_network_definition() {
 }
 
 #######################################
-# description
+# Generates the volume definition for Docker Compose depending on whether SSL certificates are enabled.
 # Globals:
 #   USE_LETS_ENCRYPT
 # Arguments:
 #  None
 #######################################
 create_volume_definition() {
-  if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     echo "volumes:
   nginx-shared-volume:
     driver: local"

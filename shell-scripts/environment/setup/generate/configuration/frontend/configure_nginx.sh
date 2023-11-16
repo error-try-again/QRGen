@@ -43,7 +43,7 @@ configure_nginx() {
   local server_name_directive="server_name ${server_name};"
 
   # Handle Let's Encrypt configuration
-  if [[ $USE_LETS_ENCRYPT == "yes"   ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
     backend_scheme="https"
     token_directive="server_tokens off;"
     server_name_directive="server_name ${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME};"

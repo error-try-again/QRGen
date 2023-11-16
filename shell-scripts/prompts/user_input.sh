@@ -43,7 +43,7 @@ custom_install_prompt() {
     prompt_yes_no "Would you like to enable Must Staple? (yes/no): " USE_MUST_STAPLE
     prompt_yes_no "Would you like to enable Strict Permissions? (yes/no): " USE_STRICT_PERMISSIONS
     prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no): " USE_UIR
-    prompt_yes_no "Would you like to overwrite self-signed certificates? (yes/no): " OVERWRITE_SELF_SIGNED_CERTS
+    prompt_yes_no "Would you like to overwrite self-signed certificates? (yes/no): " USE_OVERWRITE_SELF_SIGNED_CERTS
     prompt_yes_no "Would you like to enable auto-renewal of SSL certificates? (yes/no): " USE_AUTO_RENEW_SSL
 }
 
@@ -51,7 +51,7 @@ custom_install_prompt() {
 # description
 # Globals:
 #   LETSENCRYPT_EMAIL
-#   OVERWRITE_SELF_SIGNED_CERTS
+#   USE_OVERWRITE_SELF_SIGNED_CERTS
 #   REGENERATE_SSL_CERTS
 #   USE_AUTO_RENEW_SSL
 #   USE_DRY_RUN
@@ -72,11 +72,21 @@ automatic_selection() {
       USE_HSTS="yes"
       USE_UIR="yes"
       USE_DRY_RUN="yes"
-      OVERWRITE_SELF_SIGNED_CERTS="yes"
+      USE_OVERWRITE_SELF_SIGNED_CERTS="yes"
       USE_PRODUCTION_SSL="no"
       USE_STRICT_PERMISSIONS="no"
       USE_OCSP_STAPLING="no"
       USE_MUST_STAPLE="no"
+}
+
+#######################################
+# Sets the environment variable flag for Express to use SSL
+# Arguments:
+#  None
+#######################################
+# bashsupport disable=BP2001
+set_ssl_flag() {
+   USE_SSL="true"
 }
 
 #######################################
@@ -91,12 +101,18 @@ automatic_selection() {
 prompt_for_ssl() {
   prompt_yes_no "Would you like to use Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? " USE_LETS_ENCRYPT
   if [[ $USE_LETS_ENCRYPT == "yes"   ]]; then
+    set_ssl_flag
     prompt_yes_no "Would you like to run auto-setup for Let's Encrypt SSL (yes/no)(Recommended)? " USE_AUTO_SETUP
     if [[ $USE_AUTO_SETUP == "yes"   ]]; then
       automatic_selection
     else
       custom_install_prompt
     fi
+  elif  [[ $USE_SELF_SIGNED_CERTS == "yes"   ]]; then
+    set_ssl_flag
+    prompt_yes_no "Would you like to regenerate the self-signed certificates (yes/no)? " REGENERATE_SSL_CERTS
+  else
+    echo "SSL will not be enabled."
   fi
 }
 
@@ -104,7 +120,7 @@ prompt_for_ssl() {
 # description
 # Globals:
 #   LETSENCRYPT_EMAIL
-#   OVERWRITE_SELF_SIGNED_CERTS
+#   USE_OVERWRITE_SELF_SIGNED_CERTS
 #   USE_DRY_RUN
 #   USE_HSTS
 #   USE_MUST_STAPLE
@@ -128,7 +144,7 @@ construct_certbot_flags() {
   email_flag=$([[ $LETSENCRYPT_EMAIL == "skip"   ]] && echo "--register-unsafely-without-email" || echo "--email $LETSENCRYPT_EMAIL")
   production_certs_flag=$([[ $USE_PRODUCTION_SSL == "yes"   ]] && echo "" || echo "--staging")
   dry_run_flag=$([[ $USE_DRY_RUN == "yes"   ]] && echo "--dry-run" || echo "")
-  overwrite_self_signed_certs_flag=$([[ $OVERWRITE_SELF_SIGNED_CERTS == "yes"   ]] && echo "--overwrite-cert-dirs" || echo "")
+  overwrite_self_signed_certs_flag=$([[ $USE_OVERWRITE_SELF_SIGNED_CERTS == "yes"   ]] && echo "--overwrite-cert-dirs" || echo "")
   ocsp_stapling_flag=$([[ $USE_OCSP_STAPLING == "yes"   ]] && echo "--staple-ocsp" || echo "")
   must_staple_flag=$([[ $USE_MUST_STAPLE == "yes"   ]] && echo "--must-staple" || echo "")
   strict_permissions_flag=$([[ $USE_STRICT_PERMISSIONS == "yes"   ]] && echo "--strict-permissions" || echo "")
