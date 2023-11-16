@@ -132,12 +132,10 @@ initialize_cert_watcher() {
 
   # Restart services with Docker Compose
   restart_services() {
-    local service_name="$1"
-    if docker compose -f "$compose_file" up -d "$service_name"; then
-      log_message "Service $service_name restarted successfully."
-    else
-      log_message "ERROR: Failed to restart the service $service_name."
-      exit 1
+    echo "Restarting backend and frontend services..."
+    if ! docker compose restart backend || ! docker compose restart frontend; then
+        echo "Failed to restart services."
+        return 1
     fi
   }
 
@@ -173,7 +171,7 @@ initialize_cert_watcher() {
       log_message "Detected change to $(basename "$filepath"), verifying update..."
       if certificate_updated; then
         log_message "Certificate update confirmed, restarting services..."
-        restart_services "frontend"
+        restart_services
       else
         log_message "No update to certificate detected."
       fi

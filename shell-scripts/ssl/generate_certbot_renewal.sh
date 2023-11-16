@@ -11,7 +11,8 @@
 # Arguments:
 #  None
 #######################################
-generate_certbot_renewal_job() {
+generate_certbot_renewal_job()
+                               {
 
   # Create the certbot renew script with a heredoc
   cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
@@ -53,10 +54,15 @@ EOF
   # Cron job to run certbot renewal every day at midnight
   local cron_job="0 0 * * 1-7 ${cron_script_path} >> ${cron_log_path} 2>&1"
 
-  # Add the cron job if it doesn't exist
-  (
-    crontab -l 2> /dev/null
-                          echo "$cron_job"
-  ) | crontab -
-
+  # Check if the cron job already exists
+  if ! crontab -l | grep -Fq "$cron_job"; then
+    # Add the cron job if it doesn't exist
+    (
+      crontab -l 2> /dev/null
+                               echo "$cron_job"
+    )                                             | crontab -
+    echo "Cron job added."
+  else
+    echo "Cron job already exists. No action taken."
+  fi
 }

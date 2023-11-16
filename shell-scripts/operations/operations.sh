@@ -8,13 +8,13 @@
 #  None
 #######################################
 setup() {
-    setup_project_directories
-    setup_docker_rootless
-    ensure_port_available "$NGINX_PORT"
-    prompt_for_domain_and_letsencrypt
-    generate_server_files
-    configure_nginx
-    build_and_run_docker
+  setup_project_directories
+  setup_docker_rootless
+  ensure_port_available "$NGINX_PORT"
+  prompt_for_domain_and_letsencrypt
+  generate_server_files
+  configure_nginx
+  build_and_run_docker
 }
 
 #######################################
@@ -143,7 +143,7 @@ quit() {
 #######################################
 handle_certs() {
   # Handle Let's Encrypt configuration
-  if [[ $USE_LETS_ENCRYPT == "yes"   ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
+  if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
 
     # Generate self-signed certificates if they don't exist
     generate_self_signed_certificates
@@ -333,7 +333,9 @@ run_frontend_service() {
 }
 
 #######################################
-# Runs the Certbot service, checks for dry run success, and reruns services
+# Runs the Certbot service, checks for dry run success, strips the dry run flag,
+# and runs the Certbot service again. Finally, restarts the backend and frontend services.
+# When running in production, the staging flag is also removed.
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:
@@ -341,31 +343,108 @@ run_frontend_service() {
 #######################################
 run_certbot_service() {
     echo "Running Certbot service..."
-    docker compose build certbot
 
-    # Run Certbot and wait for it to complete
-    docker compose up -d certbot
+    build_certbot_service || exit 1
+    run_certbot_dry_run || exit 1
+    rebuild_and_rerun_certbot || exit 1
+    wait_for_certbot_completion || exit 1
+    check_certbot_success && restart_services || exit 1
 
-    # Wait for Certbot to complete and check status
-    echo "Waiting for Certbot to complete..."
-    while :; do
-        [[ "$(docker compose ps -q certbot | xargs docker inspect -f '{{.State.Status}}')" == "exited" ]] && break
-        sleep 5 # Wait for 5 seconds before rechecking
+    echo "Certbot process completed successfully."
+}
+
+build_certbot_service() {
+    if ! docker compose build certbot; then
+        echo "Failed to build Certbot service."
+        return 1
+  fi
+}
+
+run_certbot_dry_run() {
+    local certbot_output
+    if ! certbot_output=$(docker compose run --rm certbot 2>&1); then
+        echo "Certbot dry-run command failed."
+        echo "Output: $certbot_output"
+        return 1
+  fi
+    echo "Certbot dry-run output: $certbot_output"
+
+    if [[ $certbot_output == *'The dry run was successful.'* ]]; then
+        echo "Certbot dry run successful."
+        handle_ssl_flags
+  else
+        echo "Certbot dry run failed."
+        return 1
+  fi
+}
+
+handle_ssl_flags() {
+    echo "Removing --dry-run flag from docker-compose.yml..."
+    remove_dry_run_flag
+
+    if [[ ${USE_PRODUCTION_SSL:-no} == "yes" ]]; then
+        echo "Certbot is running in production mode."
+        echo "Removing --staging flag from docker-compose.yml..."
+        remove_staging_flag
+  fi
+}
+
+rebuild_and_rerun_certbot() {
+    echo "Rebuilding and rerunning Certbot without dry-run..."
+    if ! docker compose build certbot || ! docker compose up -d certbot; then
+        echo "Failed to rebuild or run Certbot service."
+        return 1
+  fi
+}
+
+wait_for_certbot_completion() {
+    local attempt_count=0
+    local max_attempts=12
+    while ((attempt_count < max_attempts)); do
+
+        local certbot_container_id
+        local certbot_status
+
+        certbot_container_id=$(docker compose ps -q certbot)
+        if [[ -n $certbot_container_id ]]; then
+            certbot_status=$(docker inspect -f '{{.State.Status}}' "$certbot_container_id")
+            echo "Attempt $attempt_count: Certbot container status: $certbot_status"
+            if [[ $certbot_status == "exited" ]]; then
+                return 0
+      elif       [[ $certbot_status != "running" ]]; then
+                echo "Certbot container is in an unexpected state: $certbot_status"
+                return 1
+      fi
+    else
+            echo "Certbot container is not running."
+            break
+    fi
+        sleep 5
+        ((attempt_count++))
   done
 
-    # Check if Certbot was successful
+    if ((attempt_count == max_attempts)); then
+        echo "Certbot process timed out."
+        return 1
+  fi
+}
+
+check_certbot_success() {
     local certbot_logs
     certbot_logs=$(docker compose logs certbot)
-    if [[ $certbot_logs == *"Renewing an existing certificate"* ]]; then
-        echo "Certbot process completed."
-
-        # Restart other services
-        echo "Restarting other services..."
-        docker compose restart backend
-        docker compose restart frontend
-  else
+    echo "Certbot logs: $certbot_logs"
+    if [[ $certbot_logs != *'Renewing an existing certificate'* ]]; then
         echo "Certbot process failed."
-        exit 1
+        return 1
+  fi
+    return 0
+}
+
+restart_services() {
+    echo "Restarting backend and frontend services..."
+    if ! docker compose restart backend || ! docker compose restart frontend; then
+        echo "Failed to restart services."
+        return 1
   fi
 }
 
@@ -413,7 +492,7 @@ build_and_run_docker() {
   run_backend_service
   run_frontend_service
 
-  if [[ $USE_AUTO_RENEW_SSL == "yes"   ]]; then
+  if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
     run_certbot_service
     echo "Using auto-renewal for SSL certificates."
     generate_certbot_renewal_job
