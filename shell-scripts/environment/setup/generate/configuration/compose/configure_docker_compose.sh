@@ -34,7 +34,8 @@ configure_docker_compose() {
     frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
 
     certs_volume="    volumes:"
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:/etcs/ssl/certs:ro
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
 
     # Generate Certbot service definition
     certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$frontend_certbot_shared_volume")
