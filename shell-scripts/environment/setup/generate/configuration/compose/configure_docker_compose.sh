@@ -46,11 +46,13 @@ configure_docker_compose() {
     http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
     http01_ports+=$'\n      - "80:80"'
 
-    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}:ro
+    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:${internal_dirs[INTERNAL_CERTS_DIR]}/privkey.pem:ro
+    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:${internal_dirs[INTERNAL_CERTS_DIR]}/fullchain.pem:ro
     frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}:ro
 
     certs_volume="    volumes:"
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:/etcs/ssl/certs:ro
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
 
   else
     echo "Configuring Docker Compose without SSL certificates..."
