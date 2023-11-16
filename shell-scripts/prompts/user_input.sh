@@ -99,20 +99,27 @@ set_ssl_flag() {
 #  None
 #######################################
 prompt_for_ssl() {
+  # Prompt for using Let's Encrypt SSL
   prompt_yes_no "Would you like to use Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? " USE_LETS_ENCRYPT
-  if [[ $USE_LETS_ENCRYPT == "yes"   ]]; then
+
+  # Handling the decision for Let's Encrypt SSL
+  if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     set_ssl_flag
     prompt_yes_no "Would you like to run auto-setup for Let's Encrypt SSL (yes/no)(Recommended)? " USE_AUTO_SETUP
-    if [[ $USE_AUTO_SETUP == "yes"   ]]; then
+    if [[ $USE_AUTO_SETUP == "yes" ]]; then
       automatic_selection
     else
       custom_install_prompt
     fi
-  elif  [[ $USE_SELF_SIGNED_CERTS == "yes"   ]]; then
-    set_ssl_flag
-    prompt_yes_no "Would you like to regenerate the self-signed certificates (yes/no)? " REGENERATE_SSL_CERTS
   else
-    echo "SSL will not be enabled."
+    # Prompt for using Self-Signed Certificates if Let's Encrypt is not chosen
+    prompt_yes_no "Would you like to use self-signed SSL certificates instead (yes/no)? " USE_SELF_SIGNED_CERTS
+    if [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
+      set_ssl_flag
+      prompt_yes_no "Would you like to regenerate the self-signed certificates (yes/no)? " REGENERATE_SSL_CERTS
+    else
+      echo "SSL will not be enabled."
+    fi
   fi
 }
 
