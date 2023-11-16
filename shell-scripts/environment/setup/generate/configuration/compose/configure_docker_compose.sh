@@ -45,6 +45,9 @@ configure_docker_compose() {
     http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
     http01_ports+=$'\n      - "80:80"'
 
+    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}
+    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
+
     certs_volume="    volumes:"
     certs_volume+=$'\n      - nginx-shared-volume:/etc/ssl/certs:ro"'
 

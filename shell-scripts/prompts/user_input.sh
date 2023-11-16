@@ -116,7 +116,6 @@ prompt_for_ssl() {
     prompt_yes_no "Would you like to use self-signed SSL certificates instead (yes/no)? " USE_SELF_SIGNED_CERTS
     if [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
       set_ssl_flag
-      prompt_yes_no "Would you like to regenerate the self-signed certificates (yes/no)? " REGENERATE_SSL_CERTS
     else
       echo "SSL will not be enabled."
     fi
