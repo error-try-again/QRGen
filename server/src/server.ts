@@ -36,8 +36,8 @@ const startHttpsServer = () => {
     .then(fs => {
       import('node:https').then(https => {
         const sslOptions = {
-          key: fs.readFileSync('/etc/ssl/certs/privkey.pem'),
-          cert: fs.readFileSync('/etc/ssl/certs/cert.pem')
+          key: fs.readFileSync('/etc/letsencrypt/privkey.pem'),
+          cert: fs.readFileSync('/etc/letsencrypt/fullchain.pem')
         };
 
         https.createServer(sslOptions, app).listen(PORT, () => {

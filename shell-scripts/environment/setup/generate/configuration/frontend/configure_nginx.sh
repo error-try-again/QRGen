@@ -35,6 +35,7 @@ configure_nginx() {
   local ssl_listen_directive=""
   local acme_challenge_server_block=""
   local security_headers=""
+  local certs=""
 
   # Handle SUBDOMAIN configuration
   if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
@@ -55,18 +56,20 @@ configure_nginx() {
     ssl_config="
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_prefer_server_ciphers on;
-        ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5';
+        ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:ECDH+AES128:!DH+3DES:!ADH:!AECDH:!MD5';
         ssl_buffer_size 8k;
         ssl_dhparam ${ssl_paths[DH_PARAMS_PATH]};
         ssl_ecdh_curve secp384r1;
         ssl_session_tickets off;
         ssl_stapling on;
         ssl_stapling_verify on;
+
         resolver ${DNS_RESOLVER} valid=300s;
-        resolver_timeout ${TIMEOUT};
-        ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
-        ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
-        ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
+        resolver_timeout ${TIMEOUT};"
+
+    certs="ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/fullchain.pem;
+        ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/privkey.pem;
+        ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/fullchain.pem;"
 
     security_headers="
             add_header X-Frame-Options 'DENY' always;
@@ -75,7 +78,14 @@ configure_nginx() {
 
     # Conditionally set security headers
     if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
+      certs="ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
+        ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
+        ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
+
       security_headers="
+            add_header X-Frame-Options 'DENY' always;
+            add_header X-Content-Type-Options nosniff always;
+            add_header X-XSS-Protection '1; mode=block' always;
             add_header Strict-Transport-Security 'max-age=31536000; includeSubDomains' always;
             add_header Referrer-Policy 'strict-origin-when-cross-origin' always;"
     fi
@@ -113,12 +123,15 @@ http {
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
 
+
     server {
         ${listen_directive}
         ${ssl_listen_directive}
         ${token_directive}
         ${server_name_directive}
         ${ssl_config}
+
+        ${certs}
 
         location / {
             root /usr/share/nginx/html;

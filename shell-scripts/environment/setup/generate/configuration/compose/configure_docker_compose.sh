@@ -34,7 +34,7 @@ configure_docker_compose() {
     frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
 
     certs_volume="    volumes:"
-    certs_volume+=$'\n      - nginx-shared-volume:/etc/ssl/certs:ro"'
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}:ro
 
     # Generate Certbot service definition
     certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$frontend_certbot_shared_volume")
@@ -45,11 +45,11 @@ configure_docker_compose() {
     http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
     http01_ports+=$'\n      - "80:80"'
 
-    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}
-    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
+    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}:ro
+    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}:ro
 
     certs_volume="    volumes:"
-    certs_volume+=$'\n      - nginx-shared-volume:/etc/ssl/certs:ro"'
+    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}:ro
 
   else
     echo "Configuring Docker Compose without SSL certificates..."
@@ -157,7 +157,7 @@ create_frontend_service() {
     networks:
       - qrgen
     volumes:
-      - ./frontend:/usr/share/nginx/html
+      - ./frontend:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       $volume_section
     depends_on:
