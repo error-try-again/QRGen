@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { qrCodeRoutes } from "./routes/qr-code-routes";
-import { JSON_BODY_LIMIT, ORIGIN, PORT, TRUST_PROXY, USE_SSL } from "./config";
+import { JSON_BODY_LIMIT, ORIGIN, PORT, TRUST_PROXY } from "./config";
 import { rateLimiters } from "./middleware/rate-limiters";
 import dotenv from "dotenv";
 import http from "node:http";
@@ -27,8 +27,8 @@ app.use('/batch', rateLimiters.batchQRCode);
 // Routes
 app.use('/qr', qrCodeRoutes);
 
-// Conditional SSL setup
-const useSSL = USE_SSL === 'true';
+// Check if USE_SSL string is not false
+const useSSL = process.env['USE_SSL'] !== 'false';
 
 // Function to start HTTPS server
 const startHttpsServer = () => {
