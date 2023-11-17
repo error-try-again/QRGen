@@ -1,134 +1,201 @@
 #!/bin/bash
 
-set -euo pipefail
+. .env
 
-# Configuration Variables
-USER_NAME="${1:-docker-primary}"
-NVM_INSTALL_URL="https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh"
-NODE_VERSION="20.8.0"
-
-# Ensure correct number of arguments
-if [[ $# -gt 2 ]]; then
-  echo "Usage: $0 [username] [uninstall]"
-  exit 1
-fi
-
-UNINSTALL_MODE=false
-if [[ "${2:-}" == "uninstall" ]]; then
-  UNINSTALL_MODE=true
-fi
-
-# ---- Package Install/Uninstall ---- #
-
-install_packages() {
+#######################################
+# Installs necessary packages, sets up Docker, and configures GPG for Docker.
+# Globals:
+#   VERSION_CODENAME
+# Arguments:
+#   None
+#######################################
+function install_packages() {
   echo "Removing conflicting packages..."
-  local REMOVE_PACKAGES=(docker.io docker-doc docker-compose podman-docker containerd runc)
-  local package
-  for package in "${REMOVE_PACKAGES[@]}"; do
+  local remove_packages=(docker.io docker-doc docker-compose podman-docker containerd runc)
+  for package in "${remove_packages[@]}"; do
     sudo apt-get remove -y "$package"
   done
 
   echo "Installing required packages..."
-
   sudo apt-get update -y
   sudo apt-get install -y ca-certificates curl gnupg uidmap inotify-tools
 
   sudo install -m 0755 -d /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
   sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
   sudo apt-get update -y
-  sudo apt-get install -y jq docker-ce docker-ce-cli containerd.io \
-    docker-buildx-plugin docker-compose-plugin
+  sudo apt-get install -y jq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 }
 
-uninstall_packages() {
+#######################################
+# Uninstalls Docker and related packages.
+# Arguments:
+#   None
+#######################################
+function uninstall_packages() {
   echo "Attempting to uninstall packages..."
-
-  local PACKAGES=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose)
-  local package
-  for package in "${PACKAGES[@]}"; do
+  local packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose)
+  for package in "${packages[@]}"; do
     sudo apt-get purge -y "$package" || {
       echo "Error occurred during uninstallation of $package. This might have left your system in an inconsistent state."
       echo "You might want to try manually resolving package issues or consider using 'sudo apt --fix-broken install'."
     }
   done
 
-  sudo rm /etc/apt/sources.list.d/docker.list
+  if [ -f /etc/apt/sources.list.d/docker.list ]; then
+    echo "Removing Docker repository..."
+    sudo rm /etc/apt/sources.list.d/docker.list
+  fi
+
   sudo apt-get autoremove -y
 }
 
-# ---- Helper Functions ---- #
-
-adjust_sysctl_for_port() {
+#######################################
+# Adjusts sysctl settings to expose specific ports.
+# Arguments:
+#   1 - Port number to adjust
+#######################################
+function adjust_sysctl_for_port() {
   local port="$1"
   local setting="net.ipv4.ip_unprivileged_port_start=$port"
 
-  # Automatically adjust sysctl settings if not set
   if ! grep -q "^$setting$" /etc/sysctl.conf; then
     echo "Adjusting sysctl settings to expose port $port..."
-    echo "$setting" | sudo tee -a /etc/sysctl.conf >/dev/null && sudo sysctl -p
+    echo "$setting" | sudo tee -a /etc/sysctl.conf > /dev/null && sudo sysctl -p
   fi
 }
 
-# ---- User Functions ---- #
+# Individual User Setup Methods
+function setup_user_with_random_password() {
+  local password
+  password=$(openssl rand -base64 32)
+  echo "$user_name:$password" | sudo chpasswd
+  echo "Generated password for $user_name: $password"
+}
 
-setup_user() {
-  echo "Setting up $USER_NAME user..."
-  if ! id "$USER_NAME" &>/dev/null; then
-    sudo adduser --disabled-password --gecos "" "$USER_NAME"
-    echo "$USER_NAME:test" | sudo chpasswd
-  fi
+#######################################
+# description
+# Globals:
+#   USER_PASSWORD
+#   user_name
+# Arguments:
+#  None
+#######################################
+function setup_user_with_env_variable() {
+  local password=${USER_PASSWORD:-defaultPassword}
+  echo "$user_name:$password" | sudo chpasswd
+  echo "Password set for $user_name from environment variable."
+}
 
-  is_port_exposable() {
-    nc -zv 127.0.0.1 "$1" &>/dev/null
-  }
+#######################################
+# description
+# Globals:
+#   password
+#   user_name
+# Arguments:
+#  None
+#######################################
+function setup_user_with_prompt() {
+  read -rsp "Enter password for $user_name: " password
+  echo
+  echo "$user_name:$password" | sudo chpasswd
+  echo "Password set for $user_name from prompt."
+}
 
-  # Check and adjust port 443
-  if ! is_port_exposable 443; then
-    adjust_sysctl_for_port 443
-  fi
+# Unified User Setup Function
+function setup_user() {
+    echo "Setting up $user_name user..."
 
-  # Check and adjust port 80
-  if ! is_port_exposable 80; then
-    adjust_sysctl_for_port 80
+    if id "$user_name" &> /dev/null; then
+        local user_choice
+        echo "User $user_name already exists."
+        echo "1) Reset password"
+        echo "2) Skip user setup"
+        read -rp "Your choice (1-2): " user_choice
+
+        case $user_choice in
+            1) choose_password_setting ;;
+            2) echo "Quit." ;;
+            *)
+               echo "Invalid choice. Quitting."
+               return
+               ;;
+    esac
+  else
+        sudo adduser --disabled-password --gecos "" "$user_name"
+        choose_password_setting
   fi
 }
 
-remove_user() {
-  echo "Removing $USER_NAME user..."
-  local response
+#######################################
+# description
+# Arguments:
+#  None
+#######################################
+function choose_password_setting() {
+    local choice
+    echo "Select method for setting user password:"
+    echo "1. Generate a Random Password"
+    echo "2. Use an Environment Variable .env (USER_PASSWORD)"
+    echo "3. Prompt for Password"
+    read -rp "Enter choice (1-5): " choice
 
-  if pgrep -u "$USER_NAME" >/dev/null; then
-    echo "There are active processes running under the $USER_NAME user."
-    read -r "Would you like to kill all processes and continue with user removal? (y/N) " response
-    if [[ "$response" =~ ^[Yy][Ee]?[Ss]?$ ]]; then
-      pkill -u "$USER_NAME"
+    case $choice in
+      1) setup_user_with_random_password ;;
+      2) setup_user_with_env_variable ;;
+      3) setup_user_with_prompt ;;
+      *) echo "Invalid choice. Skipping password setup." ;;
+  esac
+}
+
+#######################################
+# Removes a user and their home directory, with a prompt to kill active processes.
+# Globals:
+#   user_name
+# Arguments:
+#   None
+#######################################
+function remove_user() {
+  echo "Removing $user_name user..."
+  if pgrep -u "$user_name" > /dev/null; then
+    echo "There are active processes running under the $user_name user."
+    read -rp "Would you like to kill all processes and continue with user removal? (y/N) " response
+    if [[ $response =~ ^[Yy][Ee]?[Ss]?$ ]]; then
+      sudo pkill -9 -u "$user_name"
+      sleep 2  # Allow some time for processes to be terminated
     else
       echo "Skipping user removal."
       return
     fi
   fi
 
-  sudo deluser --remove-home "$USER_NAME"
+  sudo deluser --remove-home "$user_name"
 }
 
-# ---- Node ---- #
-
-setup_nvm_node() {
+#######################################
+# Sets up NVM and Node.js for the specified user.
+# Globals:
+#   NODE_VERSION
+#   nvm_install_url
+#   user_name
+# Arguments:
+#   None
+#######################################
+function setup_nvm_node() {
   echo "Setting up NVM and Node.js..."
 
-  if id "$USER_NAME" &>/dev/null; then
-    sudo mkdir -p /home/"$USER_NAME"/.nvm
-    sudo chown "$USER_NAME":"$USER_NAME" /home/"$USER_NAME"/.nvm
+  if id "$user_name" &> /dev/null; then
+    sudo mkdir -p /home/"$user_name"/.nvm
+    sudo chown "$user_name:$user_name" /home/"$user_name"/.nvm
 
-    sudo -Eu "$USER_NAME" bash <<EOF
-export NVM_DIR="/home/$USER_NAME/.nvm"
-export npm_config_cache="/home/$USER_NAME/.npm"
-curl -o- $NVM_INSTALL_URL | bash
+    sudo -Eu "$user_name" bash << EOF
+export NVM_DIR="/home/$user_name/.nvm"
+export npm_config_cache="/home/$user_name/.npm"
+curl -o- $nvm_install_url | bash
 source "\$NVM_DIR/nvm.sh"
 nvm install $NODE_VERSION
 nvm use $NODE_VERSION
@@ -136,38 +203,109 @@ nvm alias default $NODE_VERSION
 npm install -g npm
 EOF
   else
-    echo "User $USER_NAME does not exist. Exiting..."
+    echo "User $user_name does not exist. Exiting..."
     exit 1
   fi
 }
 
-remove_nvm_node() {
+#######################################
+# Removes NVM and Node.js for the specified user.
+# Globals:
+#   user_name
+# Arguments:
+#   None
+#######################################
+function remove_nvm_node() {
   echo "Removing NVM and Node.js..."
-  if id "$USER_NAME" &>/dev/null; then
-    if [[ -f /home/$USER_NAME/.nvm/nvm.sh ]]; then
-      sudo -Eu "$USER_NAME" bash <<'EOF'
-source ~/.nvm/nvm.sh
-nvm deactivate
-nvm uninstall $(nvm current)
-rm -rf ~/.nvm
-EOF
+  if id "$user_name" &> /dev/null; then
+    local nvm_dir="/home/$user_name/.nvm"
+    local nvm_sh="$nvm_dir/nvm.sh"
+
+    if [ -s "$nvm_sh" ]; then
+      # Load NVM and uninstall Node versions
+      sudo -u "$user_name" bash -c "source $nvm_sh && nvm deactivate && nvm uninstall --lts && nvm uninstall --current"
+
+      # Remove NVM directory
+      sudo rm -rf "$nvm_dir"
+      echo "NVM and Node.js removed for user $user_name."
     else
-      echo "NVM is not installed for $USER_NAME. Skipping..."
+      echo "NVM is not installed for $user_name. Skipping..."
     fi
   else
-    echo "User $USER_NAME does not exist. Exiting..."
+    echo "User $user_name does not exist. Exiting..."
     exit 1
   fi
 }
 
-# ---- Main Function/Entry ---- #
+#######################################
+# description
+# Globals:
+#   choice
+# Arguments:
+#  None
+#######################################
+function installation_menu() {
+  local choice
+    echo "Choose an action:"
+    echo "1) Install Packages and Dependencies"
+    echo "2) Setup User Account"
+    echo "3) Setup NVM and Node.js"
+    echo "4) Full Installation (All)"
+    echo "5) Uninstall Packages and Dependencies"
+    echo "6) Remove User Account"
+    echo "7) Remove NVM and Node.js"
+    echo "8) Full Uninstallation (All)"
+    read -rp "Your choice (1-8): " choice
 
-if $UNINSTALL_MODE; then
-  remove_nvm_node
-  remove_user
-  uninstall_packages
-else
-  install_packages
-  setup_user
-  setup_nvm_node
-fi
+    case $choice in
+        1) install_packages ;;
+        2) setup_user ;;
+        3) setup_nvm_node ;;
+        4)
+           setup_user
+           install_packages
+           setup_nvm_node
+           ;;
+        5) uninstall_packages ;;
+        6) remove_user ;;
+        7) remove_nvm_node ;;
+        8)
+           remove_nvm_node
+           remove_user
+           uninstall_packages
+           ;;
+        *)
+           echo "Invalid choice. Exiting."
+           exit 1
+           ;;
+  esac
+}
+
+#######################################
+# Main function to control the script flow.
+# Globals:
+#   LANG
+#   LC_ALL
+#   NODE_VERSION
+#   TERM
+#   nvm_install_url
+#   user_name
+# Arguments:
+#   0 - Script name
+#   1 - User name (optional)
+#######################################
+function main() {
+  export TERM=${TERM:-xterm}
+  export LC_ALL=en_US.UTF-8
+  export LANG=en_US.UTF-8
+
+  set -euo pipefail
+
+  user_name="${1:-docker-primary}"
+  nvm_install_url="https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh"
+  NODE_VERSION="20.8.0"
+
+  installation_menu
+}
+
+main "$@"
