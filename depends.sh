@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. .env
+set -euo pipefail
 
 #######################################
 # Installs necessary packages, sets up Docker, and configures GPG for Docker.
@@ -40,10 +40,11 @@ function uninstall_packages() {
   echo "Attempting to uninstall packages..."
   local packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose)
   for package in "${packages[@]}"; do
-    sudo apt-get purge -y "$package" || {
-      echo "Error occurred during uninstallation of $package. This might have left your system in an inconsistent state."
-      echo "You might want to try manually resolving package issues or consider using 'sudo apt --fix-broken install'."
-    }
+    if ! sudo apt-get purge -y "$package"; then
+      echo "Error occurred during uninstallation of $package."
+      echo "Attempting to fix broken installs."
+      sudo apt --fix-broken install
+    fi
   done
 
   if [ -f /etc/apt/sources.list.d/docker.list ]; then
@@ -69,41 +70,30 @@ function adjust_sysctl_for_port() {
   fi
 }
 
-# Individual User Setup Methods
-function setup_user_with_random_password() {
-  local password
-  password=$(openssl rand -base64 32)
-  echo "$user_name:$password" | sudo chpasswd
-  echo "Generated password for $user_name: $password"
-}
-
 #######################################
-# description
+# Sets a new password for a given user with a prompt.
+# Prompts the user to enter a new password.
 # Globals:
-#   USER_PASSWORD
-#   user_name
+#   user_name - The name of the user for whom the password is being set.
 # Arguments:
-#  None
-#######################################
-function setup_user_with_env_variable() {
-  local password=${USER_PASSWORD:-defaultPassword}
-  echo "$user_name:$password" | sudo chpasswd
-  echo "Password set for $user_name from environment variable."
-}
-
-#######################################
-# description
-# Globals:
-#   password
-#   user_name
-# Arguments:
-#  None
+#   None
 #######################################
 function setup_user_with_prompt() {
-  read -rsp "Enter password for $user_name: " password
-  echo
-  echo "$user_name:$password" | sudo chpasswd
-  echo "Password set for $user_name from prompt."
+  if [ -z "$user_name" ]; then
+    echo "Error: user_name is not set."
+    return 1
+  fi
+
+  if ! id "$user_name" &> /dev/null; then
+    echo "User $user_name does not exist."
+    return 2
+  fi
+
+  echo "Setting a new password for $user_name."
+  passwd "$user_name" || {
+    echo "Failed to set password for $user_name."
+    return 3
+  }
 }
 
 # Unified User Setup Function
@@ -115,41 +105,23 @@ function setup_user() {
         echo "User $user_name already exists."
         echo "1) Reset password"
         echo "2) Skip user setup"
-        read -rp "Your choice (1-2): " user_choice
+        while true; do
+            read -rp "Your choice (1-2): " user_choice
+            case $user_choice in
+                1 | 2) break ;;
+                *) echo "Please enter a valid choice (1 or 2)." ;;
+      esac
+    done
 
         case $user_choice in
-            1) choose_password_setting ;;
-            2) echo "Quit." ;;
-            *)
-               echo "Invalid choice. Quitting."
-               return
-               ;;
+            1) setup_user_with_prompt ;;
+            2) echo "User setup skipped." ;;
+            *) echo "Invalid choice. Exiting." ;;
     esac
   else
         sudo adduser --disabled-password --gecos "" "$user_name"
-        choose_password_setting
+        setup_user_with_prompt
   fi
-}
-
-#######################################
-# description
-# Arguments:
-#  None
-#######################################
-function choose_password_setting() {
-    local choice
-    echo "Select method for setting user password:"
-    echo "1. Generate a Random Password"
-    echo "2. Use an Environment Variable .env (USER_PASSWORD)"
-    echo "3. Prompt for Password"
-    read -rp "Enter choice (1-5): " choice
-
-    case $choice in
-      1) setup_user_with_random_password ;;
-      2) setup_user_with_env_variable ;;
-      3) setup_user_with_prompt ;;
-      *) echo "Invalid choice. Skipping password setup." ;;
-  esac
 }
 
 #######################################
@@ -163,6 +135,7 @@ function remove_user() {
   echo "Removing $user_name user..."
   if pgrep -u "$user_name" > /dev/null; then
     echo "There are active processes running under the $user_name user."
+    local response
     read -rp "Would you like to kill all processes and continue with user removal? (y/N) " response
     if [[ $response =~ ^[Yy][Ee]?[Ss]?$ ]]; then
       sudo pkill -9 -u "$user_name"
@@ -238,11 +211,11 @@ function remove_nvm_node() {
 }
 
 #######################################
-# description
+# Provides a menu for the installation and configuration tasks.
 # Globals:
-#   choice
+#   None
 # Arguments:
-#  None
+#   None
 #######################################
 function installation_menu() {
   local choice
@@ -295,11 +268,15 @@ function installation_menu() {
 #   1 - User name (optional)
 #######################################
 function main() {
+  # Check for necessary privileges
+  if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root. Please use sudo."
+    exit 1
+  fi
+
   export TERM=${TERM:-xterm}
   export LC_ALL=en_US.UTF-8
   export LANG=en_US.UTF-8
-
-  set -euo pipefail
 
   user_name="${1:-docker-primary}"
   nvm_install_url="https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh"
