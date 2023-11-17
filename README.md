@@ -3,11 +3,14 @@
 ## Summary
 
 This project aims to automate the setup of a full-stack QR code generation service within rootless, dockerized environments. 
+The project is written in TS (Express), TSX (Vite/React), Bash/Shell (Automation) and has several layers.
 
-    Setup: Two Bash scripts used to orchestrate containers, setup enviornments, and install dependencies.
-    Backend: A Node.js server powered by Express, written in TypeScript. 
-    Frontend: A Vite-React TSX application powered by NGINX proxying requests to the backend.
-    SSL: NGINX reverse proxy with SSL termination using LetsEncrypt.
+    Installers:  
+        1. Dependency installation, running depends.sh as root ensures that all of the required dependencies are present, and that the required (non-root) user is set up correctly. 
+        2. Project installation, running install.sh kicks off a set of scripts that provision multiple custom docker instances, configuration files, and automated features.   
+    Backend: A Node.js server powered by Express, which handles the project API. 
+    Frontend: A Vite-React TSX application powered by NGINX, providing SSL termination in the case it's setup, and proxying backend queries. 
+    SSL/Certbot: A custom certbot image, automatically built from sources, provides the infrastructure necessary for production SSL certificates. 
 
 The entire project is self-hostable and has been built over <s>a weekend</s> about a month.
 Although it's been thoroughly tested manually at the time of writing, unit tests are still a work in progress.
@@ -48,16 +51,27 @@ If you encounter any bugs, please feel free to open an issue or a pull request s
 ```bash
 cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen && chmod +x depends.sh && sudo ./depends.sh
 # Select 1) Full Installation (All)
-machinectl shell docker-primary@ $HOME/QRGen/install.sh
+```
+```bash
+cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
 # 1) Run Setup 
 ```
 
 ## Remote Install Instructions:
 
+_with keys_
 ```bash
-ssh -i .ssh/mykey docker-primary@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
+ssh -i .ssh/mykey root@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
 # Select 1) Full Installation (All)
-ssh -t -i .ssh/mykey docker-primary@myhost /home/docker-primary/QRGen/install.sh
+ssh -t -i .ssh/my-other-key docker-primary@myhost /home/docker-primary/QRGen/install.sh
+# 1) Run Setup 
+```
+
+_without keys_
+```bash
+ssh root@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
+# Select 1) Full Installation (All)
+ssh docker-primary@myhost /home/docker-primary/QRGen/install.sh
 # 1) Run Setup 
 ```
 
@@ -76,6 +90,7 @@ ssh -t -i .ssh/mykey docker-primary@myhost /home/docker-primary/QRGen/install.sh
 * Rewrite the installer in Python
 * Colour QR codes, logos & other customizations
 * Add additional QR code formats (E.g. Google Reviews, etc.)
+* Write up
 
 # Desktop Examples
 
