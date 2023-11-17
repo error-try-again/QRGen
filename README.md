@@ -69,7 +69,18 @@ cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
 
 ## Remote Install Instructions:
 
-_with keys_
+_With keys, without ssh root-login_
+```bash
+ssh -i .ssh/mykey default-user@myhost
+sudo su
+git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh
+# Select 1) Full Installation (All)
+exit && exit 
+ssh -t -i .ssh/my-other-key docker-primary@myhost /home/docker-primary/QRGen/install.sh
+# 1) Run Setup 
+```
+
+_With keys, with ssh root-login_
 ```bash
 ssh -i .ssh/mykey root@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
 # Select 1) Full Installation (All)
@@ -77,13 +88,26 @@ ssh -t -i .ssh/my-other-key docker-primary@myhost /home/docker-primary/QRGen/ins
 # 1) Run Setup 
 ```
 
-_without keys_
+_Without keys_
 ```bash
 ssh root@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
 # Select 1) Full Installation (All)
 ssh docker-primary@myhost /home/docker-primary/QRGen/install.sh
 # 1) Run Setup 
 ```
+
+_For Default HTTP Servers_
+
+_For Self-Signed Certificates & HTTPS Servers_
+
+_For Lets-Encrypt Staging Certificates & Dry Run_
+
+_For Lets-Encrypt Productions Certificates & HTTPS Servers_
+
+# Security
+
+### Remote 
+Regardless of your particular environment, I highly recommend you make use of ssh keys, and disable password auth by setting 'PasswordAuthentication no' in /etc/ssh/sshd_config & restarting sshd
 
 # Roadmap
 
