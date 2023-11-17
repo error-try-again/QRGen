@@ -37,6 +37,16 @@ If you encounter any bugs, please feel free to open an issue or a pull request s
 * Supports automatic SSL certificate renewal (via cronjob)
 * Supports Self-signed SSL certificates (for development environments)
 
+# Desktop Examples
+
+### Firefox Dark
+
+![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
+
+### Firefox Light
+
+![Demo1.png](images%2FDemo%2FDemo1.png)
+
 ### Live Demo
 
 [Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
@@ -91,16 +101,6 @@ ssh docker-primary@myhost /home/docker-primary/QRGen/install.sh
 * Colour QR codes, logos & other customizations
 * Add additional QR code formats (E.g. Google Reviews, etc.)
 * Write up
-
-# Desktop Examples
-
-### Firefox Dark
-
-![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
-
-### Firefox Light
-
-![Demo1.png](images%2FDemo%2FDemo1.png)
 
 # Setup Screenshots
 
