@@ -246,38 +246,38 @@ function remove_nvm_node() {
 #######################################
 function installation_menu() {
   local choice
-    echo "Choose an action:"
-    echo "1) Install Packages and Dependencies"
-    echo "2) Setup User Account"
-    echo "3) Setup NVM and Node.js"
-    echo "4) Full Installation (All)"
-    echo "5) Uninstall Packages and Dependencies"
-    echo "6) Remove User Account"
-    echo "7) Remove NVM and Node.js"
-    echo "8) Full Uninstallation (All)"
-    read -rp "Your choice (1-8): " choice
+  echo "Choose an action:"
+  echo "1) Full Installation (All)"
+  echo "2) Setup User Account"
+  echo "3) Install Packages and Dependencies"
+  echo "4) Setup NVM and Node.js"
+  echo "5) Uninstall Packages and Dependencies"
+  echo "6) Remove User Account"
+  echo "7) Remove NVM and Node.js"
+  echo "8) Full Uninstallation (All)"
+  read -rp "Your choice (1-8): " choice
 
-    case $choice in
-        1) install_packages ;;
-        2) setup_user ;;
-        3) setup_nvm_node ;;
-        4)
-           setup_user
-           install_packages
-           setup_nvm_node
-           ;;
-        5) uninstall_packages ;;
-        6) remove_user ;;
-        7) remove_nvm_node ;;
-        8)
-           remove_nvm_node
-           remove_user
-           uninstall_packages
-           ;;
-        *)
-           echo "Invalid choice. Exiting."
-           exit 1
-           ;;
+  case $choice in
+    1)
+      setup_user
+      install_packages
+      setup_nvm_node
+      ;;
+    2) setup_user ;;
+    3) install_packages ;;
+    4) setup_nvm_node ;;
+    5) uninstall_packages ;;
+    6) remove_user ;;
+    7) remove_nvm_node ;;
+    8)
+      remove_nvm_node
+      remove_user
+      uninstall_packages
+      ;;
+    *)
+      echo "Invalid choice. Exiting."
+      exit 1
+      ;;
   esac
 }
 
