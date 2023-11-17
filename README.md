@@ -67,6 +67,7 @@ _Tech_
 ### Live Demo
 
 [Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
+
 _If the demo server is down it's very likely due to active tests and it's probably worth checking back in a couple hours_
 
 ### Tested on:
