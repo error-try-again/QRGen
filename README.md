@@ -58,41 +58,58 @@ If you encounter any bugs, please feel free to open an issue or a pull request s
 
 ## Local Install Instructions:
 
+_Run the dependency installation script_
 ```bash
 cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen && chmod +x depends.sh && sudo ./depends.sh
 # Select 1) Full Installation (All)
 ```
+
+_Enter into a new shell with the newly created user, run project installation script._ 
 ```bash
 cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
 # 1) Run Setup 
 ```
 
+_For Default HTTP Servers_
+
+_For Self-Signed Certificates & HTTPS Servers_
+
+_For Lets-Encrypt Staging Certificates & Dry Run_
+
+_For Lets-Encrypt Productions Certificates & HTTPS Servers_
+
 ## Remote Install Instructions:
 
-_With keys, without ssh root-login_
+### Step 1
+_With keys, without ssh root-login, run the dependency installation script_
 ```bash
-ssh -i .ssh/mykey default-user@myhost
+# Connect to your remote host
+ssh -i .ssh/<yourkey> <generic-user>@<hostip>
+
+# Download dependency installer
+wget https://raw.githubusercontent.com/error-try-again/QRGen/main/depends.sh && chmod +x depends.sh
+
+# Elevate user
 sudo su
-git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh
+
+# Run dependency installer 
+sudo ./depends.sh
 # Select 1) Full Installation (All)
-exit && exit 
-ssh -t -i .ssh/my-other-key docker-primary@myhost /home/docker-primary/QRGen/install.sh
-# 1) Run Setup 
+
+# Exit root user, exit ssh session
+exit && exit
+
 ```
 
-_With keys, with ssh root-login_
+### Step 2
+_Create fresh user ssh key, run the project installation script_
 ```bash
-ssh -i .ssh/mykey root@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
-# Select 1) Full Installation (All)
-ssh -t -i .ssh/my-other-key docker-primary@myhost /home/docker-primary/QRGen/install.sh
-# 1) Run Setup 
-```
+# Setup fresh user key locally
+ssh-keygen
+ssh-copy-id -i ~/.ssh/<a-fresh-public-key> docker-primary@<hostip>
 
-_Without keys_
-```bash
-ssh root@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
-# Select 1) Full Installation (All)
-ssh docker-primary@myhost /home/docker-primary/QRGen/install.sh
+# Use your fresh key to remote in & install the project
+ssh -t -i .ssh/<a-fresh-public-key> docker-primary@<hostip> "cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen && /home/docker-primary/QRGen/install.sh"
 # 1) Run Setup 
 ```
 
