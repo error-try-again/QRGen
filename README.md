@@ -2,40 +2,61 @@
 
 ## Summary
 
-This project aims to automate the setup of a full-stack QR code generation service within rootless, dockerized environments. 
-The project is written in TS (Express), TSX (Vite/React), Bash/Shell (Automation) and has several layers.
+This project aims to automate the setup of a scalable full-stack QR code generation
+service within a rootless Docker environment, with a focus on security, ease of use,
+and simplicity. The project is written in TS (Express), TSX (Vite/React),
+Bash/Shell (Automation) and has several key layers.
 
-    Installers:  
-        1. Dependency installation, running depends.sh as root ensures that all of the required dependencies are present, and that the required (non-root) user is set up correctly. 
-        2. Project installation, running install.sh kicks off a set of scripts that provision multiple custom docker instances, configuration files, and automated features.   
-    Backend: A Node.js server powered by Express, which handles the project API. 
-    Frontend: A Vite-React TSX application powered by NGINX, providing SSL termination in the case it's setup, and proxying backend queries. 
-    SSL/Certbot: A custom certbot image, automatically built from sources, provides the infrastructure necessary for production SSL certificates. 
+The idea was initially conceived when I found myself needing to generate a large
+number of QR codes for a project, and I was unable to find a suitable
+self-hostable solution. I decided to build my own, and QRGen was born.
 
-The entire project is self-hostable and has been built over <s>a weekend</s> about a month.
-Although it's been thoroughly tested manually at the time of writing, unit tests are still a work in progress.
+The project is free because I was so damn sick of seeing QR code generation
+services monetizing the hell out of their users. I hope others find it useful and
+can make use of what I've built here.
 
-There might be some unforeseen bugs and rough edges. For the future of the project, see the Roadmap section. 
-If you encounter any bugs, please feel free to open an issue or a pull request so that I can investigate further.
+The project is self-hostable and has been developed over approximately a month.
+It's undergone extensive manual testing. Continuous improvements and bug fixes are
+expected, with contributions welcome.
+
+A full write up and comprehensive documentation is coming soon, but for now,
+here's a quick overview of the project.
 
 ## Features
 
-* Self-hostable QR code generation service (Docker)
-* Supports Bulk QR code generation (up to 1000 QR codes at a time)
-* Supports multiple QR code formats (URL, SMS, Email, Events, Phone, Geolocation,
-  Wifi, Zoom, Contact, Text)
-* Supports multiple QR code sizes
-* Supports multiple QR code error correction levels
-* Responsive design
-* Mobile friendly
-* Dark mode
-* QR Generation APIs (POST /qr/generate) or (POST /qr/batch)
-* CORS support, Rate limiting, and other security features
-* Supports Custom Domains & Subdomains
-* Supports SSL termination using LetsEncrypt with automatic SSL certificate
-  installation
-* Supports automatic SSL certificate renewal (via cronjob)
-* Supports Self-signed SSL certificates (for development environments)
+_QRGen supports the following formats for regular and bulk QR code generation (E.g.
+1000+ QR codes at once):_
+
+- Text
+- URLs & links
+- SMS
+- Email
+- Events
+- Phone
+- Geolocation
+- Wifi
+- Zoom
+- Digital Contact Cards
+- Crypto Currencies
+
+_UI_
+
+- Dark mode, responsive, and mobile-friendly design.
+
+_Tech_
+
+- Self-hostable QR code generation
+    - Supports custom domains and subdomains, custom ports, etc.
+    - Various formats and sizes, with multiple error correction levels.
+    - Highly automated & scalable.
+    - Supports multiple environments (development, staging, production, etc.)
+        - Self-signed SSL certificate support for development environments. (TLS
+          1.2 & 1.3)
+        - LetsEncrypt support for staging & production environments.
+        - Automated SSL certificate renewal via cron.
+- Rootless & Dockerized.
+- Security features: CORS, rate limiting, OCSP stapling, HSTS, and more.
+- Provides QR Generation web APIs (POST /qr/generate) or (POST /qr/batch)
 
 # Desktop Examples
 
@@ -56,15 +77,18 @@ If you encounter any bugs, please feel free to open an issue or a pull request s
 * on Ubuntu 22.04.3 LTS, jammy, 5.15.0-87-generic SMP x86_64 GNU/Linux
 * on Pop!_OS 22.04 LTS, jammy, 6.5.6-76060506-generic SMP x86_64 GNU/Linux
 
-## Local Install Instructions:
+## Local Setup:
 
 _Run the dependency installation script_
+
 ```bash
 cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen && chmod +x depends.sh && sudo ./depends.sh
 # Select 1) Full Installation (All)
 ```
 
-_Enter into a new shell with the newly created user, run project installation script._ 
+_Enter into a new shell with the newly created user, run project installation
+script._
+
 ```bash
 cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
 # 1) Run Setup 
@@ -78,10 +102,12 @@ _For Lets-Encrypt Staging Certificates & Dry Run_
 
 _For Lets-Encrypt Productions Certificates & HTTPS Servers_
 
-## Remote Install Instructions:
+## Remote Setup:
 
 ### Step 1
+
 _With keys, without ssh root-login, run the dependency installation script_
+
 ```bash
 # Connect to your remote host
 ssh -i .ssh/<yourkey> <generic-user>@<hostip>
@@ -102,7 +128,9 @@ exit && exit
 ```
 
 ### Step 2
+
 _Create fresh user ssh key, run the project installation script_
+
 ```bash
 # Setup fresh user key locally
 ssh-keygen
@@ -121,10 +149,15 @@ _For Lets-Encrypt Staging Certificates & Dry Run_
 
 _For Lets-Encrypt Productions Certificates & HTTPS Servers_
 
-# Security
+# Security Recommendations
 
-### Remote 
-Regardless of your particular environment, I highly recommend you make use of ssh keys, and disable password auth by setting 'PasswordAuthentication no' in /etc/ssh/sshd_config & restarting sshd
+### Remote
+
+- Regardless of your particular environment, I highly recommend you make use of ssh
+  keys, and disable password auth by setting 'PasswordAuthentication no' in
+  /etc/ssh/sshd_config & restarting sshd.
+
+- More to come. (E.g. Fail2Ban, etc.)
 
 # Roadmap
 
@@ -166,5 +199,7 @@ Regardless of your particular environment, I highly recommend you make use of ss
 ![machinectl.png](images%2FLocal%2Fmachinectl.png)
 
 # Error Screenshots
+
+## LetsEncrypt Rate Limit Example
 
 ![rate-limit-error.png](images%2FGeneral%2Frate-limit-error.png)
