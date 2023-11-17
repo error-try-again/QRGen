@@ -2,24 +2,18 @@
 
 ## Summary
 
-This project aims to automate the setup of a full-stack QR code generation service
-within rootless, dockerized
-environments.
+This project aims to automate the setup of a full-stack QR code generation service within rootless, dockerized environments. 
 
     Setup: Two Bash scripts used to orchestrate containers, setup enviornments, and install dependencies.
     Backend: A Node.js server powered by Express, written in TypeScript. 
     Frontend: A Vite-React TSX application powered by NGINX proxying requests to the backend.
     SSL: NGINX reverse proxy with SSL termination using LetsEncrypt.
 
-The entire project is self-hostable and has been built over <s>a weekend</s>
-about a month.
-Although it's been thoroughly tested manually at the time of writing, unit tests are
-still a work in progress.
+The entire project is self-hostable and has been built over <s>a weekend</s> about a month.
+Although it's been thoroughly tested manually at the time of writing, unit tests are still a work in progress.
 
-There might be some unforeseen bugs and rough edges. For the future roadmap, skip to
-the the bottom of this README.
-If you encounter any bugs, please feel free to open an issue or a pull request so
-that I can investigate further.
+There might be some unforeseen bugs and rough edges. For the future of the project, see the Roadmap section. 
+If you encounter any bugs, please feel free to open an issue or a pull request so that I can investigate further.
 
 ## Features
 
@@ -49,53 +43,23 @@ that I can investigate further.
 * on Ubuntu 22.04.3 LTS, jammy, 5.15.0-87-generic SMP x86_64 GNU/Linux
 * on Pop!_OS 22.04 LTS, jammy, 6.5.6-76060506-generic SMP x86_64 GNU/Linux
 
-## Installation Instructions:
+## Local Install Instructions:
 
 ```bash
-cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen
+cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen && chmod +x depends.sh && sudo ./depends.sh
+# Select 1) Full Installation (All)
+machinectl shell docker-primary@ $HOME/QRGen/install.sh
+# 1) Run Setup 
 ```
 
-_Ensures that the host system has all the required dependencies_
+## Remote Install Instructions:
 
 ```bash
-chmod +x depends.sh
-sudo ./depends.sh
+ssh -i .ssh/mykey docker-primary@myhost "git clone https://github.com/error-try-again/QRGen.git && cd QRGen && ~/QRGen/depends.sh"
+# Select 1) Full Installation (All)
+ssh -t -i .ssh/mykey docker-primary@myhost /home/docker-primary/QRGen/install.sh
+# 1) Run Setup 
 ```
-
-_If you are running the project locally, you must use the following command to build
-and install the core project_
-
-```bash
-machinectl shell docker-primary@ $HOME/QRGen/install.sh $HOME/QRGen/
-```
-
-_If you are running the project on a remote server, you must use the following
-command to build and install the core
-project_
-
-```bash
-ssh -t <user>@<host> "./$HOME/QRGen/install.sh $HOME/QRGen/"
-```
-
-_If you are already logged in remotely_
-
-```bash
-./install.sh
-# Select run
-```
-
-_Uninstall the project_
-
-```bash
-sudo ./depends.sh uninstall
-./install.sh
-# Select Uninstall
-```
-
-## Security Notes
-
-setup-deps.sh sets the default password for docker-primary to 'test'.
-This should be changed in production environments.
 
 # Roadmap
 
