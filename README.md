@@ -96,7 +96,7 @@ _For Self-Signed Certificates & HTTPS Servers_
 
 _For Lets-Encrypt Staging Certificates & Dry Run_
 
-_For Lets-Encrypt Productions Certificates & HTTPS Servers_
+_For Lets-Encrypt Production Certificates & HTTPS Servers_
 
 ## Remote Setup:
 
@@ -143,7 +143,43 @@ _For Self-Signed Certificates & HTTPS Servers_
 
 _For Lets-Encrypt Staging Certificates & Dry Run_
 
-_For Lets-Encrypt Productions Certificates & HTTPS Servers_
+_For Lets-Encrypt Production Certificates & HTTPS Servers_
+
+```
+# Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+# yes
+# Enter your domain name (e.g., example.com): qr-gen.net
+# Using custom domain name: http://qr-gen.net
+# Would you like to specify a subdomain other than the default (none) (yes/no)?
+# yes
+# Enter your subdomain name (e.g., www): void
+# Using custom subdomain: http://void.qr-gen.net
+# Would you like to use Let's Encrypt SSL for qr-gen.net (yes/no)?
+# yes
+# Would you like to run automatic staging setup for Let's Encrypt SSL (yes/no) (Recommended)?
+# no
+# Please enter your Let's Encrypt email or type 'skip' to skip: skip
+# Would you like to use a production SSL certificate? (yes/no):
+# yes
+# Would you like to use a dry run? (yes/no):
+# yes
+# Would you like to force current certificate renewal? (yes/no):
+# yes
+# Would you like to automatically renew your SSL certificate? (yes/no):
+# yes
+# Would you like to enable HSTS? (yes/no):
+# yes
+# Would you like to enable OCSP Stapling? (yes/no):
+# yes
+# Would you like to enable Must Staple? (yes/no):
+# no
+# Would you like to enable Strict Permissions? (yes/no):
+# no
+# Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no):
+# yes
+# Would you like to overwrite self-signed certificates? (yes/no):
+# yes
+```
 
 # Security Recommendations
 
