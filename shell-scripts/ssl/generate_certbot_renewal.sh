@@ -11,8 +11,7 @@
 # Arguments:
 #  None
 #######################################
-generate_certbot_renewal_job()
-                               {
+generate_certbot_renewal_job() {
 
   # Create the certbot renew script with a heredoc
   cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
