@@ -84,11 +84,6 @@ function setup_user_with_prompt() {
     return 1
   fi
 
-  if ! id "$user_name" &> /dev/null; then
-    echo "User $user_name does not exist."
-    return 2
-  fi
-
   echo "Setting a new password for $user_name."
   passwd "$user_name" || {
     echo "Failed to set password for $user_name."
@@ -112,7 +107,6 @@ function setup_user() {
                 *) echo "Please enter a valid choice (1 or 2)." ;;
       esac
     done
-
         case $user_choice in
             1) setup_user_with_prompt ;;
             2) echo "User setup skipped." ;;
@@ -274,6 +268,7 @@ function main() {
     exit 1
   fi
 
+  # Exports the current terminal & sets the locale to UTF-8 to the script's environment for automated execution
   export TERM=${TERM:-xterm}
   export LC_ALL=en_US.UTF-8
   export LANG=en_US.UTF-8

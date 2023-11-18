@@ -11,14 +11,6 @@
 #######################################
 produce_docker_logs() {
   if docker_compose_exists; then
-    # Define the path to your Docker Compose file
-    local compose_file="$PROJECT_ROOT_DIR/docker-compose.yml"
-
-    # Check if the Compose file exists
-    if [ ! -f "$compose_file" ]; then
-      echo "Docker Compose file not found: $compose_file"
-      return 1
-    fi
 
     # Get a list of services defined in the Compose file
     local services

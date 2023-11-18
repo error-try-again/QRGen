@@ -10,25 +10,17 @@
 stop_containers() {
   test_docker_env
 
-  local docker_compose_file="$PROJECT_ROOT_DIR/docker-compose.yml"
+  local containers_to_stop=$(docker ps -a -q --filter "name=qrgen")
 
-  if [[ -f $docker_compose_file ]]; then
-    echo "docker-compose.yml exists. Attempting to stop containers with docker-compose..."
+  if docker_compose_exists && [ -f "$docker_compose_file" ]; then
+    echo "Stopping containers using docker-compose..."
     docker compose -f "$docker_compose_file" down
+  fi
 
-    # Re-check if any containers are still running
-    if docker ps -a | grep -q 'qrgen'; then
-      echo "Some containers are still running. Attempting to force stop..."
-      docker ps -a | grep 'qrgen' | awk '{print $1}' | xargs -r docker stop
-    else
-      echo "No containers to stop."
-    fi
+  if [ -n "$containers_to_stop" ]; then
+    echo "Force stopping remaining 'qrgen' containers..."
+    docker stop $containers_to_stop
   else
-    echo "docker-compose.yml does not exist. Stopping all Docker containers starting with 'qrgen'..."
-    if docker ps -a | grep -q 'qrgen'; then
-      docker ps -a | grep 'qrgen' | awk '{print $1}' | xargs -r docker stop
-    else
-      echo "No 'qrgen' containers to stop."
-    fi
+    echo "No 'qrgen' containers to stop."
   fi
 }
