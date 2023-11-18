@@ -8,18 +8,14 @@ and simplicity. The project is written in TS (Express), TSX (Vite/React),
 Bash/Shell (Automation) and has several key layers.
 
 The idea was initially conceived when I found myself needing to generate a large
-number of QR codes for a project, and I was unable to find a suitable
-self-hostable solution. I decided to build my own, and QRGen was born.
-
-The project is free because I was so damn sick of seeing QR code generation
-services monetizing the hell out of their users. I hope others find it useful and
-can make use of what I've built here.
+number of QR codes for a project, and I was unable to find a suitable self-hostable solution. I decided to build my own, and QRGen was born. The project is free because I was so damn sick of seeing QR code generation
+services monetizing the hell out of their users, and I hope that others find it useful and can make use of what I've built here.
 
 The project is self-hostable and has been developed over approximately a month.
 It's undergone extensive manual testing. Continuous improvements and bug fixes are
 expected, with contributions welcome.
 
-A full write up and comprehensive documentation is coming soon, but for now,
+A full write up and comprehensive documentation is underway, but for now,
 here's a quick overview of the project.
 
 ## Features
@@ -72,6 +68,8 @@ _Tech_
 
 [Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
 
+_If the demo server is down it's very likely due to active tests and it's probably worth checking back in a couple hours_
+
 ### Tested on:
 
 * on Ubuntu 22.04.3 LTS, jammy, 5.15.0-87-generic SMP x86_64 GNU/Linux
@@ -94,13 +92,49 @@ cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
 # 1) Run Setup 
 ```
 
-_For Default HTTP Servers_
+_For Default HTTP Servers_ (TBC)
 
-_For Self-Signed Certificates & HTTPS Servers_
+_For Self-Signed Certificates & HTTPS Servers_ (TBC)
 
-_For Lets-Encrypt Staging Certificates & Dry Run_
+_For Lets-Encrypt Staging Certificates & Dry Run_ (TBC)
 
-_For Lets-Encrypt Productions Certificates & HTTPS Servers_
+_For Lets-Encrypt Production Certificates & HTTPS Servers_
+
+```
+# Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+# yes
+# Enter your domain name (e.g., example.com): qr-gen.net
+# Using custom domain name: http://qr-gen.net
+# Would you like to specify a subdomain other than the default (none) (yes/no)?
+# yes
+# Enter your subdomain name (e.g., www): void
+# Using custom subdomain: http://void.qr-gen.net
+# Would you like to use Let's Encrypt SSL for qr-gen.net (yes/no)?
+# yes
+# Would you like to run automatic staging setup for Let's Encrypt SSL (yes/no) (Recommended)?
+# no
+# Please enter your Let's Encrypt email or type 'skip' to skip: skip
+# Would you like to use a production SSL certificate? (yes/no):
+# yes
+# Would you like to use a dry run? (yes/no):
+# yes
+# Would you like to force current certificate renewal? (yes/no):
+# yes
+# Would you like to automatically renew your SSL certificate? (yes/no):
+# yes
+# Would you like to enable HSTS? (yes/no):
+# yes
+# Would you like to enable OCSP Stapling? (yes/no):
+# yes
+# Would you like to enable Must Staple? (yes/no):
+# no
+# Would you like to enable Strict Permissions? (yes/no):
+# no
+# Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no):
+# yes
+# Would you like to overwrite self-signed certificates? (yes/no):
+# yes
+```
 
 ## Remote Setup:
 
@@ -141,13 +175,49 @@ ssh -t -i .ssh/<a-fresh-public-key> docker-primary@<hostip> "cd ~ && git clone h
 # 1) Run Setup 
 ```
 
-_For Default HTTP Servers_
+_For Default HTTP Servers_ (TBC)
 
-_For Self-Signed Certificates & HTTPS Servers_
+_For Self-Signed Certificates & HTTPS Servers_ (TBC)
 
-_For Lets-Encrypt Staging Certificates & Dry Run_
+_For Lets-Encrypt Staging Certificates & Dry Run_ (TBC)
 
-_For Lets-Encrypt Productions Certificates & HTTPS Servers_
+_For Lets-Encrypt Production Certificates & HTTPS Servers_
+
+```
+# Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+# yes
+# Enter your domain name (e.g., example.com): qr-gen.net
+# Using custom domain name: http://qr-gen.net
+# Would you like to specify a subdomain other than the default (none) (yes/no)?
+# yes
+# Enter your subdomain name (e.g., www): void
+# Using custom subdomain: http://void.qr-gen.net
+# Would you like to use Let's Encrypt SSL for qr-gen.net (yes/no)?
+# yes
+# Would you like to run automatic staging setup for Let's Encrypt SSL (yes/no) (Recommended)?
+# no
+# Please enter your Let's Encrypt email or type 'skip' to skip: skip
+# Would you like to use a production SSL certificate? (yes/no):
+# yes
+# Would you like to use a dry run? (yes/no):
+# yes
+# Would you like to force current certificate renewal? (yes/no):
+# yes
+# Would you like to automatically renew your SSL certificate? (yes/no):
+# yes
+# Would you like to enable HSTS? (yes/no):
+# yes
+# Would you like to enable OCSP Stapling? (yes/no):
+# yes
+# Would you like to enable Must Staple? (yes/no):
+# no
+# Would you like to enable Strict Permissions? (yes/no):
+# no
+# Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no):
+# yes
+# Would you like to overwrite self-signed certificates? (yes/no):
+# yes
+```
 
 # Security Recommendations
 
