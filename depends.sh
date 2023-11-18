@@ -18,7 +18,7 @@ function install_packages() {
 
   echo "Installing required packages..."
   sudo apt-get update -y
-  sudo apt-get install -y ca-certificates curl gnupg uidmap inotify-tools
+  sudo apt-get install -y ca-certificates netcat curl gnupg uidmap inotify-tools
 
   sudo install -m 0755 -d /etc/apt/keyrings
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg

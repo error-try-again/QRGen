@@ -19,7 +19,7 @@ is_port_in_use() {
 
 ensure_port_available() {
   local port="$1"
-  local default_port=8080 # Define a default port, if necessary
+  local default_port=$NGINX_PORT # Store the default port in case we need to use it again.
 
   # Check if the port is in use, and prompt for a new one if it is.
   while is_port_in_use "$port"; do

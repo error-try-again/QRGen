@@ -21,17 +21,12 @@ setup_project_directories() {
   done
 
   local src_dir="$HOME/QRGen/src"
+  local server_src_dir="$src_dir/server"
 
-  if [[ -d $src_dir   ]]; then
+  if [[ -d $src_dir && -d $server_src_dir  ]]; then
     copy_server_files
   else
-    echo "Error: $src_dir does not exist. Attempting to create."
-    if mkdir -p "$src_dir"; then
-      echo "Source directory $src_dir created."
-      copy_server_files
-    else
-      echo "Error: Failed to create $src_dir"
-      exit 1
-    fi
+    echo "Error: Sources are not available, exiting..."
+    exit 1
   fi
 }
