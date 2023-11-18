@@ -6,7 +6,7 @@ export const WriteUpLink: React.FC = () => {
   return (
     <a
       style={link}
-      href="https://www.error-try-again.com/qr-code-generator"
+      href="https://insomniacvoid.dev/posts/qr-gen"
       target="_blank"
       rel="noopener noreferrer"
     >

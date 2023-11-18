@@ -8,15 +8,19 @@ and simplicity. The project is written in TS (Express), TSX (Vite/React),
 Bash/Shell (Automation) and has several key layers.
 
 The idea was initially conceived when I found myself needing to generate a large
-number of QR codes for a project, and I was unable to find a suitable self-hostable solution. I decided to build my own, and QRGen was born. The project is free because I was so damn sick of seeing QR code generation
-services monetizing the hell out of their users, and I hope that others find it useful and can make use of what I've built here.
+number of QR codes for a project, and I was unable to find a suitable self-hostable
+solution. I decided to build my own, and QRGen was born. The project is free because
+I was so damn sick of seeing QR code generation
+services monetizing the hell out of their users, and I hope that others find it
+useful and can make use of what I've built here.
 
 The project is self-hostable and has been developed over approximately a month.
 It's undergone extensive manual testing. Continuous improvements and bug fixes are
 expected, with contributions welcome.
 
-A full write up and comprehensive documentation is underway, but for now,
-here's a quick overview of the project.
+A full write up and comprehensive documentation is
+underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
+overview of the project.
 
 ## Features
 
@@ -68,7 +72,8 @@ _Tech_
 
 [Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
 
-_If the demo server is down it's very likely due to active tests and it's probably worth checking back in a couple hours_
+_If the demo server is down it's very likely due to active tests and it's probably
+worth checking back in a couple hours_
 
 ### Tested on:
 
