@@ -15,7 +15,6 @@ copy_backend_files() {
 }
 
 copy_frontend_files() {
-  ls "$PROJECT_ROOT_DIR"
   echo "Copying frontend files..."
   cp -r "src" "$FRONTEND_DIR"
   cp -r "public" "$FRONTEND_DIR"
