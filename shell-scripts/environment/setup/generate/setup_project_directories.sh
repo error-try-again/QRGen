@@ -21,7 +21,7 @@ setup_project_directories() {
   done
 
   local src_dir="$HOME/QRGen/src"
-  local server_src_dir="$src_dir/server"
+  local server_src_dir="$HOME/QRGen/server"
 
   if [[ -d $src_dir && -d $server_src_dir  ]]; then
     copy_server_files
