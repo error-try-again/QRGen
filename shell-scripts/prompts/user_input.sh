@@ -173,15 +173,21 @@ prompt_for_ssl() {
   case $SSL_CHOICE in
     1)
       set_ssl_flag
-      echo "1: Run automatic staging setup for Let's Encrypt SSL (Recommended)"
-      echo "2: Custom install"
+      echo "1: Run automatic staging setup for Let's Encrypt SSL (Recommended for testing)"
+      echo "2: Run automatic production setup for Let's Encrypt SSL (Recommended for production)"
+      echo "3: Run custom setup for Let's Encrypt SSL"
       prompt_numeric "Please enter your choice (1/2): " AUTO_SETUP_CHOICE
       if [[ $AUTO_SETUP_CHOICE == 1 ]]; then
         USE_LETS_ENCRYPT="yes"
         automatic_staging_selection
-    else
+    elif [[ $AUTO_SETUP_CHOICE == 2 ]]; then
+        USE_LETS_ENCRYPT="yes"
+        automation_production_selection
+    elif   [[ $AUTO_SETUP_CHOICE == 3 ]]; then
         USE_LETS_ENCRYPT="yes"
         custom_install_prompt
+    else
+        echo "Invalid choice. Please enter 1, 2, or 3."
     fi
       ;;
     2)
