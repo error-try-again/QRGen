@@ -35,24 +35,6 @@ log_error() {
 
 #######################################
 # description
-# Arguments:
-#   1
-#   2
-# Returns:
-#   1 ...
-#######################################
-execute_and_check() {
-    local cmd=$1
-    local error_msg=$2
-
-    if ! $cmd; then
-        log_error "$error_msg"
-        return 1
-  fi
-}
-
-#######################################
-# description
 # Globals:
 #   BACKEND_PORT
 #   DH_PARAMS_PATH
@@ -102,15 +84,11 @@ configure_nginx() {
     security_headers=""
     acme_challenge_server_block=""
 
-    if execute_and_check configure_subdomain "Subdomain configuration failed." ||
-       execute_and_check configure_https "HTTPS configuration failed." ||
-       execute_and_check configure_acme_challenge "ACME challenge configuration failed." ||
-       execute_and_check backup_existing_config "Backup of existing configuration failed." ||
-       execute_and_check write_nginx_config "Writing NGINX configuration failed."; then
-        echo "NGINX configuration completed successfully."
-  else
-        return 1
-  fi
+    backup_existing_config
+    configure_subdomain
+    configure_https
+    configure_acme_challenge
+    write_nginx_config
 }
 
 #######################################
@@ -391,12 +369,6 @@ http {
     ${acme_challenge_server_block}
 }
 EOF
-
-  if ! configure_nginx; then
-        log_error "Writing NGINX configuration failed."
-        return 1
-  else
         echo "NGINX configuration written to ${PROJECT_ROOT_DIR}/nginx.conf"
-  fi
 
 }
