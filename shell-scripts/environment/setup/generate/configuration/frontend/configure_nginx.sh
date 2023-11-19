@@ -57,21 +57,7 @@ log_error() {
 # bashsupport disable=BP5006
 configure_nginx() {
     echo "Creating NGINX configuration..."
-
-    # Set defaults for possibly unset variables
-    BACKEND_PORT=${BACKEND_PORT:-""}
-    DH_PARAMS_PATH=${DH_PARAMS_PATH:-""}
-    DNS_RESOLVER=${DNS_RESOLVER:-""}
-    DOMAIN_NAME=${DOMAIN_NAME:-""}
-    INTERNAL_LETS_ENCRYPT_DIR=${INTERNAL_LETS_ENCRYPT_DIR:-""}
-    NGINX_PORT=${NGINX_PORT:-80}
-    NGINX_SSL_PORT=${NGINX_SSL_PORT:-443}
-    PROJECT_ROOT_DIR=${PROJECT_ROOT_DIR:-""}
-    SUBDOMAIN=${SUBDOMAIN:-""}
-    TIMEOUT=${TIMEOUT:-""}
-    USE_LETS_ENCRYPT=${USE_LETS_ENCRYPT:-"no"}
-    USE_SELF_SIGNED_CERTS=${USE_SELF_SIGNED_CERTS:-"no"}
-    USE_SSL_BACKWARD_COMPAT=${USE_SSL_BACKWARD_COMPAT:-"no"}
+    TLS_PROTOCOL_SUPPORT=${TLS_PROTOCOL_SUPPORT:-"restricted"}
 
     # Initialize local variables
     backend_scheme="http"
@@ -131,16 +117,8 @@ configure_https() {
   fi
 }
 
-#######################################
-# description
-# Globals:
-#   USE_SSL_BACKWARD_COMPAT
-#   ssl_mode_block
-# Arguments:
-#  None
-#######################################
 configure_ssl_mode() {
-    if [[ $USE_SSL_BACKWARD_COMPAT == "yes" ]]; then
+    if [[ $TLS_PROTOCOL_SUPPORT == "restricted" ]]; then
         ssl_mode_block=$(get_gzip)
         ssl_mode_block+=$(get_ssl_protocol_compatibility)
         ssl_mode_block+=$(get_ssl_additional_config)

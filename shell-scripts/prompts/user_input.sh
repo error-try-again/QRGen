@@ -177,12 +177,15 @@ prompt_for_ssl() {
       echo "2: Custom install"
       prompt_numeric "Please enter your choice (1/2): " AUTO_SETUP_CHOICE
       if [[ $AUTO_SETUP_CHOICE == 1 ]]; then
+        USE_LETS_ENCRYPT="yes"
         automatic_staging_selection
     else
+        USE_LETS_ENCRYPT="yes"
         custom_install_prompt
     fi
       ;;
     2)
+      USE_SELF_SIGNED_CERTS="yes"
       set_ssl_flag
       ;;
     3)
