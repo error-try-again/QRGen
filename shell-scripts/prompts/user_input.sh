@@ -65,7 +65,6 @@ automatic_staging_selection() {
 automation_production_selection() {
       LETSENCRYPT_EMAIL="skip"
       USE_AUTO_RENEW_SSL="yes"
-      REGENERATE_SSL_CERTS="yes"
       USE_HSTS="yes"
       USE_UIR="yes"
       USE_OVERWRITE_SELF_SIGNED_CERTS="yes"
