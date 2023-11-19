@@ -10,7 +10,8 @@
 stop_containers() {
   test_docker_env
 
-  local containers_to_stop=$(docker ps -a -q --filter "name=qrgen")
+  local containers_to_stop
+  containers_to_stop=$(docker ps -a -q --filter "name=qrgen")
 
   if docker_compose_exists && [ -f "$docker_compose_file" ]; then
     echo "Stopping containers using docker-compose..."

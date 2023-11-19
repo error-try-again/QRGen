@@ -47,7 +47,7 @@ custom_install_prompt() {
 }
 
 # bashsupport disable=BP5006
-automatic_selection() {
+automatic_staging_selection() {
       LETSENCRYPT_EMAIL="skip"
       USE_AUTO_RENEW_SSL="yes"
       REGENERATE_SSL_CERTS="yes"
@@ -61,6 +61,21 @@ automatic_selection() {
       USE_MUST_STAPLE="no"
 }
 
+# bashsupport disable=BP5006
+automation_production_selection() {
+      LETSENCRYPT_EMAIL="skip"
+      USE_AUTO_RENEW_SSL="yes"
+      REGENERATE_SSL_CERTS="yes"
+      USE_HSTS="yes"
+      USE_UIR="yes"
+      USE_OVERWRITE_SELF_SIGNED_CERTS="yes"
+      USE_DRY_RUN="yes"
+      USE_PRODUCTION_SSL="yes"
+      USE_OCSP_STAPLING="yes"
+      USE_STRICT_PERMISSIONS="no"
+      USE_MUST_STAPLE="no"
+}
+
 #######################################
 # Sets the environment variable flag for Express to use SSL
 # Arguments:
@@ -69,39 +84,6 @@ automatic_selection() {
 # bashsupport disable=BP2001
 set_ssl_flag() {
    USE_SSL="true"
-}
-
-#######################################
-# description
-# Globals:
-#   USE_AUTO_SETUP
-#   USE_LETS_ENCRYPT
-#   DOMAIN_NAME
-# Arguments:
-#  None
-#######################################
-prompt_for_ssl() {
-  # Prompt for using Let's Encrypt SSL
-  prompt_yes_no "Would you like to use Let's Encrypt SSL for $DOMAIN_NAME (yes/no)? " USE_LETS_ENCRYPT
-
-  # Handling the decision for Let's Encrypt SSL
-  if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
-    set_ssl_flag
-    prompt_yes_no "Would you like to run automatic staging setup for Let's Encrypt SSL (yes/no)(Recommended)? " USE_AUTO_SETUP
-    if [[ $USE_AUTO_SETUP == "yes" ]]; then
-      automatic_selection
-    else
-      custom_install_prompt
-    fi
-  else
-    # Prompt for using Self-Signed Certificates if Let's Encrypt is not chosen
-    prompt_yes_no "Would you like to use self-signed SSL certificates instead (yes/no)? " USE_SELF_SIGNED_CERTS
-    if [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
-      set_ssl_flag
-    else
-      echo "SSL will not be enabled."
-    fi
-  fi
 }
 
 #######################################
@@ -165,6 +147,51 @@ prompt_yes_no() {
         ;;
     esac
   done
+}
+
+prompt_numeric() {
+  local prompt_message=$1
+  local var_name=$2
+  local input
+
+  # Read the numeric input
+  read -rp "$prompt_message" input
+  while ! [[ $input =~ ^[0-9]+$   ]]; do
+    echo "Please enter a valid number."
+    read -rp "$prompt_message" input
+  done
+  eval "$var_name"="'$input'"
+}
+
+prompt_for_ssl() {
+  # Prompt for using Let's Encrypt SSL
+  echo "1: Use Let's Encrypt SSL"
+  echo "2: Use self-signed SSL certificates"
+  echo "3: Do not enable SSL"
+  prompt_numeric "Please enter your choice (1/2/3): " SSL_CHOICE
+
+  case $SSL_CHOICE in
+    1)
+      set_ssl_flag
+      echo "1: Run automatic staging setup for Let's Encrypt SSL (Recommended)"
+      echo "2: Custom install"
+      prompt_numeric "Please enter your choice (1/2): " AUTO_SETUP_CHOICE
+      if [[ $AUTO_SETUP_CHOICE == 1 ]]; then
+        automatic_staging_selection
+    else
+        custom_install_prompt
+    fi
+      ;;
+    2)
+      set_ssl_flag
+      ;;
+    3)
+      echo "SSL will not be enabled."
+      ;;
+    *)
+      echo "Invalid choice. Please enter 1, 2, or 3."
+      ;;
+  esac
 }
 
 # Function to prompt user input with a custom message and error handling
