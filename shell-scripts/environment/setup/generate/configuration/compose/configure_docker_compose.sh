@@ -160,7 +160,7 @@ create_frontend_service() {
     networks:
       - qrgen
     volumes:
-      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend:/usr/share/nginx/html
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       $volume_section
     depends_on:

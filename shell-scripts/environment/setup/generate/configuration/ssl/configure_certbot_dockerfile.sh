@@ -29,7 +29,7 @@ RUN mkdir -p src \
  && rm -rf certbot-master.tar.gz certbot-master
 
 # Install certbot runtime dependencies
-RUN apk add --no-cache --virtual .certbot-deps \
+RUN apk add --virtual .certbot-deps \
         libffi \
         libssl1.1 \
         openssl \
@@ -41,7 +41,7 @@ RUN apk add --no-cache --virtual .certbot-deps \
 # cryptography library
 ARG CARGO_NET_GIT_FETCH_WITH_CLI=true
 # Install certbot from sources
-RUN apk add --no-cache --virtual .build-deps \
+RUN apk add --virtual .build-deps \
         gcc \
         linux-headers \
         openssl-dev \
@@ -51,7 +51,7 @@ RUN apk add --no-cache --virtual .build-deps \
         cargo \
         git \
         pkgconfig \
-    && python tools/pip_install.py --no-cache-dir \
+    && python tools/pip_install.py -dir \
             --editable src/acme \
             --editable src/certbot \
     && apk del .build-deps \

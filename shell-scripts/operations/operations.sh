@@ -320,7 +320,7 @@ remove_staging_flag() {
 #######################################
 run_backend_service() {
   echo "Building and running Backend service..."
-    docker compose build --no-cache backend
+    docker compose build backend
     docker compose up -d backend
 }
 
@@ -333,7 +333,7 @@ run_backend_service() {
 #######################################
 run_frontend_service() {
   echo "Building and running Frontend service..."
-  docker compose build --no-cache frontend
+  docker compose build frontend
   docker compose up -d frontend
 }
 
@@ -366,7 +366,7 @@ run_certbot_service() {
 #   1 ...
 #######################################
 build_certbot_service() {
-    if ! docker compose build --no-cache certbot; then
+    if ! docker compose build  certbot; then
         echo "Failed to build Certbot service."
         return 1
   fi
