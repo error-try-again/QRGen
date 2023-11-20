@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Load environment variables from .env file
-source .env
+. .env
+. ../../shell-scripts/environment/setup/generate/configuration/frontend/configure_nginx.sh
 
 # Function to simulate running the NGINX configuration script
 run_nginx_configuration() {
