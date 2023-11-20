@@ -61,8 +61,9 @@ configure_nginx() {
     # Initialize local variables
     backend_scheme="http"
     server_name="${DOMAIN_NAME}"
-    listen_directive="listen $NGINX_PORT;"
-    listen_directive+="listen [::]:$NGINX_PORT;"
+    default_port_directive="listen $NGINX_PORT;"
+    default_port_directive+=$'\n'
+    default_port_directive+="        listen [::]:$NGINX_PORT;"
     ssl_listen_directive=""
     ssl_mode_block=""
     resolver_settings=""
@@ -110,9 +111,12 @@ configure_https() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
         backend_scheme="https"
         ssl_listen_directive="listen $NGINX_SSL_PORT ssl;"
-        ssl_listen_directive+="listen [::]:$NGINX_SSL_PORT ssl;"
+        ssl_listen_directive+=$'\n'
+        ssl_listen_directive+="        listen [::]:""$NGINX_SSL_PORT ssl;"
         configure_ssl_mode
-        resolver_settings="resolver ${DNS_RESOLVER} valid=300s; resolver_timeout ${TIMEOUT};"
+        resolver_settings="resolver ${DNS_RESOLVER} valid=300s;"
+        resolver_settings+=$'\n'
+        resolver_settings+="        resolver_timeout ${TIMEOUT}ms;"
         configure_certs
         configure_security_headers
   fi
@@ -121,11 +125,15 @@ configure_https() {
 configure_ssl_mode() {
     if [[ $TLS_PROTOCOL_SUPPORT == "restricted" ]]; then
         ssl_mode_block=$(get_gzip)
+        ssl_mode_block+=$'\n'
         ssl_mode_block+=$(get_ssl_protocol_compatibility)
+        ssl_mode_block+=$'\n'
         ssl_mode_block+=$(get_ssl_additional_config)
   else
         ssl_mode_block=$(get_gzip)
+        ssl_mode_block+=$'\n'
         ssl_mode_block+=$(tls_protocol_one_three_restrict)
+        ssl_mode_block+=$'\n'
         ssl_mode_block+=$(get_ssl_additional_config)
   fi
 }
@@ -206,9 +214,9 @@ EOF
 #######################################
 configure_certs() {
       certs="
-      ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
-      ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
-      ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
+        ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
+        ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
+        ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 }
 
 #######################################
@@ -269,17 +277,17 @@ configure_security_headers() {
 configure_acme_challenge() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
         acme_challenge_server_block="server {
-            listen 80;
-            listen [::]:80;
-            server_name ${server_name};
-            location / {
-                return 301 https://\$host\$request_uri;
-            }
-            location /.well-known/acme-challenge/ {
-                allow all;
-                root /usr/share/nginx/html;
-            }
-        }"
+          listen 80;
+          listen [::]:80;
+          server_name qr-gen.net void.qr-gen.net;
+          location / {
+              return 301 https://\$host\$request_uri;
+          }
+          location /.well-known/acme-challenge/ {
+              allow all;
+              root /usr/share/nginx/html;
+          }
+      }"
   fi
 }
 
@@ -305,7 +313,7 @@ backup_existing_config() {
 #   acme_challenge_server_block
 #   backend_scheme
 #   certs
-#   listen_directive
+#   default_port_directive
 #   resolver_settings
 #   security_headers
 #   server_name
@@ -325,7 +333,7 @@ http {
     default_type application/octet-stream;
 
     server {
-        ${listen_directive}
+        ${default_port_directive}
         ${ssl_listen_directive}
         server_name ${server_name};
         ${ssl_mode_block}
@@ -349,6 +357,6 @@ http {
     ${acme_challenge_server_block}
 }
 EOF
+        cat "${NGINX_CONF_FILE}"
         echo "NGINX configuration written to ${NGINX_CONF_FILE}"
-
 }

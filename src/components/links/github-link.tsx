@@ -10,7 +10,7 @@ export const GithubLink: React.FC = () => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      View the project on Github 💾
+      View the project on Github under the MIT license 💾 📦
     </a>
   );
 };
