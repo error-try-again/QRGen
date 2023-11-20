@@ -229,12 +229,11 @@ handle_ambiguous_networks() {
 #######################################
 modify_docker_compose() {
   local flag_to_remove=$1
-  local docker_compose_file="${PROJECT_ROOT_DIR}/docker-compose.yml"
   local temp_file
   temp_file="$(mktemp)"
 
   # Perform the modification
-  sed "/certbot:/,/command:/s/$flag_to_remove//" "$docker_compose_file" > "$temp_file"
+  sed "/certbot:/,/command:/s/$flag_to_remove//" "$DOCKER_COMPOSE_FILE" > "$temp_file"
 
   # Output only the path to the temporary file
   echo "$temp_file"
@@ -293,7 +292,7 @@ remove_dry_run_flag() {
   echo "Removing --dry-run flag from docker-compose.yml..."
   temp_file=$(modify_docker_compose '--dry-run')
   check_flag_removal "$temp_file" '--dry-run'
-  backup_and_replace_file "${PROJECT_ROOT_DIR}/docker-compose.yml" "$temp_file"
+  backup_and_replace_file "${DOCKER_COMPOSE_FILE}" "$temp_file"
 }
 
 #######################################
@@ -308,7 +307,7 @@ remove_staging_flag() {
   echo "Removing --staging flag from docker-compose.yml..."
   temp_file=$(modify_docker_compose '--staging')
   check_flag_removal "$temp_file" '--staging'
-  backup_and_replace_file "${PROJECT_ROOT_DIR}/docker-compose.yml" "$temp_file"
+  backup_and_replace_file "${DOCKER_COMPOSE_FILE}" "$temp_file"
 }
 
 #######################################

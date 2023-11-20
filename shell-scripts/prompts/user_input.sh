@@ -10,9 +10,10 @@
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
   local opt
-  select opt in "Run Setup" "Uninstall" "Reload/Refresh" "Dump logs" "Update Project" "Stop Project Docker Containers" "Prune All Docker Builds - Dangerous" "Quit"; do
+  select opt in "Run Setup" "Run Configuration Tests" "Uninstall" "Reload/Refresh" "Dump logs" "Update Project" "Stop Project Docker Containers" "Prune All Docker Builds - Dangerous" "Quit"; do
     case $opt in
       "Run Setup") setup ;;
+      "Run Configuration Tests") run_nginx_configuration ;;
       "Uninstall") uninstall ;;
       "Reload/Refresh") reload ;;
       "Dump logs") dump_logs ;;

@@ -1,30 +1,8 @@
 #!/bin/bash
 
-#######################################
-# description
-# Globals:
-#   checksum_file
-#   COMPOSE_FILE
-#   log_file
-#   PROJECT_LOGS_DIR
-#   PROJECT_ROOT_DIR
-#   watched_dir
-#   cmd
-#   compose_file
-#   DOMAIN_NAME
-#   filepath
-#   var
-# Arguments:
-#   1
-# Returns:
-#   0 ...
-#   1 ...
-#######################################
 initialize_cert_watcher() {
-
   # Configuration through environment variables or a default value
   watched_dir="${WATCHED_DIR:-certs/live/$DOMAIN_NAME}"
-  compose_file="${COMPOSE_FILE:-$PROJECT_ROOT_DIR/docker-compose.yml}"
   checksum_file="${CHECKSUM_FILE:-$PROJECT_ROOT_DIR/certs/cert_checksum}"
   log_file="$PROJECT_LOGS_DIR/cert-watcher.log"
 

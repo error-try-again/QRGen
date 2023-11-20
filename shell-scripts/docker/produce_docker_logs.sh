@@ -15,14 +15,13 @@ produce_docker_logs() {
     # Get a list of services defined in the Compose file
     local services
     local service
-    compose_file="$PROJECT_ROOT_DIR/docker-compose.yml"
 
-    services=$(docker compose -f "$compose_file" config --services)
+    services=$(docker compose -f "$DOCKER_COMPOSE_FILE" config --services)
 
     # Loop through each service and produce logs
     for service in $services; do
       echo "Logs for service: $service" "@" "$(date)"
-      docker compose -f "$compose_file" logs "$service"
+      docker compose -f "$DOCKER_COMPOSE_FILE" logs "$service"
       echo "--------------------------------------------"
     done
   else

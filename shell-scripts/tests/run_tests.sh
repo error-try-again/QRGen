@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Load environment variables from .env file
-. .env
-. ../../shell-scripts/environment/setup/generate/configuration/frontend/configure_nginx.sh
-
 # Function to simulate running the NGINX configuration script
 run_nginx_configuration() {
     echo "Simulating NGINX configuration..."
@@ -20,5 +16,3 @@ run_nginx_configuration() {
     DOMAIN_NAME="example.com"
     configure_nginx
 }
-
-run_nginx_configuration

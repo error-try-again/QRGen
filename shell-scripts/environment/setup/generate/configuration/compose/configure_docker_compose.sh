@@ -78,11 +78,11 @@ configure_docker_compose() {
     echo "$certbot_service_definition"
     echo "$network_section"
     echo "$volume_section"
-  } > "${PROJECT_ROOT_DIR}/docker-compose.yml"
+  } > "${DOCKER_COMPOSE_FILE}"
 
   # Display the generated Docker Compose file
-  cat "${PROJECT_ROOT_DIR}/docker-compose.yml"
-  echo "Docker Compose configuration written to ${PROJECT_ROOT_DIR}/docker-compose.yml"
+  cat "${DOCKER_COMPOSE_FILE}"
+  echo "Docker Compose configuration written to ${DOCKER_COMPOSE_FILE}"
 }
 
 ################################################

@@ -1,5 +1,4 @@
 #!/bin/bash
-. .env
 
 #######################################
 # Configures NGINX with SSL and optional settings
@@ -350,6 +349,6 @@ http {
     ${acme_challenge_server_block}
 }
 EOF
-        echo "NGINX configuration written to ${PROJECT_ROOT_DIR}/nginx.conf"
+        echo "NGINX configuration written to ${NGINX_CONF_FILE}"
 
 }
