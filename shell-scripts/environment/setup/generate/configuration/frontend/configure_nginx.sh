@@ -62,7 +62,8 @@ configure_nginx() {
     # Initialize local variables
     backend_scheme="http"
     server_name="${DOMAIN_NAME}"
-    listen_directive="listen $NGINX_PORT; listen [::]:$NGINX_PORT;"
+    listen_directive="listen $NGINX_PORT;"
+    listen_directive+="listen [::]:$NGINX_PORT;"
     ssl_listen_directive=""
     ssl_mode_block=""
     resolver_settings=""
@@ -109,7 +110,8 @@ configure_subdomain() {
 configure_https() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
         backend_scheme="https"
-        ssl_listen_directive="listen $NGINX_SSL_PORT ssl; listen [::]:$NGINX_SSL_PORT ssl;"
+        ssl_listen_directive="listen $NGINX_SSL_PORT ssl;"
+        ssl_listen_directive+="listen [::]:$NGINX_SSL_PORT ssl;"
         configure_ssl_mode
         resolver_settings="resolver ${DNS_RESOLVER} valid=300s; resolver_timeout ${TIMEOUT};"
         configure_certs
@@ -138,7 +140,7 @@ configure_ssl_mode() {
 #######################################
 get_gzip() {
     cat <<- EOF
-    gzip off;
+        gzip off;
 EOF
 }
 
@@ -152,7 +154,7 @@ EOF
 #######################################
 get_ssl_protocol_compatibility() {
     cat <<- EOF
-    ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_protocols TLSv1.2 TLSv1.3;
 EOF
 }
 
@@ -167,15 +169,15 @@ EOF
 #######################################
 get_ssl_additional_config() {
     cat <<- EOF
-    ssl_prefer_server_ciphers on;
-    ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:!DH+3DES:!ADH:!AECDH:!MD5:!ECDHE-RSA-AES256-SHA384:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES128-SHA:!RC2:!RC4:!DES:!EXPORT:!NULL:!SHA1';
-    ssl_buffer_size 8k;
-    ssl_dhparam ${ssl_paths[DH_PARAMS_PATH]};
-    ssl_ecdh_curve secp384r1;
-    ssl_stapling on;
-    ssl_stapling_verify on;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:!DH+3DES:!ADH:!AECDH:!MD5:!ECDHE-RSA-AES256-SHA384:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES128-SHA:!RC2:!RC4:!DES:!EXPORT:!NULL:!SHA1';
+        ssl_buffer_size 8k;
+        ssl_dhparam ${ssl_paths[DH_PARAMS_PATH]};
+        ssl_ecdh_curve secp384r1;
+        ssl_stapling on;
+        ssl_stapling_verify on;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
 EOF
 }
 
@@ -204,9 +206,10 @@ EOF
 #  None
 #######################################
 configure_certs() {
-      certs="ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
-           ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
-           ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
+      certs="
+      ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
+      ssl_certificate_key ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem;
+      ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 }
 
 #######################################
@@ -222,32 +225,32 @@ configure_certs() {
 #######################################
 configure_security_headers() {
   security_headers="
-    # Prevent clickjacking by instructing the browser to deny rendering iframes
-    add_header X-Frame-Options 'DENY' always;
+            # Prevent clickjacking by instructing the browser to deny rendering iframes
+            add_header X-Frame-Options 'DENY' always;
 
-    # Protect against MIME type sniffing security vulnerabilities
-    add_header X-Content-Type-Options nosniff always;
+            # Protect against MIME type sniffing security vulnerabilities
+            add_header X-Content-Type-Options nosniff always;
 
-    # Enable XSS filtering in browsers that support it
-    add_header X-XSS-Protection '1; mode=block' always;
+            # Enable XSS filtering in browsers that support it
+            add_header X-XSS-Protection '1; mode=block' always;
 
-    # Control the information that the browser includes with navigations away from your site
-    add_header Referrer-Policy 'strict-origin-when-cross-origin' always;
+            # Control the information that the browser includes with navigations away from your site
+            add_header Referrer-Policy 'strict-origin-when-cross-origin' always;
 
-    # Content Security Policy
-    # The CSP restricts the sources of content like scripts, styles, images, etc. to increase security
-    # 'self' keyword restricts loading resources to the same origin as the document
-    # Adjust the policy directives based on your application's specific needs
-    add_header Content-Security-Policy \"default-src 'self';
-        script-src 'self';             # Allow scripts from the same origin
-        object-src 'none';             # Prevent loading plugins
-        style-src 'self' 'unsafe-inline'; # Allow styles from the same origin and unsafe inline styles
-        img-src 'self';                # Allow images from the same origin
-        media-src 'none';              # Disallow audio and video
-        frame-src 'none';              # Disallow iframes
-        font-src 'self';               # Allow fonts from the same origin
-        connect-src 'self';            # Restrict origins for script interfaces
-    \";"
+            # Content Security Policy
+            # The CSP restricts the sources of content like scripts, styles, images, etc. to increase security
+            # 'self' keyword restricts loading resources to the same origin as the document
+            # Adjust the policy directives based on your application's specific needs
+            add_header Content-Security-Policy \"default-src 'self' data:;
+                script-src 'self';                 # Allow scripts from the same origin
+                object-src 'none';                 # Prevent loading plugins
+                style-src 'self' 'unsafe-inline';  # Allow styles from the same origin and unsafe inline styles
+                img-src 'self' data:;              # Allow images from the same origin and base64 encoded images
+                media-src 'none';                  # Disallow audio and video
+                frame-src 'none';                  # Disallow iframes
+                font-src 'self';                   # Allow fonts from the same origin
+                connect-src 'self';                # Restrict origins for script interfaces
+            \";"
 
     if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
         security_headers+="
@@ -289,9 +292,9 @@ configure_acme_challenge() {
 #  None
 #######################################
 backup_existing_config() {
-    if [[ -f "${PROJECT_ROOT_DIR}/nginx.conf" ]]; then
-        cp "${PROJECT_ROOT_DIR}/nginx.conf" "${PROJECT_ROOT_DIR}/nginx.conf.bak"
-        echo "Backup created at ${PROJECT_ROOT_DIR}/nginx.conf.bak"
+    if [[ -f ${NGINX_CONF_FILE}   ]]; then
+        cp "${NGINX_CONF_FILE}" "${NGINX_CONF_FILE}.bak"
+        echo "Backup created at \"${NGINX_CONF_FILE}.bak\""
   fi
 }
 
@@ -313,7 +316,7 @@ backup_existing_config() {
 #  None
 #######################################
 write_nginx_config() {
-    cat <<- EOF > "${PROJECT_ROOT_DIR}/nginx.conf"
+    cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
 events {
     worker_connections 1024;
