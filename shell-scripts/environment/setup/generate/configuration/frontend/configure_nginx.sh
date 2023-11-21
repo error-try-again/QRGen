@@ -109,32 +109,32 @@ configure_subdomain() {
 #######################################
 configure_https() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
-        backend_scheme="https"
-        ssl_listen_directive="listen $NGINX_SSL_PORT ssl;"
-        ssl_listen_directive+=$'\n'
-        ssl_listen_directive+="        listen [::]:""$NGINX_SSL_PORT ssl;"
-        configure_ssl_mode
-        resolver_settings="resolver ${DNS_RESOLVER} valid=300s;"
-        resolver_settings+=$'\n'
-        resolver_settings+="        resolver_timeout ${TIMEOUT}ms;"
-        configure_certs
-        configure_security_headers
+    backend_scheme="https"
+    ssl_listen_directive="listen $NGINX_SSL_PORT ssl;"
+    ssl_listen_directive+=$'\n'
+    ssl_listen_directive+="        listen [::]:""$NGINX_SSL_PORT ssl;"
+    configure_ssl_mode
+    resolver_settings="resolver ${DNS_RESOLVER} valid=300s;"
+    resolver_settings+=$'\n'
+    resolver_settings+="        resolver_timeout ${TIMEOUT}ms;"
+    configure_certs
+    configure_security_headers
   fi
 }
 
 configure_ssl_mode() {
     if [[ $TLS_PROTOCOL_SUPPORT == "restricted" ]]; then
-        ssl_mode_block=$(get_gzip)
-        ssl_mode_block+=$'\n'
-        ssl_mode_block+=$(get_ssl_protocol_compatibility)
-        ssl_mode_block+=$'\n'
-        ssl_mode_block+=$(get_ssl_additional_config)
+    ssl_mode_block=$(get_gzip)
+    ssl_mode_block+=$'\n'
+    ssl_mode_block+=$(get_ssl_protocol_compatibility)
+    ssl_mode_block+=$'\n'
+    ssl_mode_block+=$(get_ssl_additional_config)
   else
-        ssl_mode_block=$(get_gzip)
-        ssl_mode_block+=$'\n'
-        ssl_mode_block+=$(tls_protocol_one_three_restrict)
-        ssl_mode_block+=$'\n'
-        ssl_mode_block+=$(get_ssl_additional_config)
+    ssl_mode_block=$(get_gzip)
+    ssl_mode_block+=$'\n'
+    ssl_mode_block+=$(tls_protocol_one_three_restrict)
+    ssl_mode_block+=$'\n'
+    ssl_mode_block+=$(get_ssl_additional_config)
   fi
 }
 
@@ -146,8 +146,8 @@ configure_ssl_mode() {
 #  None
 #######################################
 get_gzip() {
-    cat <<- EOF
-     gzip off;
+        cat <<- EOF
+gzip off;
 EOF
 }
 
