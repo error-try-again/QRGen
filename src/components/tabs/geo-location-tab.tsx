@@ -11,7 +11,6 @@ import { LocationPicker } from '../../services/map-location-picker';
 
 export const GeoLocationTab = () => {
   const { dispatch, state, setError } = useCore();
-
   const { sectionTitle, section } = styles;
   const handleInputChange = useHandleInputChange();
   return (

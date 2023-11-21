@@ -15,7 +15,5 @@ export function convertValueToString({
     // convert null or undefined to empty string
     return '';
   }
-  // Log a warning if the value is not a string, boolean, null or undefined
-  console.warn(`Unexpected value type: ${typeof value}`);
   return String(value);
 }
