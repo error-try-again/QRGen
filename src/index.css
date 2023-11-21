@@ -1,17 +1,17 @@
 :root {
-	background-color         : #242424;
-	color                    : rgba(255, 255, 255, 0.87);
-	font-family              : Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	background-color       : #242424;
+	color                  : rgba(255, 255, 255, 0.87);
+	font-family            : Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 
 	/*color-scheme: light dark;*/
-	-webkit-font-smoothing   : antialiased;
-	font-synthesis           : none;
+	-webkit-font-smoothing : antialiased;
+	font-synthesis         : none;
 
-	font-weight              : 400;
-	line-height              : 1.5;
-	-moz-osx-font-smoothing  : grayscale;
-	text-rendering           : optimizeLegibility;
-	-webkit-text-size-adjust : 100%;
+	font-weight            : 400;
+	line-height            : 1.5;
+	/*-moz-osx-font-smoothing  : grayscale;*/
+	text-rendering         : optimizeLegibility;
+	/*-webkit-text-size-adjust : 100%;*/
 	}
 
 a {
