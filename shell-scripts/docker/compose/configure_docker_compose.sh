@@ -92,6 +92,8 @@ configure_docker_compose() {
     frontend_ports+="     - \"${NGINX_PORT}:${NGINX_PORT}\""
     frontend_ports+=$'\n'
     frontend_ports+="     - \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
+    frontend_ports+=$'\n'
+    frontend_ports+="     - \"${CHALLENGE_PORT}:${CHALLENGE_PORT}\""
 
     shared_volumes+="volumes:"
     shared_volumes+=$'\n'
