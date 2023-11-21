@@ -248,7 +248,7 @@ configure_security_headers() {
             # The CSP restricts the sources of content like scripts, styles, images, etc. to increase security
             # 'self' keyword restricts loading resources to the same origin as the document
             # Adjust the policy directives based on your application's specific needs
-            add_header Content-Security-Policy \"default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self';\";"
+            add_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.tile.openstreetmap.org; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self';\";"
 
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     security_headers+="
