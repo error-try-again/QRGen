@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 configure_docker_compose() {
   # Network-related declarations and assignments
   local network_name
@@ -57,6 +55,9 @@ configure_docker_compose() {
   local frontend_ports
   frontend_ports=""
 
+  local frontend_volumes
+  frontend_volumes=""
+
   local backend_volumes
   backend_volumes=""
 
@@ -94,10 +95,6 @@ configure_docker_compose() {
 
     shared_volumes+="volumes:"
     shared_volumes+=$'\n'
-    shared_volumes+="      - ./frontend:/usr/share/nginx/html"
-    shared_volumes+=$'\n'
-    shared_volumes+="      - ./nginx.conf:/etc/nginx/nginx.conf:ro"
-    shared_volumes+=$'\n'
     shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}"
     shared_volumes+=$'\n'
     shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}"
@@ -105,6 +102,20 @@ configure_docker_compose() {
     shared_volumes+="      - ${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}"
     shared_volumes+=$'\n'
     shared_volumes+="      - nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
+
+    frontend_volumes+="volumes:"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ./frontend:/usr/share/nginx/html"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ./nginx.conf:/etc/nginx/nginx.conf:ro"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
 
     backend_volumes="volumes:"
     backend_volumes+=$'\n'
@@ -131,15 +142,15 @@ configure_docker_compose() {
     frontend_ports+=$'\n'
     frontend_ports+="      - \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
 
-    shared_volumes+="volumes:"
-    shared_volumes+=$'\n'
-    shared_volumes+="      - ./nginx.conf:/etc/nginx/nginx.conf:ro"
-    shared_volumes+=$'\n'
-    shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}"
-    shared_volumes+=$'\n'
-    shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}"
-    shared_volumes+=$'\n'
-    shared_volumes+="      - ${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}"
+    frontend_volumes+="volumes:"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ./nginx.conf:/etc/nginx/nginx.conf:ro"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}"
+    frontend_volumes+=$'\n'
+    frontend_volumes+="      - ${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}"
 
     backend_volumes="volumes:"
     backend_volumes+=$'\n'
@@ -180,7 +191,7 @@ configure_docker_compose() {
       $frontend_context \
       $frontend_dockerfile \
       "$frontend_ports" \
-      "$shared_volumes" \
+      "$frontend_volumes" \
       "$frontend_networks" \
       "$frontend_depends_on"
   )
