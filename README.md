@@ -174,16 +174,6 @@ _For Lets-Encrypt Production Certificates & HTTPS Servers_
 # yes
 ```
 
-# Security Recommendations
-
-### Remote
-
-- Regardless of your particular environment, I highly recommend you make use of ssh
-  keys, and disable password auth by setting 'PasswordAuthentication no' in
-  /etc/ssh/sshd_config & restarting sshd.
-
-- More to come. (E.g. Fail2Ban, etc.)
-
 # Roadmap
 
 * Add additional client/server validation for QR code formats
