@@ -23,7 +23,7 @@ setup_project_directories() {
   local src_dir="$HOME/QRGen/src"
   local server_src_dir="$HOME/QRGen/server"
 
-  if [[ -d $src_dir && -d $server_src_dir  ]]; then
+  if [[ -d $src_dir && -d $server_src_dir ]]; then
     copy_server_files
   else
     echo "Error: Sources are not available, exiting..."

@@ -25,7 +25,7 @@ function install_packages() {
   sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
   sudo apt-get update -y
   sudo apt-get install -y jq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -93,28 +93,28 @@ function setup_user_with_prompt() {
 
 # Unified User Setup Function
 function setup_user() {
-    echo "Setting up $user_name user..."
+  echo "Setting up $user_name user..."
 
-    if id "$user_name" &> /dev/null; then
-        local user_choice
-        echo "User $user_name already exists."
-        echo "1) Reset password"
-        echo "2) Skip user setup"
-        while true; do
-            read -rp "Your choice (1-2): " user_choice
-            case $user_choice in
-                1 | 2) break ;;
-                *) echo "Please enter a valid choice (1 or 2)." ;;
+  if id "$user_name" &> /dev/null; then
+    local user_choice
+    echo "User $user_name already exists."
+    echo "1) Reset password"
+    echo "2) Skip user setup"
+    while true; do
+      read -rp "Your choice (1-2): " user_choice
+      case $user_choice in
+        1 | 2) break ;;
+        *) echo "Please enter a valid choice (1 or 2)." ;;
       esac
     done
-        case $user_choice in
-            1) setup_user_with_prompt ;;
-            2) echo "User setup skipped." ;;
-            *) echo "Invalid choice. Exiting." ;;
+    case $user_choice in
+      1) setup_user_with_prompt ;;
+      2) echo "User setup skipped." ;;
+      *) echo "Invalid choice. Exiting." ;;
     esac
   else
-        sudo adduser --disabled-password --gecos "" "$user_name"
-        setup_user_with_prompt
+    sudo adduser --disabled-password --gecos "" "$user_name"
+    setup_user_with_prompt
   fi
 }
 
@@ -133,7 +133,7 @@ function remove_user() {
     read -rp "Would you like to kill all processes and continue with user removal? (y/N) " response
     if [[ $response =~ ^[Yy][Ee]?[Ss]?$ ]]; then
       sudo pkill -9 -u "$user_name"
-      sleep 2  # Allow some time for processes to be terminated
+      sleep 2 # Allow some time for processes to be terminated
     else
       echo "Skipping user removal."
       return

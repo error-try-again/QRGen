@@ -11,7 +11,7 @@
 #  None
 #######################################
 configure_backend_docker() {
-  cat << EOF > "$BACKEND_DIR/Dockerfile"
+  cat << EOF > "$BACKEND_DOCKERFILE"
 # Use the latest version of Node.js
 FROM node:$NODE_VERSION
 
@@ -33,4 +33,5 @@ EXPOSE $BACKEND_PORT
 # Use ts-node to run the TypeScript server file
 CMD ["npx", "ts-node", "src/server.ts"]
 EOF
+  cat "$BACKEND_DOCKERFILE"
 }

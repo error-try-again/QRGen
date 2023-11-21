@@ -46,13 +46,13 @@ initialize_cert_watcher() {
     datetime=$(date '+%Y-%m-%d %H:%M:%S')
 
     # Check if the log directory is writable
-    if [[ ! -w $PROJECT_LOGS_DIR   ]]; then
+    if [[ ! -w $PROJECT_LOGS_DIR ]]; then
       echo "ERROR: Log directory $PROJECT_LOGS_DIR is not writable. Attempting to log to /tmp instead."
       log_file="/tmp/cert-watcher.log"
     fi
 
     # Check if the log file is writable or can be created
-    if [[ ! -w $log_file   ]] && ! touch "$log_file" 2> /dev/null; then
+    if [[ ! -w $log_file ]] && ! touch "$log_file" 2> /dev/null; then
       echo "ERROR: Log file $log_file is not writable and cannot be created. Logging to console."
       echo "$datetime - $message"
       return 1
@@ -84,7 +84,7 @@ initialize_cert_watcher() {
 
   # Read the stored checksum from a file
   read_stored_checksum() {
-    if [[ -f $checksum_file   ]]; then
+    if [[ -f $checksum_file ]]; then
       cat "$checksum_file"
     else
       echo ""
@@ -98,7 +98,7 @@ initialize_cert_watcher() {
     local new_checksum
     new_checksum=$(get_certificate_checksum)
 
-    if [[ $new_checksum != "$last_checksum"   ]]; then
+    if [[ $new_checksum != "$last_checksum" ]]; then
       log_message "Certificate checksum has changed from $last_checksum to $new_checksum."
       store_checksum "$new_checksum"
       return 0 # True, certificate has changed
@@ -112,8 +112,8 @@ initialize_cert_watcher() {
   restart_services() {
     echo "Restarting backend and frontend services..."
     if ! docker compose restart backend || ! docker compose restart frontend; then
-        echo "Failed to restart services."
-        return 1
+      echo "Failed to restart services."
+      return 1
     fi
   }
 

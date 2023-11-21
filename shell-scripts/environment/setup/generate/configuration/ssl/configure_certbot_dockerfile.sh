@@ -9,7 +9,7 @@
 #  None
 #######################################
 configure_certbot_docker() {
-  cat << EOF > "$CERTBOT_DIR/Dockerfile"
+  cat << EOF > "$CERTBOT_DOCKERFILE"
 #base image
 FROM python:3.10-alpine3.16 as certbot
 
@@ -57,4 +57,5 @@ RUN apk add --no-cache --virtual .build-deps \
     && apk del .build-deps \
     && rm -rf ${HOME}/.cargo
 EOF
+  cat "$CERTBOT_DOCKERFILE"
 }

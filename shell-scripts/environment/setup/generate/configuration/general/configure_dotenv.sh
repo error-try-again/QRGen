@@ -10,7 +10,7 @@
 #  None
 #######################################
 configure_dot_env() {
-  cat << EOF > "$BACKEND_DIR/.env"
+  cat << EOF > "$BACKEND_DOTENV_FILE"
 ORIGIN=$ORIGIN
 PORT=$BACKEND_PORT
 USE_SSL=$USE_SSL

@@ -8,5 +8,5 @@
 #  None
 #######################################
 docker_compose_exists() {
-  [[ -f ${DOCKER_COMPOSE_FILE}   ]]
+  [[ -f ${DOCKER_COMPOSE_FILE} ]]
 }

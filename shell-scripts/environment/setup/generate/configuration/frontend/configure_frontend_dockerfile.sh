@@ -10,7 +10,7 @@
 #  None
 #######################################
 configure_frontend_docker() {
-  cat << EOF > "$FRONTEND_DIR/Dockerfile"
+  cat << EOF > "$FRONTEND_DOCKERFILE"
 # Use the latest version of Node.js
 FROM node:$NODE_VERSION as build
 
@@ -59,4 +59,6 @@ EXPOSE $NGINX_PORT
 # Run nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
 EOF
+
+  cat "$FRONTEND_DOCKERFILE"
 }
