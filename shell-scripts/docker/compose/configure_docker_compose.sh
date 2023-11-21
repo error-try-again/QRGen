@@ -94,7 +94,7 @@ configure_docker_compose() {
 
     shared_volumes+="volumes:"
     shared_volumes+=$'\n'
-    shared_volumes+="      - ./frontend:/usr/share/nginx/html:ro"
+    shared_volumes+="      - ./frontend:/usr/share/nginx/html"
     shared_volumes+=$'\n'
     shared_volumes+="      - ./nginx.conf:/etc/nginx/nginx.conf:ro"
     shared_volumes+=$'\n'
