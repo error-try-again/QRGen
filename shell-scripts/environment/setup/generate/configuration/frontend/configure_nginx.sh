@@ -147,7 +147,7 @@ configure_ssl_mode() {
 #######################################
 get_gzip() {
     cat <<- EOF
-        gzip off;
+     gzip off;
 EOF
 }
 
@@ -248,19 +248,12 @@ configure_security_headers() {
             # The CSP restricts the sources of content like scripts, styles, images, etc. to increase security
             # 'self' keyword restricts loading resources to the same origin as the document
             # Adjust the policy directives based on your application's specific needs
-            add_header Content-Security-Policy \"default-src 'self' data:;
-                script-src 'self';                 # Allow scripts from the same origin
-                object-src 'none';                 # Prevent loading plugins
-                style-src 'self' 'unsafe-inline';  # Allow styles from the same origin and unsafe inline styles
-                img-src 'self' data:;              # Allow images from the same origin and base64 encoded images
-                media-src 'none';                  # Disallow audio and video
-                frame-src 'none';                  # Disallow iframes
-                font-src 'self';                   # Allow fonts from the same origin
-                connect-src 'self';                # Restrict origins for script interfaces
-            \";"
+            add_header Content-Security-Policy \"default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self';\";"
 
-    if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
-        security_headers+="
+  if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
+    security_headers+="
+
+            # HTTP Strict Transport Security (HSTS) for 1 year, including subdomains
             add_header Strict-Transport-Security 'max-age=31536000; includeSubDomains' always;"
   fi
 }
@@ -279,7 +272,7 @@ configure_acme_challenge() {
         acme_challenge_server_block="server {
           listen 80;
           listen [::]:80;
-          server_name qr-gen.net void.qr-gen.net;
+          server_name ${server_name};
           location / {
               return 301 https://\$host\$request_uri;
           }
