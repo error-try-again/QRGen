@@ -11,6 +11,7 @@ setup() {
   setup_project_directories
   setup_docker_rootless
   ensure_port_available "$NGINX_PORT"
+  disable_docker_build_caching_prompt
   prompt_for_domain_and_letsencrypt
   generate_server_files
   configure_nginx
@@ -145,7 +146,6 @@ quit() {
 handle_certs() {
   # Handle Let's Encrypt configuration
   if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
-
     # Generate self-signed certificates if they don't exist
     generate_self_signed_certificates
 
@@ -305,9 +305,21 @@ remove_staging_flag() {
 #  None
 #######################################
 run_backend_service() {
-  echo "Building and running Backend service..."
-  docker compose build backend
-  docker compose up -d backend
+  if [[ $DISABLE_DOCKER_CACHING == "yes" ]]; then
+    echo "Building and running Backend service without caching..."
+    if ! docker compose build --no-cache --progress=plain backend; then
+      echo "Failed to build Backend service."
+      exit 1
+    fi
+    docker compose up -d backend
+  else
+    echo "Building and running Backend service..."
+    if ! docker compose build --progress=plain backend; then
+      echo "Failed to build Backend service."
+      exit 1
+    fi
+    docker compose up -d backend
+  fi
 }
 
 #######################################
@@ -318,9 +330,21 @@ run_backend_service() {
 #  None
 #######################################
 run_frontend_service() {
-  echo "Building and running Frontend service..."
-  docker compose build frontend
-  docker compose up -d frontend
+    if [[ $DISABLE_DOCKER_CACHING == "yes" ]]; then
+     echo "Building and running Frontend service without caching..."
+      if ! docker compose build --no-cache --progress=plain frontend; then
+          echo "Failed to build Frontend service."
+          exit 1
+      fi
+      docker compose up -d frontend
+  else
+      echo "Building and running Frontend service..."
+      if ! docker compose build --progress=plain frontend; then
+          echo "Failed to build Frontend service."
+          exit 1
+      fi
+      docker compose up -d frontend
+  fi
 }
 
 #######################################
@@ -352,9 +376,12 @@ run_certbot_service() {
 #   1 ...
 #######################################
 build_certbot_service() {
-  if ! docker compose build certbot; then
-    echo "Failed to build Certbot service."
-    return 1
+  if [[ $DISABLE_DOCKER_CACHING == "yes" ]]; then
+    echo "Building Certbot service without caching..."
+    if ! docker compose build --no-cache --progress=plain certbot; then
+      echo "Failed to build Certbot service."
+      return 1
+    fi
   fi
 }
 
@@ -522,6 +549,7 @@ pre_flight() {
 
 # ---- Build and Run Docker ---- #
 build_and_run_docker() {
+
   cd "$PROJECT_ROOT_DIR" || {
     echo "Failed to change directory to $PROJECT_ROOT_DIR"
     exit 1
@@ -550,7 +578,6 @@ build_and_run_docker() {
     run_certbot_service
     echo "Using auto-renewal for SSL certificates."
     generate_certbot_renewal_job
-
   fi
 
   # Dump logs or any other post-run operations

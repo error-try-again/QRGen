@@ -1,14 +1,5 @@
 #!/bin/bash
 
-#######################################
-# description
-# Globals:
-#   FRONTEND_DIR
-#   NODE_VERSION
-#   NGINX_PORT
-# Arguments:
-#  None
-#######################################
 configure_frontend_docker() {
   cat << EOF > "$FRONTEND_DOCKERFILE"
 # Use the latest version of Node.js
@@ -27,8 +18,8 @@ RUN npm init -y \
 && npx create-vite frontend --template react-ts
 
 # Delete the default App.tsx/App.css file (does not use kebab case)
-RUN rm /usr/app/frontend/src/App.tsx
-RUN rm /usr/app/frontend/src/App.css
+RUN rm /usr/app/frontend/src/App.tsx && \
+rm /usr/app/frontend/src/App.css
 
 # Copy Project files to the container
 COPY frontend/src/ /usr/app/frontend/src
@@ -49,8 +40,10 @@ FROM nginx:alpine
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 
 # Create .well-known and .well-known/acme-challenge directories
-RUN mkdir /usr/share/nginx/html/.well-known/
-RUN mkdir /usr/share/nginx/html/.well-known/acme-challenge
+RUN mkdir /usr/share/nginx/html/.well-known/ && \
+mkdir /usr/share/nginx/html/.well-known/acme-challenge
+
+# Set permissions for the .well-known directory so certbot can access it
 RUN chmod -R 777 /usr/share/nginx/html/.well-known
 
 # Set the nginx port

@@ -8,7 +8,9 @@ run_tests() {
 
   # Run individual configuration tests
   run_nginx_test_configuration
-  run_compose_test_configuration
+  run_compose_le_configuration
+  run_compose_ss_configuration
+  run_compose_dev_configuration
   run_backend_test_configuration
   run_frontend_test_configuration
   run_certbot_test_configuration
@@ -24,13 +26,34 @@ run_nginx_test_configuration() {
   configure_nginx
 }
 
-# Function to simulate running the Docker Compose configuration script
-run_compose_test_configuration() {
-  echo "Simulating docker-compose configuration..."
-  DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose.yml"
+run_compose_le_configuration() {
+  echo "Simulating Docker Compose configuration with Let's Encrypt..."
+  USE_LETS_ENCRYPT="yes"
+  USE_SELF_SIGNED_CERTS="no"
+  force_renew_flag="--force-renew"
+  DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose-le.yml"
   setup_common_configuration_parameters
   configure_docker_compose
 }
+
+run_compose_ss_configuration() {
+  echo "Simulating Docker Compose configuration with self-signed certificates..."
+  USE_LETS_ENCRYPT="no"
+  USE_SELF_SIGNED_CERTS="yes"
+  DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose-ss.yml"
+  setup_common_configuration_parameters
+  configure_docker_compose
+}
+
+run_compose_dev_configuration() {
+  echo "Simulating Docker Compose configuration for development..."
+  USE_LETS_ENCRYPT="no"
+  USE_SELF_SIGNED_CERTS="no"
+  DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose-ss.yml"
+  setup_common_configuration_parameters
+  configure_docker_compose
+}
+
 
 # Function to simulate running the backend configuration script
 run_backend_test_configuration() {
@@ -62,12 +85,21 @@ run_certbot_test_configuration() {
 
 # Setup common configuration parameters for NGINX and Docker Compose
 setup_common_configuration_parameters() {
-  USE_LETS_ENCRYPT="yes"
-  USE_SELF_SIGNED_CERTS="no"
   NGINX_SSL_PORT=443
   DNS_RESOLVER="8.8.8.8"
   TIMEOUT="5s"
   DOMAIN_NAME="example.com"
   SUBDOMAIN="test"
   TLS_PROTOCOL_SUPPORT="restricted"
+
+  email_flag="--email example@example.com"
+  production_certs_flag="--production-certs"
+  dry_run_flag="--dry-run"
+  force_renew_flag="--force-renew"
+  overwrite_self_signed_certs_flag="--overwrite-cert-dirs"
+  ocsp_stapling_flag="--staple-ocsp"
+  must_staple_flag="--must-staple"
+  strict_permissions_flag="--strict-permissions"
+  hsts_flag="--hsts"
+  uir_flag="--uir"
 }

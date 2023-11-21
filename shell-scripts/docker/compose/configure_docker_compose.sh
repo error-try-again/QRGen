@@ -1,102 +1,212 @@
 #!/bin/bash
 
-################################################
-# Sets up the Docker Compose configuration for the application.
-# This includes configuring services for the backend, frontend, and optionally Certbot for Let's Encrypt SSL.
-#
-# Globals:
-#   CERTBOT_VOLUME_MAPPINGS, CERTS_DH_VOLUME_MAPPING, INTERNAL_WEBROOT_DIR,
-#   LETS_ENCRYPT_LOGS_VOLUME_MAPPING, LETS_ENCRYPT_VOLUME_MAPPING,
-#   NGINX_SSL_PORT, PROJECT_ROOT_DIR, USE_LETS_ENCRYPT
-#   certbot_volume_mappings, internal_dirs
-# Arguments:
-#   None
-################################################
-configure_docker_compose() {
-  # Local variables for service definitions and volume mappings
-  local certbot_service_definition=""
-  local http01_ports=""
-  local frontend_certbot_shared_volume=""
-  local certs_volume=""
+#!/bin/bash
 
-  # Configure for Let's Encrypt if enabled
+configure_docker_compose() {
+  # Network-related declarations and assignments
+  local network_name
+  network_name="qrgen"
+
+  local network_driver
+  network_driver="bridge"
+
+  # Volume-related declarations and assignments
+  local volume_name
+  volume_name="nginx-shared-volume"
+
+  local volume_driver
+  volume_driver="local"
+
+  # Service names declarations and assignments
+  local backend_name
+  backend_name="backend"
+
+  local frontend_name
+  frontend_name="frontend"
+
+  local certbot_name
+  certbot_name="certbot"
+
+  # Backend Dockerfile declarations and assignments
+  local backend_context
+  backend_context="."
+
+  local backend_dockerfile
+  backend_dockerfile="./backend/Dockerfile"
+
+  # Frontend Dockerfile declarations and assignments
+  local frontend_context
+  frontend_context="."
+
+  local frontend_dockerfile
+  frontend_dockerfile="./frontend/Dockerfile"
+
+  # Certbot Dockerfile declarations and assignments
+  local certbot_context
+  certbot_context="."
+
+  local certbot_dockerfile
+  certbot_dockerfile="./certbot/Dockerfile"
+
+  # Ports and volumes declarations
+  local backend_ports
+  backend_ports="ports:"
+  backend_ports+=$'\n'
+  backend_ports+="      - \"${BACKEND_PORT}:${BACKEND_PORT}\""
+
+  local frontend_ports
+  frontend_ports=""
+
+  local backend_volumes
+  backend_volumes=""
+
+  local shared_volumes
+  shared_volumes=""
+
+  # Service definition declarations
+  local certbot_service_definition
+  certbot_service_definition=""
+
+  # Network configurations for services
+  local frontend_networks
+  frontend_networks=$(specify_network $network_name)
+
+  local backend_networks
+  backend_networks="$(specify_network $network_name)"
+
+  # Dependency declarations
+  local backend_depends_on
+  backend_depends_on=""
+
+  local frontend_depends_on
+  frontend_depends_on="backend"
+
+  local certbot_depends_on
+  certbot_depends_on="frontend"
+
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     echo "Configuring Docker Compose for Let's Encrypt..."
+    frontend_ports+="ports:"
+    frontend_ports+=$'\n'
+    frontend_ports+="     - \"${NGINX_PORT}:${NGINX_PORT}\""
+    frontend_ports+=$'\n'
+    frontend_ports+="     - \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
 
-    # Ports for HTTP-01 challenge
-    http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
-    http01_ports+=$'\n      - "80:80"'
+    shared_volumes+="volumes:"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ./frontend:/usr/share/nginx/html:ro"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ./nginx.conf:/etc/nginx/nginx.conf:ro"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
 
-    # Shared volumes for Let's Encrypt and SSL certificates
-    frontend_certbot_shared_volume="- nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
-    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}
-    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}
-    frontend_certbot_shared_volume+=$'\n      - '${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}
+    backend_volumes="volumes:"
+    backend_volumes+=$'\n'
+    backend_volumes+=$'      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro
+    backend_volumes+=$'\n'
+    backend_volumes+=$'      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
 
-    certs_volume="    volumes:"
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
-
-    # Generate Certbot service definition
-    certbot_service_definition=$(create_certbot_service "$(generate_certbot_command)" "$frontend_certbot_shared_volume")
+    certbot_service_definition=$(
+      create_certbot_service \
+        $certbot_name \
+        $certbot_context \
+        $certbot_dockerfile \
+        "$(generate_certbot_command)" \
+        "$shared_volumes" \
+        $certbot_depends_on
+    )
 
   elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     echo "Configuring Docker Compose for self-signed certificates..."
 
-    http01_ports="- \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
-    http01_ports+=$'\n      - "80:80"'
+    frontend_ports="ports:"
+    frontend_ports+=$'\n'
+    frontend_ports+="      - \"${NGINX_PORT}:${NGINX_PORT}\""
+    frontend_ports+=$'\n'
+    frontend_ports+="      - \"${NGINX_SSL_PORT}:${NGINX_SSL_PORT}\""
 
-    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem:ro
-    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem:ro
-    frontend_certbot_shared_volume+=$'\n      - '${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}:ro
+    shared_volumes+="volumes:"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ./nginx.conf:/etc/nginx/nginx.conf:ro"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}"
+    shared_volumes+=$'\n'
+    shared_volumes+="      - ${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}"
 
-    certs_volume="    volumes:"
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro
-    certs_volume+=$'\n      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
+    backend_volumes="volumes:"
+    backend_volumes+=$'\n'
+    backend_volumes+=$'      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro
+    backend_volumes+=$'\n'
+    backend_volumes+=$'      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
 
   else
-    echo "Configuring Docker Compose without SSL certificates..."
+    frontend_ports="ports:"
+    frontend_ports+=$'\n'
+    frontend_ports+="      - \"${NGINX_PORT}:80\""
+
+    backend_volumes="volumes:"
+    backend_volumes+=$'\n'
+    backend_volumes+=$'      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro
+    backend_volumes+=$'\n'
+    backend_volumes+=$'      - '${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
   fi
 
-  local backend_section
-  local frontend_section
-  local network_section
-  local volume_section
+  local backend_service_definition
+  local frontend_service_definition
+  local network_definition
+  local volume_definition
 
-  # Assembling Docker Compose sections
-  backend_section=$(create_backend_service "$certs_volume")
-  frontend_section=$(create_frontend_service "$http01_ports" "$frontend_certbot_shared_volume")
-  network_section=$(create_network_definition)
-  volume_section=$(create_volume_definition)
+  backend_service_definition=$(
+    create_backend_service \
+      $backend_name \
+      $backend_context \
+      $backend_dockerfile \
+      "$backend_ports" \
+      "$backend_volumes" \
+      "$backend_networks"
+  )
 
-  # Write Docker Compose file
+  frontend_service_definition=$(
+    create_frontend_service \
+      $frontend_name \
+      $frontend_context \
+      $frontend_dockerfile \
+      "$frontend_ports" \
+      "$shared_volumes" \
+      "$frontend_networks" \
+      "$frontend_depends_on"
+  )
+
+  network_definition=$(create_network_definition \
+    $network_name \
+    $network_driver)
+
+  volume_definition=$(create_volume_definition \
+    $volume_name \
+    $volume_driver)
+
   {
     echo "version: '3.8'"
     echo "services:"
-    echo "$backend_section"
-    echo "$frontend_section"
+    echo "$backend_service_definition"
+    echo "$frontend_service_definition"
     echo "$certbot_service_definition"
-    echo "$network_section"
-    echo "$volume_section"
+    echo "$network_definition"
+    echo "$volume_definition"
   } > "${DOCKER_COMPOSE_FILE}"
 
-  # Display the generated Docker Compose file
   cat "${DOCKER_COMPOSE_FILE}"
   echo "Docker Compose configuration written to ${DOCKER_COMPOSE_FILE}"
 }
 
-################################################
-# Generates the command to be used with Certbot for SSL certificate generation.
-#
-# Globals:
-#   FORCE_RENEWAL_FLAG, INTERNAL_WEBROOT_DIR, NON_INTERACTIVE_FLAG,
-#   NO_EFF_EMAIL_FLAG, RSA_KEY_SIZE_FLAG, TOS_FLAG, DOMAIN_NAME,
-#   dry_run_flag, email_flag, hsts_flag, internal_dirs, must_staple_flag,
-#   ocsp_stapling_flag, overwrite_self_signed_certs_flag, production_certs_flag,
-#   strict_permissions_flag, SUBDOMAIN, uir_flag
-# Arguments:
-#   None
-################################################
 generate_certbot_command() {
   echo "certonly \
 --webroot \
@@ -119,96 +229,93 @@ ${overwrite_self_signed_certs_flag}" \
     --domains "$SUBDOMAIN"."${DOMAIN_NAME}"
 }
 
-#######################################
-# Generates the backend service definition for Docker Compose.
-# Globals:
-#   BACKEND_PORT
-# Arguments:
-#   1
-#######################################
 create_backend_service() {
-  local volume_section=$1
-  echo "  backend:
+  local name="$1"
+  local build_context="$2"
+  local dockerfile="$3"
+  local ports="$4"
+  local volumes="$5"
+  local networks="$6"
+
+  echo "
+  ${name}:
     build:
-      context: .
-      dockerfile: ./backend/Dockerfile
-    ports:
-      - \"${BACKEND_PORT}:${BACKEND_PORT}\"
-    networks:
-      - qrgen
-$volume_section"
+      context: ${build_context}
+      dockerfile: ${dockerfile}
+    ${ports}
+    ${networks}
+    ${volumes}"
 }
 
-#######################################
-# Generates the frontend service definition for Docker Compose.
-# Globals:
-#   NGINX_PORT
-# Arguments:
-#   1
-#   2
-#######################################
 create_frontend_service() {
-  local ports_section=$1
-  local volume_section=$2
-  echo "  frontend:
+  local name="$1"
+  local build_context="$2"
+  local dockerfile="$3"
+  local ports="$4"
+  local volumes="$5"
+  local networks="$6"
+  local depends="$7"
+
+  echo "
+  ${name}:
     build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-    ports:
-      - \"${NGINX_PORT}:${NGINX_PORT}\"
-      $ports_section
-    networks:
-      - qrgen
-    volumes:
-      - ./frontend:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      $volume_section
+      context: ${build_context}
+      dockerfile: ${dockerfile}
+    ${ports}
+    ${networks}
+    ${volumes}
     depends_on:
-      - backend"
+      - ${depends}"
 }
 
-#######################################
-# Generates the Certbot service definition for Docker Compose.
-# Arguments:
-#   1
-#   2
-#######################################
 create_certbot_service() {
-  local command=$1
-  local volumes=$2
-  echo "  certbot:
+  local name="$1"
+  local build_context="$2"
+  local dockerfile="$3"
+  local command="$4"
+  local volumes="$5"
+  local depends="$6"
+
+  echo "
+  ${name}:
     build:
-      context: .
-      dockerfile: ./certbot/Dockerfile
-    command: $command
-    volumes:
-      $volumes
+      context: ${build_context}
+      dockerfile: ${dockerfile}
+    command: ${command}
+    ${volumes}
     depends_on:
-      - frontend"
+      - ${depends}"
 }
 
-#######################################
-# Generates the network definition for Docker Compose.
-# Arguments:
-#  None
-#######################################
+
+specify_network() {
+  local network_name="$1"
+
+  echo "
+    networks:
+      - ${network_name}"
+}
+
+# Generates network definition for Docker Compose.
 create_network_definition() {
-  echo "networks:
-  qrgen:
-    driver: bridge"
+  local network_name="$1"
+  local network_driver="$2"
+
+  echo "
+networks:
+  ${network_name}:
+    driver: ${network_driver}"
 }
 
-#######################################
-# Generates the volume definition for Docker Compose depending on whether SSL certificates are enabled.
-# Globals:
-#   USE_LETS_ENCRYPT
-# Arguments:
-#  None
-#######################################
+# Generates volume definition for Docker Compose.
 create_volume_definition() {
+  local volume_name="$1"
+  local volume_driver="$2"
+
   if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
-    echo "volumes:
-  nginx-shared-volume:
-    driver: local"
+    echo "
+volumes:
+  ${volume_name}:
+    driver: ${volume_driver}"
   fi
 }

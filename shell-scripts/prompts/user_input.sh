@@ -112,6 +112,7 @@ automation_production_selection() {
 set_ssl_flag() {
   USE_SSL="true"
 }
+
 #######################################
 # description
 # Globals:
@@ -122,6 +123,7 @@ set_ssl_flag() {
 set_letsencrypt_flag() {
   USE_LETS_ENCRYPT="yes"
 }
+
 #######################################
 # description
 # Globals:
@@ -132,32 +134,7 @@ set_letsencrypt_flag() {
 set_self_signed_flag() {
   USE_SELF_SIGNED_CERTS="yes"
 }
-#######################################
-# description
-# Globals:
-#   LETSENCRYPT_EMAIL
-#   USE_DRY_RUN
-#   USE_FORCE_RENEW
-#   USE_HSTS
-#   USE_MUST_STAPLE
-#   USE_OCSP_STAPLING
-#   USE_OVERWRITE_SELF_SIGNED_CERTS
-#   USE_PRODUCTION_SSL
-#   USE_STRICT_PERMISSIONS
-#   USE_UIR
-#   dry_run_flag
-#   email_flag
-#   force_renew_flag
-#   hsts_flag
-#   must_staple_flag
-#   ocsp_stapling_flag
-#   overwrite_self_signed_certs_flag
-#   production_certs_flag
-#   strict_permissions_flag
-#   uir_flag
-# Arguments:
-#  None
-#######################################
+
 construct_certbot_flags() {
   email_flag=$([[ $LETSENCRYPT_EMAIL == "skip" ]] && echo "--register-unsafely-without-email" || echo "--email $LETSENCRYPT_EMAIL")
   production_certs_flag=$([[ $USE_PRODUCTION_SSL == "yes" ]] && echo "" || echo "--staging")
@@ -170,6 +147,18 @@ construct_certbot_flags() {
   hsts_flag=$([[ $USE_HSTS == "yes" ]] && echo "--hsts" || echo "")
   uir_flag=$([[ $USE_UIR == "yes" ]] && echo "--uir" || echo "")
 }
+
+disable_docker_build_caching_prompt() {
+  prompt_yes_no "Would you like to disable Docker build caching for this run? (yes/no): " DISABLE_DOCKER_CACHING
+}
+
+prompt_for_self_signed_certificates() {
+  prompt_yes_no "Would you like to enable self-signed certificates? (yes/no): " USE_SELF_SIGNED_CERTS
+  if [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
+    set_ssl_flag
+  fi
+}
+
 #######################################
 # description
 # Arguments:
@@ -213,6 +202,7 @@ prompt_numeric() {
   done
   eval "$var_name"="'$input'"
 }
+
 #######################################
 # description
 # Globals:
@@ -330,6 +320,7 @@ prompt_for_domain_details() {
     fi
   else
     echo "Using default domain name: $DOMAIN_NAME"
+
   fi
 }
 #######################################
@@ -344,6 +335,8 @@ prompt_for_domain_and_letsencrypt() {
   if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
     prompt_for_ssl
     construct_certbot_flags
+  else
+    prompt_for_self_signed_certificates
   fi
 }
 #######################################
