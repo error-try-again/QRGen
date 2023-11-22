@@ -108,7 +108,7 @@ EOF
 
 tls_protocol_one_three_restrict() {
     cat <<- EOF
-    ssl_protocols TLSv1.3;
+        ssl_protocols TLSv1.3;
 EOF
 }
 
