@@ -67,6 +67,38 @@ _Tech_
 - NGINX proxy provides multi-service integrations.  
 - Provides QR Generation web APIs (POST /qr/generate) or (POST /qr/batch)
 
+## High level project overview
+
+    Bash:
+        depends.sh:
+        - A minimal dependency installer/uninstaller for apt packages, user setup, NVM setup (root)
+        
+        install.sh:
+        - A rootless primary installer for docker, environment configuration, and user prompts. 
+        - Automated deployment and generation of Compose config files, Dockerfiles, and dependencies.
+        - Certbot command generation and more.
+
+    Python:
+        - Modified Certbot fork in a Docker container for automatic certificate mergers between self-signed and Let's Encrypt certificates.
+
+    NGINX:
+        - Proxies queries between frontend/backend services.
+        - Adds security headers and handles TLS with strong cipher suites.
+        - Manages ACME challenge for Certbot.
+
+    Compose:
+        - Simplifies container and volume management.
+        - Manages network configuration and port assignments.
+
+    Express Backend (TypeScript):
+        - Manages query validation mappings and security features (Helmet, CORS, rate limiting.)
+        - API for generating and batching QR data.
+
+    React Frontend (TSX/Vite):
+        - Utilizes React for its efficient state management and context API.
+        - Vite for bundling and testing integrations.
+
+
 ### Tested on:
 
 * on Ubuntu 22.04.3 LTS, jammy, 5.15.0-87-generic SMP x86_64 GNU/Linux
