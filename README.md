@@ -10,7 +10,7 @@ The idea was initially conceived when I found myself needing to generate a large
 number of QR codes for a project, and I was unable to find a suitable self-hostable solution, so I decided to build my own. 
 I hope that others find it useful too. 
 
-*Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome. 
+*Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome.*
 
 A full write up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
