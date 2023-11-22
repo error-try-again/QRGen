@@ -348,7 +348,7 @@ configure_docker_compose() {
 
     frontend_ports=$(create_ports_or_volumes \
         "ports" \
-        "${NGINX_PORT}:${default_port}")
+        "${NGINX_PORT}:${NGINX_PORT}")
   fi
 
   backend_service_definition=$(create_service \
@@ -374,7 +374,6 @@ configure_docker_compose() {
   network_definition=$(create_network_definition \
     "$network_name" \
     "$network_driver")
-
 
   volume_definition=$(create_volume_definition \
     "$volume_name" \
