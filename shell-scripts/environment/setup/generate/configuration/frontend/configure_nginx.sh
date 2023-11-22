@@ -1,9 +1,5 @@
 #!/bin/bash
 
-log_error() {
-    echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1"
-}
-
 # bashsupport disable=BP5006
 configure_nginx() {
     echo "Creating NGINX configuration..."

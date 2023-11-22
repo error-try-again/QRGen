@@ -272,6 +272,8 @@ configure_docker_compose() {
   backend_networks="$(specify_network "$network_name")"
   certbot_networks=""
 
+  default_port="80"
+
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     echo "Configuring Docker Compose for Let's Encrypt..."
 
@@ -330,7 +332,6 @@ configure_docker_compose() {
 
     frontend_volumes=$(create_ports_or_volumes \
       "volumes" \
-      "./frontend:/usr/share/nginx/html" \
       "./nginx.conf:/etc/nginx/nginx.conf:ro" \
       "${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}" \
       "${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}" \
@@ -347,7 +348,7 @@ configure_docker_compose() {
 
     frontend_ports=$(create_ports_or_volumes \
         "ports" \
-        "${NGINX_PORT}:${NGINX_PORT}")
+        "${NGINX_PORT}:${default_port}")
   fi
 
   backend_service_definition=$(create_service \
