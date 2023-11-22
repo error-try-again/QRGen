@@ -162,6 +162,29 @@ ssh -t -i .ssh/<a-fresh-public-key> docker-primary@<hostip> "cd ~ && git clone h
 
 _For Lets-Encrypt Production Certificates & HTTPS Servers_
 
+*Automatic*
+```
+Would you like to disable Docker build caching for this run? (yes/no):
+yes
+Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+yes
+Enter your domain name (e.g., example.com): qr-gen.net
+Using custom domain name: http://qr-gen.net
+Would you like to specify a subdomain other than the default (none) (yes/no)?
+yes
+Enter your subdomain name (e.g., www): void
+Using custom subdomain: http://void.qr-gen.net
+1: Use Let's Encrypt SSL
+2: Use self-signed SSL certificates
+3: Do not enable SSL
+Please enter your choice (1/2/3): 1
+1: Run automatic staging setup for Let's Encrypt SSL (Recommended for testing)
+2: Run automatic production setup for Let's Encrypt SSL (Recommended for production)
+3: Run custom setup for Let's Encrypt SSL
+Please enter your choice (1/2): 2
+```
+
+*Custom*
 ```
 # Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
 # yes
