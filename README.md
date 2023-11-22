@@ -168,12 +168,12 @@ _For Lets-Encrypt Production Certificates & HTTPS Servers_
 
 # Roadmap
 
-* Add additional client/server validation for QR code formats
+* Additional client/server validation for QR code formats
 * Add import mechanism for QR code generation (CSV, JSON, Excel, etc.)
 * API Documentation
-* CI/CD pipeline
+* Improved CI/CD pipeline
 * Improved test coverage
-* Add additional deployment options (E.g. Kubernetes, etc.)
+* Additional deployment options (E.g. Kubernetes, etc.)
 * Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content
   persistence, content expiry, etc.)
 * Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code
@@ -199,9 +199,3 @@ _For Lets-Encrypt Production Certificates & HTTPS Servers_
 ### Self-signed SSL certificate
 
 ![regen-self-signed.png](images%2FGeneral%2Fregen-self-signed.png)
-
-# Error Screenshots
-
-## LetsEncrypt Rate Limit Example
-
-![rate-limit-error.png](images%2FGeneral%2Frate-limit-error.png)
