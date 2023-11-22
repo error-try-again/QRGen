@@ -1,11 +1,6 @@
 #!/bin/bash
 . .env
 
-#######################################
-# description
-# Arguments:
-#  None
-#######################################
 user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
   local opt
@@ -26,11 +21,7 @@ user_prompt() {
   done
   echo "Thanks for using the QR Code Generator setup script!"
 }
-#######################################
-# description
-# Arguments:
-#  None
-#######################################
+
 custom_install_prompt() {
   prompt_for_input "Please enter your Let's Encrypt email or type 'skip' to skip: " "Error: Email address cannot be empty." LETSENCRYPT_EMAIL
   prompt_yes_no "Would you like to use a production SSL certificate? (yes/no): " USE_PRODUCTION_SSL
@@ -43,24 +34,10 @@ custom_install_prompt() {
   prompt_yes_no "Would you like to enable Strict Permissions? (yes/no): " USE_STRICT_PERMISSIONS
   prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no): " USE_UIR
   prompt_yes_no "Would you like to overwrite self-signed certificates? (yes/no): " USE_OVERWRITE_SELF_SIGNED_CERTS
+  prompt_yes_no "Would you like to enable TLSv1.3? (yes/no) (Recommended): " USE_TLS13
+  prompt_yes_no "Would you like to enable TLSv1.2? (yes/no): " USE_TLS12
 }
-#######################################
-# description
-# Globals:
-#   LETSENCRYPT_EMAIL
-#   REGENERATE_SSL_CERTS
-#   USE_AUTO_RENEW_SSL
-#   USE_DRY_RUN
-#   USE_HSTS
-#   USE_MUST_STAPLE
-#   USE_OCSP_STAPLING
-#   USE_OVERWRITE_SELF_SIGNED_CERTS
-#   USE_PRODUCTION_SSL
-#   USE_STRICT_PERMISSIONS
-#   USE_UIR
-# Arguments:
-#  None
-#######################################
+
 automatic_staging_selection() {
   LETSENCRYPT_EMAIL="skip"
   USE_AUTO_RENEW_SSL="yes"
@@ -74,22 +51,7 @@ automatic_staging_selection() {
   USE_OCSP_STAPLING="no"
   USE_MUST_STAPLE="no"
 }
-#######################################
-# description
-# Globals:
-#   LETSENCRYPT_EMAIL
-#   USE_AUTO_RENEW_SSL
-#   USE_DRY_RUN
-#   USE_HSTS
-#   USE_MUST_STAPLE
-#   USE_OCSP_STAPLING
-#   USE_OVERWRITE_SELF_SIGNED_CERTS
-#   USE_PRODUCTION_SSL
-#   USE_STRICT_PERMISSIONS
-#   USE_UIR
-# Arguments:
-#  None
-#######################################
+
 automation_production_selection() {
   LETSENCRYPT_EMAIL="skip"
   USE_AUTO_RENEW_SSL="yes"
@@ -102,35 +64,15 @@ automation_production_selection() {
   USE_STRICT_PERMISSIONS="no"
   USE_MUST_STAPLE="no"
 }
-#######################################
-# description
-# Globals:
-#   USE_SSL
-# Arguments:
-#  None
-#######################################
+
 set_ssl_flag() {
   USE_SSL="true"
 }
 
-#######################################
-# description
-# Globals:
-#   USE_LETS_ENCRYPT
-# Arguments:
-#  None
-#######################################
 set_letsencrypt_flag() {
   USE_LETS_ENCRYPT="yes"
 }
 
-#######################################
-# description
-# Globals:
-#   USE_SELF_SIGNED_CERTS
-# Arguments:
-#  None
-#######################################
 set_self_signed_flag() {
   USE_SELF_SIGNED_CERTS="yes"
 }
@@ -159,12 +101,6 @@ prompt_for_self_signed_certificates() {
   fi
 }
 
-#######################################
-# description
-# Arguments:
-#   1
-#   2
-#######################################
 prompt_yes_no() {
   local prompt="$1"
   local result_var="$2"
@@ -185,12 +121,7 @@ prompt_yes_no() {
     esac
   done
 }
-#######################################
-# description
-# Arguments:
-#   1
-#   2
-#######################################
+
 prompt_numeric() {
   local prompt_message=$1
   local var_name=$2
@@ -203,14 +134,6 @@ prompt_numeric() {
   eval "$var_name"="'$input'"
 }
 
-#######################################
-# description
-# Globals:
-#   AUTO_SETUP_CHOICE
-#   SSL_CHOICE
-# Arguments:
-#  None
-#######################################
 prompt_for_ssl() {
   echo "1: Use Let's Encrypt SSL"
   echo "2: Use self-signed SSL certificates"
@@ -246,13 +169,7 @@ prompt_for_ssl() {
     *) echo "Invalid choice. Please enter 1, 2, or 3." ;;
   esac
 }
-#######################################
-# description
-# Arguments:
-#   1
-#   2
-#   3
-#######################################
+
 prompt_for_input() {
   local prompt_message="$1"
   local error_message="$2"
@@ -268,16 +185,7 @@ prompt_for_input() {
     fi
   done
 }
-#######################################
-# description
-# Globals:
-#   REGENERATE_SSL_CERTS
-# Arguments:
-#   1
-# Returns:
-#   0 ...
-#   1 ...
-#######################################
+
 prompt_for_regeneration() {
   if [[ $REGENERATE_SSL_CERTS == "yes"  ]]; then
     return 0
@@ -290,19 +198,7 @@ prompt_for_regeneration() {
     return 1
   fi
 }
-#######################################
-# description
-# Globals:
-#   BACKEND_SCHEME
-#   DOMAIN_NAME
-#   ORIGIN
-#   ORIGIN_PORT
-#   SUBDOMAIN
-#   USE_CUSTOM_DOMAIN
-#   USE_SUBDOMAIN
-# Arguments:
-#  None
-#######################################
+
 prompt_for_domain_details() {
   prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost) (yes/no)? " USE_CUSTOM_DOMAIN
   if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
@@ -323,13 +219,7 @@ prompt_for_domain_details() {
 
   fi
 }
-#######################################
-# description
-# Globals:
-#   USE_CUSTOM_DOMAIN
-# Arguments:
-#  None
-#######################################
+
 prompt_for_domain_and_letsencrypt() {
   prompt_for_domain_details
   if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
@@ -339,12 +229,7 @@ prompt_for_domain_and_letsencrypt() {
     prompt_for_self_signed_certificates
   fi
 }
-#######################################
-# description
-# Arguments:
-#   1
-#   2
-#######################################
+
 prompt_with_validation() {
   local prompt_message="$1"
   local error_message="$2"

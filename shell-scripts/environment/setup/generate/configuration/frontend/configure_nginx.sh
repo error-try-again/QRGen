@@ -1,64 +1,12 @@
 #!/bin/bash
 
-#######################################
-# Configures NGINX with SSL and optional settings
-# Globals:
-#   BACKEND_PORT
-#   DH_PARAMS_PATH
-#   DNS_RESOLVER
-#   DOMAIN_NAME
-#   INTERNAL_LETS_ENCRYPT_DIR
-#   NGINX_PORT
-#   NGINX_SSL_PORT
-#   PROJECT_ROOT_DIR
-#   SUBDOMAIN
-#   TIMEOUT
-#   USE_LETS_ENCRYPT
-#   USE_SELF_SIGNED_CERTS
-#   internal_dirs
-#   ssl_paths
-# Arguments:
-#  None
-# Returns:
-#   1 on error
-#######################################
-
-#######################################
-# description
-# Arguments:
-#   1
-#######################################
 log_error() {
     echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
-#######################################
-# description
-# Globals:
-#   BACKEND_PORT
-#   DH_PARAMS_PATH
-#   DNS_RESOLVER
-#   DOMAIN_NAME
-#   INTERNAL_LETS_ENCRYPT_DIR
-#   NGINX_PORT
-#   NGINX_SSL_PORT
-#   PROJECT_ROOT_DIR
-#   SUBDOMAIN
-#   TIMEOUT
-#   USE_LETS_ENCRYPT
-#   USE_SELF_SIGNED_CERTS
-#   USE_SSL_BACKWARD_COMPAT
-# Arguments:
-#  None
-# Returns:
-#   1 ...
-#######################################
 # bashsupport disable=BP5006
 configure_nginx() {
     echo "Creating NGINX configuration..."
-    TLS_PROTOCOL_SUPPORT=${TLS_PROTOCOL_SUPPORT:-"restricted"}
-
-    # Initialize local variables
     backend_scheme="http"
     server_name="${DOMAIN_NAME}"
     default_port_directive="listen $NGINX_PORT;"
@@ -78,35 +26,13 @@ configure_nginx() {
     write_nginx_config
 }
 
-#######################################
-# description
-# Globals:
-#   DOMAIN_NAME
-#   SUBDOMAIN
-#   server_name
-# Arguments:
-#  None
-#######################################
 configure_subdomain() {
     if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
         server_name="${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 }
 
-#######################################
-# description
-# Globals:
-#   DNS_RESOLVER
-#   NGINX_SSL_PORT
-#   TIMEOUT
-#   USE_LETS_ENCRYPT
-#   USE_SELF_SIGNED_CERTS
-#   backend_scheme
-#   resolver_settings
-#   ssl_listen_directive
-# Arguments:
-#  None
-#######################################
+
 configure_https() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     backend_scheme="https"
@@ -123,7 +49,7 @@ configure_https() {
 }
 
 configure_ssl_mode() {
-    if [[ $TLS_PROTOCOL_SUPPORT == "restricted" ]]; then
+    if [[ $USE_TLS12 == "yes" && $USE_TLS13 == "yes" ]]; then
     ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
     ssl_mode_block+=$(get_ssl_protocol_compatibility)
@@ -151,14 +77,6 @@ gzip off;
 EOF
 }
 
-#######################################
-# description
-# Globals:
-#   DH_PARAMS_PATH
-#   ssl_paths
-# Arguments:
-#  None
-#######################################
 get_ssl_protocol_compatibility() {
     cat <<- EOF
         ssl_protocols TLSv1.2 TLSv1.3;
@@ -188,30 +106,13 @@ get_ssl_additional_config() {
 EOF
 }
 
-#######################################
-# description
-# Globals:
-#   DH_PARAMS_PATH
-#   ssl_paths
-# Arguments:
-#  None
-#######################################
 tls_protocol_one_three_restrict() {
     cat <<- EOF
     ssl_protocols TLSv1.3;
 EOF
 }
 
-#######################################
-# description
-# Globals:
-#   DOMAIN_NAME
-#   INTERNAL_LETS_ENCRYPT_DIR
-#   certs
-#   internal_dirs
-# Arguments:
-#  None
-#######################################
+
 configure_certs() {
       certs="
         ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
@@ -219,17 +120,6 @@ configure_certs() {
         ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 }
 
-#######################################
-# description
-# Globals:
-#   DOMAIN_NAME
-#   INTERNAL_LETS_ENCRYPT_DIR
-#   USE_LETS_ENCRYPT
-#   internal_dirs
-#   security_headers
-# Arguments:
-#  None
-#######################################
 configure_security_headers() {
   security_headers="
             # Prevent clickjacking by instructing the browser to deny rendering iframes
@@ -258,15 +148,6 @@ configure_security_headers() {
   fi
 }
 
-#######################################
-# description
-# Globals:
-#   USE_LETS_ENCRYPT
-#   acme_challenge_server_block
-#   server_name
-# Arguments:
-#  None
-#######################################
 configure_acme_challenge() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
         acme_challenge_server_block="server {
@@ -284,13 +165,6 @@ configure_acme_challenge() {
   fi
 }
 
-#######################################
-# description
-# Globals:
-#   PROJECT_ROOT_DIR
-# Arguments:
-#  None
-#######################################
 backup_existing_config() {
     if [[ -f ${NGINX_CONF_FILE}   ]]; then
         cp "${NGINX_CONF_FILE}" "${NGINX_CONF_FILE}.bak"
@@ -298,23 +172,7 @@ backup_existing_config() {
   fi
 }
 
-#######################################
-# description
-# Globals:
-#   BACKEND_PORT
-#   PROJECT_ROOT_DIR
-#   acme_challenge_server_block
-#   backend_scheme
-#   certs
-#   default_port_directive
-#   resolver_settings
-#   security_headers
-#   server_name
-#   ssl_listen_directive
-#   ssl_mode_block
-# Arguments:
-#  None
-#######################################
+
 write_nginx_config() {
     cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
