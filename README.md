@@ -232,7 +232,7 @@ Please enter your choice (1/2): 2
 * Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content
   persistence, content expiry, etc.)
 * Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code
-  generation history, dynamic QR code generation, etc.)
+  generation history, dynamic QR code generation & linking, etc.)
 * Rewrite the installer in Python
 * Colour QR codes, logos & other customizations
 * Add additional QR code formats (E.g. Google Reviews, etc.)
