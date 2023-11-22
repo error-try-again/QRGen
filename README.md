@@ -16,6 +16,23 @@ A full write up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
 overview of the project.
 
+### Live Demo
+
+[Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
+
+_If the demo server is is down for maintainence, it's probably
+worth checking back in a couple hours_
+
+# Desktop Examples
+
+### Firefox Dark
+
+![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
+
+### Firefox Light
+
+![Demo1.png](images%2FDemo%2FDemo1.png)
+
 ## Features
 
 _QRGen supports the the QR Code generation in the following formats for both bulk and regular code generation_
@@ -49,23 +66,6 @@ _Tech_
 - Security features such as CORS, rate limiting, OCSP stapling, HSTS, and more.
 - NGINX proxy provides multi-service integrations.  
 - Provides QR Generation web APIs (POST /qr/generate) or (POST /qr/batch)
-
-# Desktop Examples
-
-### Firefox Dark
-
-![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
-
-### Firefox Light
-
-![Demo1.png](images%2FDemo%2FDemo1.png)
-
-### Live Demo
-
-[Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
-
-_If the demo server is down it's very likely due to active tests and it's probably
-worth checking back in a couple hours_
 
 ### Tested on:
 
