@@ -10,11 +10,28 @@ The idea was initially conceived when I found myself needing to generate a large
 number of QR codes for a project, and I was unable to find a suitable self-hostable solution, so I decided to build my own. 
 I hope that others find it useful too. 
 
-*Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome. 
+*Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome.*
 
 A full write up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
 overview of the project.
+
+### Live Demo
+
+[Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
+
+_If the demo server is is down for maintainence, it's probably
+worth checking back in a couple hours_
+
+# Desktop Examples
+
+### Firefox Dark
+
+![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
+
+### Firefox Light
+
+![Demo1.png](images%2FDemo%2FDemo1.png)
 
 ## Features
 
@@ -50,22 +67,37 @@ _Tech_
 - NGINX proxy provides multi-service integrations.  
 - Provides QR Generation web APIs (POST /qr/generate) or (POST /qr/batch)
 
-# Desktop Examples
+## High level project overview
 
-### Firefox Dark
+    Bash:
+        depends.sh:
+        - A minimal dependency installer/uninstaller for apt packages, user setup, NVM setup (root)
+        
+        install.sh:
+        - A rootless installer for docker, environment configurations, and user prompts. 
+        - Automated deployment and generation of Compose config files, Dockerfiles, and dependencies.
+        - Certbot command generation and more.
 
-![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
+    Python:
+        - Modified Certbot fork in a Docker container for automatic certificate mergers between self-signed and Let's Encrypt certificates.
 
-### Firefox Light
+    NGINX:
+        - Proxies queries between frontend/backend services.
+        - Adds security headers and handles TLS with strong cipher suites.
+        - Manages ACME challenge for Certbot.
 
-![Demo1.png](images%2FDemo%2FDemo1.png)
+    Compose:
+        - Simplifies container and volume management.
+        - Manages network configuration and port assignments.
 
-### Live Demo
+    Express Backend (TypeScript):
+        - Manages query validation mappings and security features (Helmet, CORS, rate limiting.)
+        - API for generating and batching QR data.
 
-[Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
+    React Frontend (TSX/Vite):
+        - Utilizes React for its efficient state management and context API.
+        - Vite for bundling and testing integrations.
 
-_If the demo server is down it's very likely due to active tests and it's probably
-worth checking back in a couple hours_
 
 ### Tested on:
 
@@ -130,6 +162,29 @@ ssh -t -i .ssh/<a-fresh-public-key> docker-primary@<hostip> "cd ~ && git clone h
 
 _For Lets-Encrypt Production Certificates & HTTPS Servers_
 
+*Automatic*
+```
+Would you like to disable Docker build caching for this run? (yes/no):
+yes
+Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+yes
+Enter your domain name (e.g., example.com): qr-gen.net
+Using custom domain name: http://qr-gen.net
+Would you like to specify a subdomain other than the default (none) (yes/no)?
+yes
+Enter your subdomain name (e.g., www): void
+Using custom subdomain: http://void.qr-gen.net
+1: Use Let's Encrypt SSL
+2: Use self-signed SSL certificates
+3: Do not enable SSL
+Please enter your choice (1/2/3): 1
+1: Run automatic staging setup for Let's Encrypt SSL (Recommended for testing)
+2: Run automatic production setup for Let's Encrypt SSL (Recommended for production)
+3: Run custom setup for Let's Encrypt SSL
+Please enter your choice (1/2): 2
+```
+
+*Custom*
 ```
 # Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
 # yes
@@ -168,12 +223,12 @@ _For Lets-Encrypt Production Certificates & HTTPS Servers_
 
 # Roadmap
 
-* Add additional client/server validation for QR code formats
+* Additional client/server validation for QR code formats
 * Add import mechanism for QR code generation (CSV, JSON, Excel, etc.)
 * API Documentation
-* CI/CD pipeline
+* Improved CI/CD pipeline
 * Improved test coverage
-* Add additional deployment options (E.g. Kubernetes, etc.)
+* Additional deployment options (E.g. Kubernetes, etc.)
 * Admin panel for tunable settings (E.g. SSL configuration, rate limiting, content
   persistence, content expiry, etc.)
 * Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code
@@ -199,9 +254,3 @@ _For Lets-Encrypt Production Certificates & HTTPS Servers_
 ### Self-signed SSL certificate
 
 ![regen-self-signed.png](images%2FGeneral%2Fregen-self-signed.png)
-
-# Error Screenshots
-
-## LetsEncrypt Rate Limit Example
-
-![rate-limit-error.png](images%2FGeneral%2Frate-limit-error.png)
