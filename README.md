@@ -2,21 +2,15 @@
 
 ## Summary
 
-This project aims to automate the setup of a scalable full-stack QR code generation
-service within a rootless Docker environment, with a focus on security, ease of use,
-and simplicity. The project is written in TS (Express), TSX (Vite/React),
-Bash/Shell (Automation) and has several key layers.
+This project aims to automate the setup of a scalable, self-hostable, full-stack QR code generation
+service within a rootless Docker environment, with a focus on security & ease of use. 
+The project is written in TS (Express), TSX (Vite/React), Bash/Shell (Automation) and has several key layers. Each of which deserve their own companion documentation. 
 
 The idea was initially conceived when I found myself needing to generate a large
-number of QR codes for a project, and I was unable to find a suitable self-hostable
-solution. I decided to build my own, and QRGen was born. The project is free because
-I was so damn sick of seeing QR code generation
-services monetizing the hell out of their users, and I hope that others find it
-useful and can make use of what I've built here.
+number of QR codes for a project, and I was unable to find a suitable self-hostable solution, so I decided to build my own. 
+I hope that others find it useful too. 
 
-The project is self-hostable and has been developed over approximately a month.
-It's undergone extensive manual testing. Continuous improvements and bug fixes are
-expected, with contributions welcome.
+*Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome. 
 
 A full write up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
@@ -24,8 +18,7 @@ overview of the project.
 
 ## Features
 
-_QRGen supports the following formats for regular and bulk QR code generation (E.g.
-1000+ QR codes at once):_
+_QRGen supports the the QR Code generation in the following formats for both bulk and regular code generation_
 
 - Text
 - URLs & links
@@ -46,16 +39,15 @@ _UI_
 _Tech_
 
 - Self-hostable QR code generation
-    - Supports custom domains and subdomains, custom ports, etc.
-    - Various formats and sizes, with multiple error correction levels.
-    - Highly automated & scalable.
-    - Supports multiple environments (development, staging, production, etc.)
-        - Self-signed SSL certificate support for development environments. (TLS
-          1.2 & 1.3)
-        - LetsEncrypt support for staging & production environments.
-        - Automated SSL certificate renewal via cron.
+- Supports custom domains and subdomains, custom ports, etc.
+- Various formats and sizes, with multiple error correction levels.
+- Highly automated & scalable.
+- Self-signed SSL certificate generation.
+- LetsEncrypt certificate automation for staging & production environments.
+- Automated SSL certificate renewal via cron.
 - Rootless & Dockerized.
-- Security features: CORS, rate limiting, OCSP stapling, HSTS, and more.
+- Security features such as CORS, rate limiting, OCSP stapling, HSTS, and more.
+- NGINX proxy provides multi-service integrations.  
 - Provides QR Generation web APIs (POST /qr/generate) or (POST /qr/batch)
 
 # Desktop Examples
@@ -189,7 +181,6 @@ _For Lets-Encrypt Production Certificates & HTTPS Servers_
 * Rewrite the installer in Python
 * Colour QR codes, logos & other customizations
 * Add additional QR code formats (E.g. Google Reviews, etc.)
-* Write up
 
 # Setup Screenshots
 
@@ -208,10 +199,6 @@ _For Lets-Encrypt Production Certificates & HTTPS Servers_
 ### Self-signed SSL certificate
 
 ![regen-self-signed.png](images%2FGeneral%2Fregen-self-signed.png)
-
-### Machinectl
-
-![machinectl.png](images%2FLocal%2Fmachinectl.png)
 
 # Error Screenshots
 
