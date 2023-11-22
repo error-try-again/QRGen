@@ -74,7 +74,7 @@ _Tech_
         - A minimal dependency installer/uninstaller for apt packages, user setup, NVM setup (root)
         
         install.sh:
-        - A rootless primary installer for docker, environment configuration, and user prompts. 
+        - A rootless installer for docker, environment configurations, and user prompts. 
         - Automated deployment and generation of Compose config files, Dockerfiles, and dependencies.
         - Certbot command generation and more.
 
