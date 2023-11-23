@@ -5,8 +5,8 @@ import {
   dispatchInitialTabState,
   resetBatchAndLoadingState
 } from '../../helpers/reset-loading-state';
-import { HandleBatchResponse } from '../../responses/handle-batch-response';
-import { HandleSingleResponse } from '../../responses/handle-single-response';
+import { HandleBatchResponse } from '../../services/batching/handle-batch-response.tsx';
+import { HandleSingleResponse } from '../../services/handle-single-response.tsx';
 import { UpdateBatchJob } from '../../services/batching/update-batch-job';
 import { useCore } from '../../hooks/use-core';
 import { setInitialTabState } from '../../helpers/check-tab-type';
@@ -30,10 +30,6 @@ function dispatchClearQRCodeUrl(
   dispatch: (value: { type: 'SET_QRCODE_URL'; value: string | null }) => void
 ) {
   dispatch({ type: 'SET_QRCODE_URL', value: '' });
-}
-
-function handleEndpointSelection(qrBatchCount: number) {
-  return qrBatchCount > 1 ? '/qr/batch' : '/qr/generate';
 }
 
 export const GenerateButtonsSection = () => {
@@ -87,7 +83,6 @@ export const GenerateButtonsSection = () => {
     }
 
     dispatchLoading(dispatch);
-    const endpoint = handleEndpointSelection(qrBatchCount);
 
     if (qrBatchCount === 1) {
       const errorMessage = 'Please add at least 2 QR codes to the batch.';
@@ -101,32 +96,19 @@ export const GenerateButtonsSection = () => {
         : { customData: { ...state }, type: Tabs[activeTab] };
 
     try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestData)
-      });
-
-      if (!response.ok || response.status === 429) {
-        setGenericErrorMessage(setError);
-        dispatchClearQRCodeUrl(dispatch);
-        resetBatchAndLoadingState({ setBatchData, setQrBatchCount, dispatch });
-        return;
-      }
-
       qrBatchCount > 1
         ? await HandleBatchResponse({
             setError,
             setBatchData,
             setQrBatchCount,
             dispatch
-          })(response)
+          })(requestData)
         : await HandleSingleResponse({
             dispatch,
             setError,
             setBatchData,
             setQrBatchCount
-          })(response);
+          })(requestData);
     } catch {
       setGenericErrorMessage(setError);
       dispatchClearQRCodeUrl(dispatch);

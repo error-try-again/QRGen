@@ -213,7 +213,6 @@ configure_docker_compose() {
   local certbot_context
   local certbot_dockerfile
 
-  local frontend_depends_on
   local certbot_depends_on
 
   local frontend_ports
@@ -279,7 +278,7 @@ configure_docker_compose() {
       "${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}" \
       "nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}")
 
-    certbot_service_definition=$( create_service \
+    certbot_service_definition=$(create_service \
         "${certbot_name}" \
         "${certbot_context}" \
         "${certbot_dockerfile}" \
@@ -307,7 +306,7 @@ configure_docker_compose() {
   else
     frontend_ports=$(create_ports_or_volumes \
         "ports" \
-        "${NGINX_PORT}:${NGINX_PORT}")
+        "${NGINX_PORT}:80")
   fi
 
   frontend_service_definition=$(create_service \
@@ -318,7 +317,7 @@ configure_docker_compose() {
     "$frontend_ports" \
     "$frontend_volumes" \
     "$frontend_networks" \
-    "$frontend_depends_on")
+    "")
 
   network_definition=$(create_network_definition \
     "$network_name" \
