@@ -1,4 +1,5 @@
 #!/bin/bash
+
 . .env
 
 user_prompt() {

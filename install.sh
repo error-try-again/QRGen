@@ -49,6 +49,8 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   # The main operational scripts that carry out the required tasks.
   . ./shell-scripts/operations/operations.sh
 
+  . ./shell-scripts/prompts/user_input.sh
+
   # Tests
   . ./shell-scripts/mocks/run_tests.sh  # Define global associative arrays.
   dirs=(
