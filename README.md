@@ -1,20 +1,11 @@
-# QRGen
+# QRGen - Minimal
 
 ## Summary
 
-This project aims to automate the setup of a scalable, self-hostable, full-stack QR code generation
+This project aims to automate the setup of a minimal scalable, self-hostable, QR code generation
 service within a rootless Docker environment, with a focus on security & ease of use. 
-The project is written in TS (Express), TSX (Vite/React), Bash/Shell (Automation) and has several key layers. Each of which deserve their own companion documentation. 
+The project is written in TSX (Vite/React), Bash/Shell (Automation) and has several key layers. Each of which deserve their own companion documentation. 
 
-The idea was initially conceived when I found myself needing to generate a large
-number of QR codes for a project, and I was unable to find a suitable self-hostable solution, so I decided to build my own. 
-I hope that others find it useful too. 
-
-*Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome.*
-
-A full write up and comprehensive documentation is
-underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
-overview of the project.
 
 ### Live Demo
 
