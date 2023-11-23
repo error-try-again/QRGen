@@ -82,17 +82,12 @@ _Tech_
         - Modified Certbot fork in a Docker container for automatic certificate mergers between self-signed and Let's Encrypt certificates.
 
     NGINX:
-        - Proxies queries between frontend/backend services.
         - Adds security headers and handles TLS with strong cipher suites.
         - Manages ACME challenge for Certbot.
 
     Compose:
         - Simplifies container and volume management.
         - Manages network configuration and port assignments.
-
-    Express Backend (TypeScript):
-        - Manages query validation mappings and security features (Helmet, CORS, rate limiting.)
-        - API for generating and batching QR data.
 
     React Frontend (TSX/Vite):
         - Utilizes React for its efficient state management and context API.

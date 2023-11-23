@@ -3,7 +3,6 @@
 # bashsupport disable=BP5006
 configure_nginx() {
     echo "Creating NGINX configuration..."
-    backend_scheme="http"
     server_name="${DOMAIN_NAME}"
     default_port_directive="listen $NGINX_PORT;"
     default_port_directive+=$'\n'
@@ -40,7 +39,6 @@ configure_subdomain() {
 
 configure_https() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
-    backend_scheme="https"
     ssl_listen_directive="listen $NGINX_SSL_PORT ssl;"
     ssl_listen_directive+=$'\n'
     ssl_listen_directive+="        listen [::]:""$NGINX_SSL_PORT ssl;"
@@ -170,6 +168,13 @@ configure_acme_challenge() {
   fi
 }
 
+#######################################
+# Backs up existing nginx.conf if it exists
+# Globals:
+#   NGINX_CONF_FILE
+# Arguments:
+#  None
+#######################################
 backup_existing_config() {
     if [[ -f ${NGINX_CONF_FILE}   ]]; then
         cp "${NGINX_CONF_FILE}" "${NGINX_CONF_FILE}.bak"
@@ -177,6 +182,21 @@ backup_existing_config() {
   fi
 }
 
+#######################################
+# Heredocs the nginx.conf file
+# Globals:
+#   NGINX_CONF_FILE
+#   acme_challenge_server_block
+#   certs
+#   default_port_directive
+#   resolver_settings
+#   security_headers
+#   server_name
+#   ssl_listen_directive
+#   ssl_mode_block
+# Arguments:
+#  None
+#######################################
 write_nginx_config() {
     cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
@@ -204,12 +224,6 @@ http {
             ${security_headers}
         }
 
-        location /qr/ {
-            proxy_pass ${backend_scheme}://backend:${BACKEND_PORT};
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        }
     }
     ${acme_challenge_server_block}
 }

@@ -173,7 +173,6 @@ ${overwrite_self_signed_certs_flag}" \
 #######################################
 # Determines how the Docker Compose file should be configured depending on the user's choices.
 # Globals:
-#   BACKEND_PORT
 #   CERTS_DH_VOLUME_MAPPING
 #   CERTS_DIR
 #   CHALLENGE_PORT
@@ -193,7 +192,6 @@ ${overwrite_self_signed_certs_flag}" \
 #  None
 #######################################
 configure_docker_compose() {
-  local backend_service_definition
   local frontend_service_definition
   local certbot_service_definition
 
@@ -206,12 +204,8 @@ configure_docker_compose() {
   local volume_definition
   local network_definition
 
-  local backend_name
   local frontend_name
   local certbot_name
-
-  local backend_context
-  local backend_dockerfile
 
   local frontend_context
   local frontend_dockerfile
@@ -219,22 +213,17 @@ configure_docker_compose() {
   local certbot_context
   local certbot_dockerfile
 
-  local backend_depends_on
   local frontend_depends_on
   local certbot_depends_on
 
-  local backend_ports
   local frontend_ports
 
-  local backend_volumes
   local frontend_volumes
   local shared_certbot_volumes
 
-  local backend_networks
   local frontend_networks
   local certbot_networks
 
-  backend_service_definition=""
   frontend_service_definition=""
   certbot_service_definition=""
 
@@ -244,12 +233,8 @@ configure_docker_compose() {
   volume_name="nginx-shared-volume"
   volume_driver="local"
 
-  backend_name="backend"
   frontend_name="frontend"
   certbot_name="certbot"
-
-  backend_context="."
-  backend_dockerfile="./backend/Dockerfile"
 
   frontend_context="."
   frontend_dockerfile="./frontend/Dockerfile"
@@ -257,29 +242,20 @@ configure_docker_compose() {
   certbot_context="."
   certbot_dockerfile="./certbot/Dockerfile"
 
-  backend_depends_on=""
-  frontend_depends_on="backend"
   certbot_depends_on="frontend"
 
-  backend_ports=""
   frontend_ports=""
 
-  backend_volumes=""
   frontend_volumes=""
   shared_certbot_volumes=""
 
   frontend_networks=$(specify_network "$network_name")
-  backend_networks="$(specify_network "$network_name")"
   certbot_networks=""
 
   default_port="80"
 
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     echo "Configuring Docker Compose for Let's Encrypt..."
-
-      backend_ports=$(create_ports_or_volumes \
-      "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
 
       frontend_ports=$(create_ports_or_volumes \
       "ports" \
@@ -303,11 +279,6 @@ configure_docker_compose() {
       "${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}" \
       "nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}")
 
-    backend_volumes=$(create_ports_or_volumes \
-      "volumes" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")
-
     certbot_service_definition=$( create_service \
         "${certbot_name}" \
         "${certbot_context}" \
@@ -321,10 +292,6 @@ configure_docker_compose() {
   elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     echo "Configuring Docker Compose for self-signed certificates..."
 
-      backend_ports=$(create_ports_or_volumes \
-      "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
-
     frontend_ports=$(create_ports_or_volumes \
       "ports" \
       "${NGINX_PORT}:${NGINX_PORT}" \
@@ -337,29 +304,11 @@ configure_docker_compose() {
       "${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}" \
       "${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}")
 
-    backend_volumes=$(create_ports_or_volumes \
-      "volumes" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")
   else
-      backend_ports=$(create_ports_or_volumes \
-      "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
-
     frontend_ports=$(create_ports_or_volumes \
         "ports" \
         "${NGINX_PORT}:${NGINX_PORT}")
   fi
-
-  backend_service_definition=$(create_service \
-    "$backend_name" \
-    "$backend_context" \
-    "$backend_dockerfile" \
-    "" \
-    "$backend_ports" \
-    "$backend_volumes" \
-    "$backend_networks" \
-    "$backend_depends_on")
 
   frontend_service_definition=$(create_service \
     "$frontend_name" \
@@ -382,7 +331,6 @@ configure_docker_compose() {
   {
     echo "version: '3.8'"
     echo "services:"
-    echo "$backend_service_definition"
     echo "$frontend_service_definition"
     echo "$certbot_service_definition"
     echo "$network_definition"

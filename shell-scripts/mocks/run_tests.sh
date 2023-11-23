@@ -12,7 +12,6 @@ run_tests() {
   run_compose_le_configuration
   run_compose_ss_configuration
   run_compose_dev_configuration
-  run_backend_container_configuration
   run_frontend_container_configuration
   run_certbot_container_configuration
 
@@ -69,16 +68,6 @@ run_compose_dev_configuration() {
   configure_docker_compose
 }
 
-
-run_backend_container_configuration() {
-  echo "Simulating backend configuration..."
-  BACKEND_DOCKERFILE="${test_output_dir}/Backend.Dockerfile"
-  backend_files="backend/*"
-  setup_common_configuration_parameters
-  configure_backend_docker
-}
-
-
 run_frontend_container_configuration() {
   echo "Simulating frontend configuration..."
   FRONTEND_DOCKERFILE="${test_output_dir}/Frontend.Dockerfile"
@@ -100,7 +89,6 @@ setup_common_configuration_parameters() {
   NODE_VERSION="latest"
   NGINX_SSL_PORT="443"
   NGINX_PORT=8080
-  BACKEND_PORT=3001
   DNS_RESOLVER="8.8.8.8"
   TIMEOUT="5s"
   DOMAIN_NAME="example.com"

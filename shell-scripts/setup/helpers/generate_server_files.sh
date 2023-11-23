@@ -3,11 +3,6 @@
 # Produces server-side configuration files essential for backend and frontend operations.
 generate_server_files() {
   echo "Creating server configuration files..."
-  configure_backend_tsconfig
-  configure_dot_env
-  echo "Configuring the Docker Express..."
-  configure_backend_docker
-  echo "Configuring the Docker NGINX Proxy..."
   configure_frontend_docker
   echo "Configuring the Docker Certbot..."
   configure_certbot_docker

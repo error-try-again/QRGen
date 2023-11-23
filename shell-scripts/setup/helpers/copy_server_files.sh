@@ -3,15 +3,6 @@
 copy_server_files() {
   echo "Copying server files..."
   copy_frontend_files
-  copy_backend_files
-}
-
-copy_backend_files() {
-  echo "Copying backend files..."
-  cp -r "server" "$BACKEND_DIR"
-  cp "tsconfig.json" "$BACKEND_DIR"
-  cp ".env" "$BACKEND_DIR"
-  backend_files="backend/*"
 }
 
 copy_frontend_files() {

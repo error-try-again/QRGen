@@ -31,9 +31,8 @@ renew_certbot() {
   echo "Certbot dry run succeeded, attempting renewal..."
   docker compose run --rm certbot renew
 
-  # Restart the nginx frontend and backend services
+  # Restart the nginx frontend services
   docker compose restart frontend
-  docker compose restart backend
 }
 
 # Start logging

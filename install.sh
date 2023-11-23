@@ -36,9 +36,6 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   . ./shell-scripts/setup/docker-rootless/setup_docker_rootless.sh
   . ./shell-scripts/setup/helpers/setup_project_directories.sh
   . ./shell-scripts/setup/helpers/generate_server_files.sh  # Configuration scripts to generate the necessary files for the project.
-  . ./shell-scripts/setup/backend/configure_backend_tsconfig.sh
-  . ./shell-scripts/setup/docker/containers/backend/configure_backend_dockerfile.sh
-  . ./shell-scripts/setup/backend/configure_dotenv.sh
   . ./shell-scripts/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
   . ./shell-scripts/setup/nginx/configure_nginx.sh
   . ./shell-scripts/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
@@ -54,7 +51,6 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   # Tests
   . ./shell-scripts/mocks/run_tests.sh  # Define global associative arrays.
   dirs=(
-        [BACKEND_DIR]="${PROJECT_ROOT_DIR}/backend"
         [FRONTEND_DIR]="${PROJECT_ROOT_DIR}/frontend"
         [SERVER_DIR]="${PROJECT_ROOT_DIR}/server"
         [CERTBOT_DIR]="${PROJECT_ROOT_DIR}/certbot"

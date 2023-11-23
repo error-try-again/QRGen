@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Handles the generation of self-signed certificates for a domain.
 # Globals:
 #   CERTS_DH_DIR
 #   CERTS_DIR

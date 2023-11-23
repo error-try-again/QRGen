@@ -298,31 +298,6 @@ remove_staging_flag() {
 }
 
 #######################################
-# Builds and runs the backend service without caching
-# Globals:
-#   PROJECT_ROOT_DIR
-# Arguments:
-#  None
-#######################################
-run_backend_service() {
-  if [[ $DISABLE_DOCKER_CACHING == "yes" ]]; then
-    echo "Building and running Backend service without caching..."
-    if ! docker compose build --no-cache --progress=plain backend; then
-      echo "Failed to build Backend service."
-      exit 1
-    fi
-    docker compose up -d backend
-  else
-    echo "Building and running Backend service..."
-    if ! docker compose build --progress=plain backend; then
-      echo "Failed to build Backend service."
-      exit 1
-    fi
-    docker compose up -d backend
-  fi
-}
-
-#######################################
 # Builds and runs the frontend service without caching
 # Globals:
 #   PROJECT_ROOT_DIR
@@ -349,7 +324,7 @@ run_frontend_service() {
 
 #######################################
 # Runs the Certbot service, checks for dry run success, strips the dry run flag,
-# and runs the Certbot service again. Finally, restarts the backend and frontend services.
+# and runs the Certbot service again. Finally, restarts the frontend service.
 # When running in production, the staging flag is also removed.
 # Globals:
 #   PROJECT_ROOT_DIR
@@ -521,8 +496,8 @@ check_certbot_success() {
 #   1 ...
 #######################################
 restart_services() {
-  echo "Restarting backend and frontend services..."
-  if ! docker compose restart backend || ! docker compose restart frontend; then
+  echo "Restarting frontend service..."
+  if ! docker compose restart frontend; then
     echo "Failed to restart services."
     return 1
   fi
@@ -571,7 +546,6 @@ build_and_run_docker() {
   }
 
   # Run each service separately - must be active for certbot to work
-  run_backend_service
   run_frontend_service
 
   if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
