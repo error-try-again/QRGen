@@ -33,7 +33,11 @@ generate_self_signed_certificates() {
       -subj "/CN=${DOMAIN_NAME}"
 
     echo "Self-signed certificates for ${DOMAIN_NAME} generated at ${certs_path}."
-    openssl dhparam -out "${dh_params_path}" 4096
+
+    # Generate DH parameters
+    prompt_for_dhparam_strength
+    echo "Generate a Diffie-Hellman (DH) key exchange parameters file with ${DH_PARAM_SIZE} bits..."
+    openssl dhparam -out "${dh_params_path}" "${DH_PARAM_SIZE}"
     echo "DH parameters generated at ${dh_params_path}."
   else
     echo "Certificates for ${DOMAIN_NAME} already exist at ${certs_path}."

@@ -1,4 +1,5 @@
 #!/bin/bash
+# bashsupport disable=BP5006
 
 . .env
 
@@ -200,6 +201,17 @@ prompt_for_regeneration() {
   fi
 }
 
+prompt_for_dhparam_strength() {
+  echo "1: Use 2048-bit DH parameters (Faster)"
+  echo "2: Use 4096-bit DH parameters (More secure)"
+  prompt_numeric "Please enter your choice (1/2): " DH_PARAM_CHOICE
+  case $DH_PARAM_CHOICE in
+    1) DH_PARAM_SIZE=2048 ;;
+    2) DH_PARAM_SIZE=4096 ;;
+    *) echo "Invalid choice. Please enter 1 or 2." ;;
+  esac
+}
+
 prompt_for_domain_details() {
   prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost) (yes/no)? " USE_CUSTOM_DOMAIN
   if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
@@ -217,7 +229,6 @@ prompt_for_domain_details() {
     fi
   else
     echo "Using default domain name: $DOMAIN_NAME"
-
   fi
 }
 
