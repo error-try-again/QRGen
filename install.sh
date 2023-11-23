@@ -20,47 +20,37 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   fi
 
   # Helper scripts for setting up the project environment.
-  . ./shell-scripts/helpers/create_directory.sh
-  . ./shell-scripts/helpers/copy_server_files.sh
+  . ./shell-scripts/setup/helpers/create_directory.sh
+  . ./shell-scripts/setup/helpers/copy_server_files.sh
 
   # Docker-related scripts to manage the container lifecycle.
-  . ./shell-scripts/docker/helpers/docker_compose_exists.sh
-  . ./shell-scripts/docker/helpers/docker_compose_down.sh
-  . ./shell-scripts/docker/helpers/produce_docker_logs.sh
-  . ./shell-scripts/docker/helpers/test_docker_env.sh
+  . ./shell-scripts/setup/docker/helpers/docker_compose_exists.sh
+  . ./shell-scripts/setup/docker/helpers/docker_compose_down.sh
+  . ./shell-scripts/setup/docker/helpers/produce_docker_logs.sh
+  . ./shell-scripts/setup/docker/helpers/test_docker_env.sh
 
   # Networking scripts to ensure the necessary ports are available for use.
   . ./shell-scripts/networking/ensure_port_is_available.sh
 
   # Environment validation and setup, to ensure the system is ready for the project.
-  . ./shell-scripts/environment/setup/generate/docker-rootless/setup_docker_rootless.sh
-  . ./shell-scripts/environment/setup/generate/setup_project_directories.sh
-  . ./shell-scripts/environment/setup/generate/generate_server_files.sh
-
-  # Configuration scripts to generate the necessary files for the project.
-  . ./shell-scripts/environment/setup/generate/configuration/backend/configure_backend_tsconfig.sh
-  . ./shell-scripts/environment/setup/generate/configuration/backend/configure_backend_dockerfile.sh
-  . ./shell-scripts/environment/setup/generate/configuration/general/configure_dotenv.sh
-  . ./shell-scripts/environment/setup/generate/configuration/frontend/configure_frontend_dockerfile.sh
-  . ./shell-scripts/environment/setup/generate/configuration/frontend/configure_nginx.sh
-  . ./shell-scripts/environment/setup/generate/configuration/ssl/configure_certbot_dockerfile.sh
-  . ./shell-scripts/environment/setup/generate/configuration/ssl/generate_self_signed_certificates.sh
-  . ./shell-scripts/docker/compose/configure_docker_compose.sh # Helper scripts for user prompts and input.
-  . ./shell-scripts/prompts/user_input.sh
-
-  # File watcher for service restarts & certificate renewal.
-  . ./shell-scripts/ssl/cert_file_watcher.sh
-
-  # Generate the certificate renewal script for cron.
+  . ./shell-scripts/setup/docker-rootless/setup_docker_rootless.sh
+  . ./shell-scripts/setup/helpers/setup_project_directories.sh
+  . ./shell-scripts/setup/helpers/generate_server_files.sh  # Configuration scripts to generate the necessary files for the project.
+  . ./shell-scripts/setup/backend/configure_backend_tsconfig.sh
+  . ./shell-scripts/setup/docker/containers/backend/configure_backend_dockerfile.sh
+  . ./shell-scripts/setup/backend/configure_dotenv.sh
+  . ./shell-scripts/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
+  . ./shell-scripts/setup/nginx/configure_nginx.sh
+  . ./shell-scripts/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
+  . ./shell-scripts/setup/self-signed/generate_self_signed_certificates.sh
+  . ./shell-scripts/setup/docker/compose/configure_docker_compose.sh # Helper scripts for user prompts and input.  . ./shell-scripts/prompts/user_input.sh  # Generate the certificate renewal script for cron.
   . ./shell-scripts/ssl/generate_certbot_renewal.sh
 
   # The main operational scripts that carry out the required tasks.
   . ./shell-scripts/operations/operations.sh
 
   # Tests
-  . ./shell-scripts/tests/run_tests.sh
-
-  # Define global associative arrays.
+  . ./shell-scripts/mocks/run_tests.sh  # Define global associative arrays.
   dirs=(
         [BACKEND_DIR]="${PROJECT_ROOT_DIR}/backend"
         [FRONTEND_DIR]="${PROJECT_ROOT_DIR}/frontend"

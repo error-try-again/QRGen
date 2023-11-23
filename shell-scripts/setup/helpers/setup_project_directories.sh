@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Generates project directory structure.
 setup_project_directories() {
   echo "Staging project directories..."
   local directory

@@ -38,7 +38,6 @@ const startHttpsServer = () => {
           key: fs.readFileSync('/etc/ssl/certs/privkey.pem'),
           cert: fs.readFileSync('/etc/ssl/certs/fullchain.pem')
         };
-
         https.createServer(sslOptions, app).listen(PORT, () => {
           console.log(`HTTPS server running on https://localhost:${PORT}`);
         });

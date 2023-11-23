@@ -22,6 +22,15 @@ configure_nginx() {
     write_nginx_config
 }
 
+#######################################
+# description
+# Globals:
+#   DOMAIN_NAME
+#   SUBDOMAIN
+#   server_name
+# Arguments:
+#  None
+#######################################
 configure_subdomain() {
     if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
         server_name="${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME}"
@@ -168,7 +177,6 @@ backup_existing_config() {
   fi
 }
 
-
 write_nginx_config() {
     cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
@@ -206,6 +214,8 @@ http {
     ${acme_challenge_server_block}
 }
 EOF
+
+
         cat "${NGINX_CONF_FILE}"
         echo "NGINX configuration written to ${NGINX_CONF_FILE}"
 }
