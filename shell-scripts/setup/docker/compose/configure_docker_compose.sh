@@ -63,6 +63,7 @@ create_volume_definition() {
 #   6
 #   7
 #   8
+#   9
 #######################################
 create_service() {
   local name="$1"
@@ -72,7 +73,8 @@ create_service() {
   local ports="$5"
   local volumes="$6"
   local networks="$7"
-  local depends="$8"
+  local restart="$8"
+  local depends="$9"
 
   local definition
   definition="  ${name}:"
@@ -103,6 +105,10 @@ create_service() {
     definition+="    depends_on:"
     definition+=$'\n'
     definition+="      - ${depends}"
+  fi
+  if [[ -n $restart ]]; then
+    definition+=$'\n'
+    definition+="    restart: ${restart}"
   fi
 
   echo "$definition"
@@ -226,6 +232,9 @@ configure_docker_compose() {
   local backend_ports
   local frontend_ports
 
+  local backend_restart
+  local frontend_restart
+
   local backend_volumes
   local frontend_volumes
   local shared_certbot_volumes
@@ -263,6 +272,9 @@ configure_docker_compose() {
 
   backend_ports=""
   frontend_ports=""
+
+  backend_restart="on-failure"
+  frontend_restart="on-failure"
 
   backend_volumes=""
   frontend_volumes=""
@@ -316,6 +328,7 @@ configure_docker_compose() {
         "" \
         "${shared_certbot_volumes}" \
         "${certbot_networks}" \
+        "" \
         "${certbot_depends_on}")
 
   elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
@@ -359,6 +372,7 @@ configure_docker_compose() {
     "$backend_ports" \
     "$backend_volumes" \
     "$backend_networks" \
+    "$backend_restart" \
     "$backend_depends_on")
 
   frontend_service_definition=$(create_service \
@@ -369,6 +383,7 @@ configure_docker_compose() {
     "$frontend_ports" \
     "$frontend_volumes" \
     "$frontend_networks" \
+    "$frontend_restart" \
     "$frontend_depends_on")
 
   network_definition=$(create_network_definition \
