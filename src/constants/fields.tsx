@@ -25,8 +25,8 @@ export const VCardFields: (keyof VCardRequest)[] = [
 export const MeCardFields: (keyof MeCardRequest)[] = [
   'firstName',
   'lastName',
-  'phone1',
   'nickname',
+  'phone1',
   'phone2',
   'phone3',
   'email',
