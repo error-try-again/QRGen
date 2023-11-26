@@ -145,7 +145,7 @@ Welcome to the QR Code Generator setup script!
 ```
 
 ```bash
-# For http only/localhost with no backend
+# For http only, localhost, with no backend (in-browser qr generation)
 ...
 1: Install minimal release (frontend QR generation) (Limited features)
 2: Install full release (frontend QR generator and backend API/server side generation) (All features)
@@ -157,6 +157,23 @@ no
 Using default domain name: localhost
 Would you like to enable self-signed certificates? (yes/no):
 no
+```
+
+```bash
+# For self-signed https only, localhost, with backend/server-side qr generation
+Port 8080 is already in use.
+Please provide an alternate port or Ctrl+C to exit: 9999
+Selected port 9999 is available.
+1: Install minimal release (frontend QR generation) (Limited features)
+2: Install full release (frontend QR generator and backend API/server side generation) (All features)
+Please enter your choice (1/2): 2
+Would you like to disable Docker build caching for this run? (yes/no):
+yes
+Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+no
+Using default domain name: localhost
+Would you like to enable self-signed certificates? (yes/no):
+yes
 ```
 
 ## Remote Setup:
