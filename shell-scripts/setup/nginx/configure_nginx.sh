@@ -37,7 +37,6 @@ configure_subdomain() {
   fi
 }
 
-
 configure_https() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     backend_scheme="https"
@@ -117,7 +116,6 @@ tls_protocol_one_three_restrict() {
 EOF
 }
 
-
 configure_certs() {
       certs="
         ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
@@ -177,6 +175,25 @@ backup_existing_config() {
   fi
 }
 
+write_endpoints() {
+        if [[ $release_branch == "full-release" ]]; then
+    echo "Writing endpoints to ${NGINX_CONF_FILE}..."
+    local endpoint="/qr/"
+
+    local proxy_pass="proxy_pass ${backend_scheme}://backend:${BACKEND_PORT};"
+    local proxy_set_header_host="proxy_set_header Host \$host;"
+    local proxy_set_header_x_real_ip="proxy_set_header X-Real-IP \$remote_addr;"
+    local proxy_set_header_x_forwarded_for="proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;"
+
+    echo "location ${endpoint} {"
+    echo "    ${proxy_pass}"
+    echo "    ${proxy_set_header_host}"
+    echo "    ${proxy_set_header_x_real_ip}"
+    echo "    ${proxy_set_header_x_forwarded_for}"
+    echo "}"
+  fi
+}
+
 write_nginx_config() {
     cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
@@ -204,17 +221,11 @@ http {
             ${security_headers}
         }
 
-        location /qr/ {
-            proxy_pass ${backend_scheme}://backend:${BACKEND_PORT};
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        }
+        $(write_endpoints)
     }
     ${acme_challenge_server_block}
 }
 EOF
-
 
         cat "${NGINX_CONF_FILE}"
         echo "NGINX configuration written to ${NGINX_CONF_FILE}"

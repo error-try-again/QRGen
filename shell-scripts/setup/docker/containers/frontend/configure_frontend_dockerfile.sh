@@ -1,57 +1,93 @@
 #!/bin/bash
 
+configure_npm_deps() {
+    local npm_global_deps=(
+        "ts-node"
+        "typescript"
+        "react-leaflet"
+        "leaflet"
+        "react"
+        "react-dom"
+    )
+    local npm_project_deps=(
+        "typescript"
+        "vite"
+        "jsdom"
+        "vite-tsconfig-paths"
+        "vite-plugin-svgr"
+        "vitest"
+        "vite-plugin-checker"
+        "@vitejs/plugin-react"
+        "@testing-library/react"
+        "@testing-library/jest-dom"
+        "@babel/plugin-proposal-private-property-in-object"
+    )
+    local npm_types_deps=(
+        "@types/leaflet"
+        "@types/react"
+        "@types/react-dom"
+        "@types/jest"
+        "@types/react-leaflet"
+    )
+
+    # Add 'file-saver' and 'qrcode' libraries and their type definitions for full-release branch
+    if [[ $release_branch == "minimal-release" ]]; then
+        npm_project_deps+=("file-saver" "qrcode" "jszip")
+        npm_types_deps+=("@types/file-saver" "@types/qrcode" "@types/jszip")
+    fi
+
+    echo "RUN npm install -g ${npm_global_deps[*]}"
+    echo "RUN npm install --save-dev ${npm_project_deps[*]}"
+    echo "RUN npm install --save-dev ${npm_types_deps[*]}"
+}
+
+
 configure_frontend_docker() {
-  cat << EOF > "$FRONTEND_DOCKERFILE"
+    local frontend_submodule_url="https://github.com/error-try-again/QRGen-frontend.git"
+    local origin="origin/$release_branch"
+    local template_name="frontend"
+
+    cat << EOF > "$FRONTEND_DOCKERFILE"
 # Use the latest version of Node.js
 FROM node:$NODE_VERSION as build
 
 # Set the default working directory
 WORKDIR /usr/app
 
-# Install project dependencies
-RUN npm init -y \
-&& npm install react-leaflet leaflet react react-dom typescript \
-&& npm install --save-dev vite jsdom vite-tsconfig-paths vite-plugin-svgr vitest \
-&& npm install --save-dev @babel/plugin-proposal-private-property-in-object \
-&& npm install --save-dev @vitejs/plugin-react @testing-library/react @testing-library/jest-dom \
-&& npm install @types/leaflet @types/react @types/react-dom @types/jest\
-&& npx create-vite frontend --template react-ts
+# Install dependencies
+$(configure_npm_deps)
 
-# Delete the default App.tsx/App.css file (does not use kebab case)
-RUN rm /usr/app/frontend/src/App.tsx && \
-rm /usr/app/frontend/src/App.css
+# Install Vite Template and remove default files
+RUN npx create-vite $template_name --template react-ts && \
+    rm /usr/app/frontend/src/App.tsx && \
+    rm /usr/app/frontend/src/App.css
 
-# Copy Project files to the container
-COPY frontend/src/ /usr/app/frontend/src
-COPY frontend/public/ /usr/app/frontend/public
-COPY frontend/tsconfig.json /usr/app/frontend
-COPY frontend/index.html /usr/app/frontend
-
-# Move to the frontend directory before building
-WORKDIR /usr/app/frontend
+# Initialize the Git repository and handle frontend submodule
+RUN git init && \
+    (if [ -d "frontend" ]; then \
+        echo "Removing existing frontend directory"; \
+        rm -rf frontend; \
+    fi) && \
+    git submodule add --force "$frontend_submodule_url" frontend && \
+    git submodule update --init --recursive && \
+    cd frontend && \
+    git fetch --all && \
+    git reset --hard "$origin" && \
+    git checkout "$release_branch" && \
+    cd ..
 
 # Build the project
+WORKDIR /usr/app/frontend
 RUN npm run build
 
-# Install nginx
+# Setup nginx to serve the built files
 FROM nginx:alpine
-
-# Copy the build files to the nginx directory
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
-
-# Create .well-known and .well-known/acme-challenge directories
-RUN mkdir /usr/share/nginx/html/.well-known/ && \
-mkdir /usr/share/nginx/html/.well-known/acme-challenge
-
-# Set permissions for the .well-known directory so certbot can access it
-RUN chmod -R 777 /usr/share/nginx/html/.well-known
-
-# Set the nginx port
+RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge && \
+    chmod -R 777 /usr/share/nginx/html/.well-known
 EXPOSE $NGINX_PORT
-
-# Run nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
 EOF
 
-  cat "$FRONTEND_DOCKERFILE"
+    cat "$FRONTEND_DOCKERFILE"
 }

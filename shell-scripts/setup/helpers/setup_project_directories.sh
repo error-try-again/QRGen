@@ -9,5 +9,5 @@ setup_project_directories() {
     create_directory "$directory"
   done
 
-  copy_server_files
+#  copy_server_files
 }

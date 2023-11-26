@@ -193,6 +193,7 @@ ${overwrite_self_signed_certs_flag}" \
 #   USE_LETS_ENCRYPT
 #   USE_SELF_SIGNED_CERTS
 #   certbot_volume_mappings
+#   default_port
 #   dirs
 #   internal_dirs
 # Arguments:
@@ -289,9 +290,16 @@ configure_docker_compose() {
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     echo "Configuring Docker Compose for Let's Encrypt..."
 
+      if [[ $release_branch == "full-release" ]]; then
       backend_ports=$(create_ports_or_volumes \
-      "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
+        "ports" \
+        "${BACKEND_PORT}:${BACKEND_PORT}")
+
+      backend_volumes=$(create_ports_or_volumes \
+        "volumes" \
+        "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
+        "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")
+    fi
 
       frontend_ports=$(create_ports_or_volumes \
       "ports" \
@@ -315,11 +323,6 @@ configure_docker_compose() {
       "${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}" \
       "nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}")
 
-    backend_volumes=$(create_ports_or_volumes \
-      "volumes" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")
-
     certbot_service_definition=$( create_service \
         "${certbot_name}" \
         "${certbot_context}" \
@@ -334,9 +337,17 @@ configure_docker_compose() {
   elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     echo "Configuring Docker Compose for self-signed certificates..."
 
+      if [[ $release_branch == "full-release" ]]; then
+
       backend_ports=$(create_ports_or_volumes \
-      "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
+        "ports" \
+        "${BACKEND_PORT}:${BACKEND_PORT}")
+
+      backend_volumes=$(create_ports_or_volumes \
+        "volumes" \
+        "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
+        "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")
+    fi
 
     frontend_ports=$(create_ports_or_volumes \
       "ports" \
@@ -350,18 +361,18 @@ configure_docker_compose() {
       "${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}" \
       "${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}")
 
-    backend_volumes=$(create_ports_or_volumes \
-      "volumes" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
-      "${dirs[CERTS_DIR]}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")
   else
+    echo "Configuring Docker Compose for HTTP..."
+
+    if [[ $release_branch == "full-release" ]]; then
       backend_ports=$(create_ports_or_volumes \
-      "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
+        "ports" \
+        "${BACKEND_PORT}:${BACKEND_PORT}")
+    fi
 
     frontend_ports=$(create_ports_or_volumes \
         "ports" \
-        "${NGINX_PORT}:${NGINX_PORT}")
+        "${NGINX_PORT}:${default_port}")
   fi
 
   backend_service_definition=$(create_service \
