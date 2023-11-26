@@ -133,7 +133,30 @@ script._
 
 ```bash
 cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
-# 1) Run Setup 
+```
+```bash
+Welcome to the QR Code Generator setup script!
+1) Run Setup				6) Update Project
+2) Run Mock Configuration		7) Stop Project Docker Containers
+3) Uninstall				8) Prune All Docker Builds - Dangerous
+4) Reload/Refresh			9) Quit
+5) Dump logs
+# Select 1)
+```
+
+```bash
+# For http only/localhost with no backend
+...
+1: Install minimal release (frontend QR generation) (Limited features)
+2: Install full release (frontend QR generator and backend API/server side generation) (All features)
+Please enter your choice (1/2): 1
+Would you like to disable Docker build caching for this run? (yes/no):
+yes
+Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+no
+Using default domain name: localhost
+Would you like to enable self-signed certificates? (yes/no):
+no
 ```
 
 ## Remote Setup:
