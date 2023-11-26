@@ -177,7 +177,6 @@ backup_existing_config() {
 
 write_endpoints() {
         if [[ $release_branch == "full-release" ]]; then
-    echo "Writing endpoints to ${NGINX_CONF_FILE}..."
     local endpoint="/qr/"
 
     local proxy_pass="proxy_pass ${backend_scheme}://backend:${BACKEND_PORT};"
