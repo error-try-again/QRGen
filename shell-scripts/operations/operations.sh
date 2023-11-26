@@ -11,6 +11,7 @@ setup() {
   setup_project_directories
   setup_docker_rootless
   ensure_port_available "$NGINX_PORT"
+  prompt_for_install_mode
   disable_docker_build_caching_prompt
   prompt_for_domain_and_letsencrypt
   generate_server_files
@@ -335,14 +336,14 @@ run_frontend_service() {
       if ! docker compose build --no-cache --progress=plain frontend; then
           echo "Failed to build Frontend service."
           exit 1
-      fi
+    fi
       docker compose up -d frontend
   else
       echo "Building and running Frontend service..."
       if ! docker compose build --progress=plain frontend; then
           echo "Failed to build Frontend service."
           exit 1
-      fi
+    fi
       docker compose up -d frontend
   fi
 }
@@ -571,8 +572,12 @@ build_and_run_docker() {
   }
 
   # Run each service separately - must be active for certbot to work
-  run_backend_service
-  run_frontend_service
+  if [[ $release_branch = "full-release" ]]; then
+    run_backend_service
+    run_frontend_service
+  else
+    run_frontend_service
+  fi
 
   if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
     run_certbot_service

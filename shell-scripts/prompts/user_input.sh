@@ -212,6 +212,25 @@ prompt_for_dhparam_strength() {
   esac
 }
 
+#######################################
+# Prompts the user for the install mode.
+# Globals:
+#   INSTALL_MODE_CHOICE
+#   release_branch
+# Arguments:
+#  None
+#######################################
+prompt_for_install_mode() {
+  echo "1: Install minimal release (frontend QR generation) (Limited features)"
+  echo "2: Install full release (frontend QR generator and backend API/server side generation) (All features)"
+  prompt_numeric "Please enter your choice (1/2): " INSTALL_MODE_CHOICE
+  case $INSTALL_MODE_CHOICE in
+    1) release_branch="minimal-release" ;;
+    2) release_branch="full-release" ;;
+    *) echo "Invalid choice. Please enter 1 or 2." ;;
+  esac
+}
+
 prompt_for_domain_details() {
   prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost) (yes/no)? " USE_CUSTOM_DOMAIN
   if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
