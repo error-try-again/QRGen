@@ -1,16 +1,29 @@
-# QRGen
+# QRGen - A self-hostable QR code generation service
 
 ## Summary
 
 This project aims to automate the setup of a scalable, self-hostable, full-stack QR code generation
-service within a rootless Docker environment, with a focus on security & ease of use. 
-The project is written in TS (Express), TSX (Vite/React), Bash/Shell (Automation) and has several key layers. Each of which deserve their own companion documentation. 
+service within a rootless Docker environment, with a focus on security & ease of use.
+The project has been written in TS (Express), TSX (Vite/React), Bash/Shell (Automation) and has several key layers. Each of which deserve their own companion documentation.
+To address the challenge of supporting multiple stack configurations, the project has gone through several iterations since its inception. 
+Currently, it is comprised of two separate git submodules that are initialized within the containers themselves at build time.
+
+[The first submodule is an optional backend (Express)](https://github.com/error-try-again/QRGen-backend) which provides an operational mode where QR codes are generated on the server. 
+This is a complex design decision and is in preparation for a full-release version of the application, which will support several additional features such as link shortening/dynamic linking, QR code generation history, administrative configuration, user accounts/auth. 
+This decision aims to provide an additional layer of security to the generation process, preventing certain types of speculative malicious QR injection & redirection attacks. 
+To read more about planned features, skip to the Roadmap section. 
+
+[The second submodule is a requisite frontend (Vite/React)](https://github.com/error-try-again/QRGen-frontend) that provides a simple, responsive, and mobile-friendly UI for generating QR codes.
+The module can be run in isolation or in conjunction with the backend submodule depending on your use case.
 
 The idea was initially conceived when I found myself needing to generate a large
 number of QR codes for a project, and I was unable to find a suitable self-hostable solution, so I decided to build my own. 
 I hope that others find it useful too. 
 
+
 *Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome.*
+If you have a specific fix for the frontend or backend envrionments, please submit your pull request to the respective submodule.
+
 
 A full write up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
@@ -20,7 +33,7 @@ overview of the project.
 
 [Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
 
-_If the demo server is is down for maintainence, it's probably
+_If the demo server is is down for maintenance, it's probably
 worth checking back in a couple hours_
 
 # Desktop Examples
