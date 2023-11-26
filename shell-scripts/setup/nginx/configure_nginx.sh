@@ -185,11 +185,11 @@ write_endpoints() {
     local proxy_set_header_x_forwarded_for="proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;"
 
     echo "location ${endpoint} {"
-    echo "    ${proxy_pass}"
-    echo "    ${proxy_set_header_host}"
-    echo "    ${proxy_set_header_x_real_ip}"
-    echo "    ${proxy_set_header_x_forwarded_for}"
-    echo "}"
+    echo "            ${proxy_pass}"
+    echo "            ${proxy_set_header_host}"
+    echo "            ${proxy_set_header_x_real_ip}"
+    echo "            ${proxy_set_header_x_forwarded_for}"
+    echo "        }"
   fi
 }
 
