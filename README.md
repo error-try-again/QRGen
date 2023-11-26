@@ -8,6 +8,8 @@ The project has been written in TS (Express), TSX (Vite/React), Bash/Shell (Auto
 To address the challenge of supporting multiple stack configurations, the project has gone through several iterations since its inception. 
 Currently, it is comprised of two separate git submodules that are initialized within the containers themselves at build time.
 
+*Note: If you're looking for a version of this project that does not use submodules and instead copies sources from the host/docker-primary user, see the legacy branch.*
+
 [The first submodule is an optional backend (Express)](https://github.com/error-try-again/QRGen-backend) which provides an operational mode where QR codes are generated on the server. 
 This is a complex design decision and is in preparation for a full-release version of the application, which will support several additional features such as link shortening/dynamic linking, QR code generation history, administrative configuration, user accounts/auth. 
 This decision aims to provide an additional layer of security to the generation process, preventing certain types of speculative malicious QR injection & redirection attacks. 
