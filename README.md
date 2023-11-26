@@ -176,6 +176,16 @@ Would you like to enable self-signed certificates? (yes/no):
 yes
 ```
 
+```bash
+# For DH paramater generation - select the option that best suits you
+Self-signed certificates for localhost generated at /home/docker-primary/QRGen/certs/live/localhost.
+1: Use 2048-bit DH parameters (Faster)
+2: Use 4096-bit DH parameters (More secure)
+Please enter your choice (1/2): 1
+Generate a Diffie-Hellman (DH) key exchange parameters file with 2048 bits...
+Generating DH parameters, 2048 bit long safe prime
+```
+
 ## Remote Setup:
 
 ### Step 1
