@@ -42,11 +42,11 @@ worth checking back in a couple hours_
 
 ### Firefox Dark
 
-![Dark-Text1-Firefox.png](images%2FDemo%2FDark-Text1-Firefox.png)
+![Dark-Text1-Firefox.png](examples%2FDemo%2FDark-Text1-Firefox.png)
 
 ### Firefox Light
 
-![Demo1.png](images%2FDemo%2FDemo1.png)
+![Demo1.png](examples%2FDemo%2FDemo1.png)
 
 ## Features
 
@@ -428,18 +428,32 @@ Generating DH parameters, 4096 bit long safe prime
 
 # Setup Screenshots
 
-### TUI
+### Local Install
 
-![run-setup.png](images%2FGeneral%2Frun-setup.png)
+![local-install-1.png](examples%2FLocal%2Flocal-install-1.png)
+
+### HTTP only
+
+![http-only.png](examples%2FLocal%2Fhttp-only.png)
 
 ### Staging environment
 
-![auto-setup-staging.png](images%2FGeneral%2Fauto-setup-staging.png)
+![auto-setup-staging.png](examples%2FGeneral%2Fauto-setup-staging.png)
 
 ### Production environment
 
-![select-production.png](images%2FGeneral%2Fselect-production.png)
+![select-production.png](examples%2FGeneral%2Fselect-production.png)
 
 ### Self-signed SSL certificate
 
-![regen-self-signed.png](images%2FGeneral%2Fregen-self-signed.png)
+![regen-self-signed.png](examples%2FGeneral%2Fregen-self-signed.png)
+
+### Pruning containers
+
+![prune-all.png](examples%2FGeneral%2Fprune-all.png)
+
+### Updating
+![updating.png](examples%2FGeneral%2Fupdating.png)
+
+### Stopping containers
+![stop-containers.png](examples%2FGeneral%2Fstop-containers.png)
