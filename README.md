@@ -1,5 +1,5 @@
 # QRGen - A self-hostable QR code generation service
-## *(Express/Backend), TSX (Vite/React/Frontend), Bash/Shell (Automation)*
+## *TS (Express/Backend), TSX (Vite/React/Frontend), Bash/Shell (Automation)*
 ## Overview
 
 This project aims to automate the setup of a scalable, self-hostable, full-stack QR code generation
