@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Manages the certbot renewal cron job and script generation with a heredoc
 # Globals:
 #   PROJECT_LOGS_DIR
 #   PROJECT_ROOT_DIR

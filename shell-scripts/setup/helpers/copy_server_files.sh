@@ -1,6 +1,13 @@
 #!/bin/bash
 
+
+#######################################
 # Initialize the Git repository if not already initialized
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+#######################################
 initialize_git_repository() {
     if [ ! -d "$PROJECT_ROOT_DIR/.git" ]; then
         echo "Initializing Git repository in $PROJECT_ROOT_DIR"
@@ -10,7 +17,13 @@ initialize_git_repository() {
   fi
 }
 
+
+#######################################
 # Function to add or update a submodule
+# Arguments:
+#   1
+#   2
+#######################################
 add_or_update_submodule() {
     local submodule_url="$1"
     local submodule_path="$2"
@@ -76,11 +89,27 @@ retrieve_submodules() {
   done
 }
 
+#######################################
+# Function to copy the updated .env file to the backend directory
+# Globals:
+#   BACKEND_DIR
+# Arguments:
+#  None
+#######################################
 copy_updated_dotenv() {
    cp ".env" "$BACKEND_DIR"
 }
 
-# Function to copy server files
+
+#######################################
+# Function to copy server files, initialize git repository and retrieve submodules
+# Globals:
+#   PROJECT_ROOT_DIR
+# Arguments:
+#  None
+# Returns:
+#   1 ...
+#######################################
 copy_server_files() {
    copy_updated_dotenv
     if [ -z "$PROJECT_ROOT_DIR" ]; then

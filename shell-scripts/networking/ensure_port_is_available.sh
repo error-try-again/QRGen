@@ -1,6 +1,15 @@
 #!/bin/bash
 
+
+#######################################
 # Check if the given port is a valid number and not in use.
+# Arguments:
+#   1
+# Returns:
+#   0 ...
+#   1 ...
+#   2 ...
+#######################################
 is_port_in_use() {
   local port="$1"
   # Check if the port is a number.
@@ -17,6 +26,13 @@ is_port_in_use() {
   fi
 }
 
+#######################################
+# Prompt for a port and ensure it is available.
+# Globals:
+#   NGINX_PORT
+# Arguments:
+#   1
+#######################################
 ensure_port_available() {
   local port="$1"
   local default_port=$NGINX_PORT # Store the default port in case we need to use it again.

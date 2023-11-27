@@ -19,7 +19,13 @@ create_ports_or_volumes() {
   echo "$result"
 }
 
+
+#######################################
 # Generates network definition for Docker Compose.
+# Arguments:
+#   1
+#   2
+#######################################
 create_network_definition() {
   local network_name="$1"
   local network_driver="$2"
@@ -34,7 +40,16 @@ create_network_definition() {
   echo "$definition"
 }
 
+
+#######################################
 # Generates volume definition for Docker Compose.
+# Globals:
+#   USE_LETS_ENCRYPT
+#   USE_SELF_SIGNED_CERTS
+# Arguments:
+#   1
+#   2
+#######################################
 create_volume_definition() {
   local volume_name="$1"
   local volume_driver="$2"

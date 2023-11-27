@@ -1,6 +1,14 @@
 #!/bin/bash
 
+#######################################
 # Configures Docker to operate in rootless mode, updating user's bashrc as required.
+# Globals:
+#   PATH
+# Arguments:
+#   1
+# Returns:
+#   1 ...
+#######################################
 setup_docker_rootless() {
   echo "Setting up Docker in rootless mode..."
 
