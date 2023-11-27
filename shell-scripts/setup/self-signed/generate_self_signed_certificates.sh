@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #######################################
-# description
+# Handles openssl certificate generation, and dh parameters generation.
+# Looks at cert paths to determine if regeneration is needed.
 # Globals:
 #   CERTS_DH_DIR
 #   CERTS_DIR

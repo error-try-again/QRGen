@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Creates a directory if it doesn't exist.
 # Arguments:
 #   1
 #######################################

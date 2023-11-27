@@ -1,6 +1,23 @@
 #!/bin/bash
 
-# bashsupport disable=BP5006
+
+#######################################
+# Manage NGINX configuration generation
+# Globals:
+#   DOMAIN_NAME
+#   NGINX_PORT
+#   acme_challenge_server_block
+#   backend_scheme
+#   certs
+#   default_port_directive
+#   resolver_settings
+#   security_headers
+#   server_name
+#   ssl_listen_directive
+#   ssl_mode_block
+# Arguments:
+#  None
+#######################################
 configure_nginx() {
     echo "Creating NGINX configuration..."
     backend_scheme="http"
@@ -23,7 +40,7 @@ configure_nginx() {
 }
 
 #######################################
-# description
+# Determine if a subdomain is being used and configure the server_name accordingly
 # Globals:
 #   DOMAIN_NAME
 #   SUBDOMAIN
@@ -37,6 +54,20 @@ configure_subdomain() {
   fi
 }
 
+#######################################
+# Determine if HTTPS is being used and configure the server accordingly
+# Globals:
+#   DNS_RESOLVER
+#   NGINX_SSL_PORT
+#   TIMEOUT
+#   USE_LETS_ENCRYPT
+#   USE_SELF_SIGNED_CERTS
+#   backend_scheme
+#   resolver_settings
+#   ssl_listen_directive
+# Arguments:
+#  None
+#######################################
 configure_https() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     backend_scheme="https"
@@ -52,6 +83,15 @@ configure_https() {
   fi
 }
 
+#######################################
+# Determine if TLS 1.2 and TLS 1.3 are being used and configure the server accordingly
+# Globals:
+#   USE_TLS12
+#   USE_TLS13
+#   ssl_mode_block
+# Arguments:
+#  None
+#######################################
 configure_ssl_mode() {
     if [[ $USE_TLS12 == "yes" && $USE_TLS13 == "yes" ]]; then
     ssl_mode_block=$(get_gzip)
@@ -81,6 +121,11 @@ gzip off;
 EOF
 }
 
+#######################################
+# description
+# Arguments:
+#  None
+#######################################
 get_ssl_protocol_compatibility() {
     cat <<- EOF
         ssl_protocols TLSv1.2 TLSv1.3;
@@ -110,12 +155,27 @@ get_ssl_additional_config() {
 EOF
 }
 
+#######################################
+# A more restrictive TLS 1.3 configuration, which disables TLS 1.2 and lower
+# Arguments:
+#  None
+#######################################
 tls_protocol_one_three_restrict() {
     cat <<- EOF
         ssl_protocols TLSv1.3;
 EOF
 }
 
+#######################################
+# Configures the certificates for HTTPS
+# Globals:
+#   DOMAIN_NAME
+#   INTERNAL_LETS_ENCRYPT_DIR
+#   certs
+#   internal_dirs
+# Arguments:
+#  None
+#######################################
 configure_certs() {
       certs="
         ssl_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;
@@ -123,6 +183,14 @@ configure_certs() {
         ssl_trusted_certificate ${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem;"
 }
 
+#######################################
+# Configures the security headers for HTTPS
+# Globals:
+#   USE_LETS_ENCRYPT
+#   security_headers
+# Arguments:
+#  None
+#######################################
 configure_security_headers() {
   security_headers="
             # Prevent clickjacking by instructing the browser to deny rendering iframes
@@ -151,6 +219,15 @@ configure_security_headers() {
   fi
 }
 
+#######################################
+# Configures the ACME challenge block for HTTPS/LE
+# Globals:
+#   USE_LETS_ENCRYPT
+#   acme_challenge_server_block
+#   server_name
+# Arguments:
+#  None
+#######################################
 configure_acme_challenge() {
     if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
         acme_challenge_server_block="server {
@@ -168,6 +245,13 @@ configure_acme_challenge() {
   fi
 }
 
+#######################################
+# Checks if an existing NGINX configuration exists and backs it up if it does
+# Globals:
+#   NGINX_CONF_FILE
+# Arguments:
+#  None
+#######################################
 backup_existing_config() {
     if [[ -f ${NGINX_CONF_FILE}   ]]; then
         cp "${NGINX_CONF_FILE}" "${NGINX_CONF_FILE}.bak"
@@ -175,6 +259,15 @@ backup_existing_config() {
   fi
 }
 
+#######################################
+# Generates an NGINX configuration for the QR endpoint if the release branch is full-release
+# Globals:
+#   BACKEND_PORT
+#   backend_scheme
+#   release_branch
+# Arguments:
+#  None
+#######################################
 write_endpoints() {
         if [[ $release_branch == "full-release" ]]; then
     local endpoint="/qr/"
@@ -193,6 +286,21 @@ write_endpoints() {
   fi
 }
 
+#######################################
+# Writes the NGINX configuration to the NGINX configuration file
+# Globals:
+#   NGINX_CONF_FILE
+#   acme_challenge_server_block
+#   certs
+#   default_port_directive
+#   resolver_settings
+#   security_headers
+#   server_name
+#   ssl_listen_directive
+#   ssl_mode_block
+# Arguments:
+#  None
+#######################################
 write_nginx_config() {
     cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;

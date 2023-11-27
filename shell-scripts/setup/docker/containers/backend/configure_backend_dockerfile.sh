@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #######################################
 # Dynamic Dockerfile generation - Express
 # Provides submodule implementation for the backend

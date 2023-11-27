@@ -127,7 +127,7 @@ purge_builds() {
 }
 
 #######################################
-# description
+# Exits the script cleanly.
 # Arguments:
 #  None
 #######################################
@@ -153,7 +153,13 @@ handle_certs() {
   fi
 }
 
+#######################################
 # Function to remove containers that conflict with Docker Compose services
+# Globals:
+#   PWD
+# Arguments:
+#  None
+#######################################
 remove_conflicting_containers() {
   # Extract service names from docker-compose.yml
   local service_names
@@ -176,7 +182,11 @@ remove_conflicting_containers() {
   done
 }
 
+#######################################
 # Function to handle ambiguous Docker networks
+# Arguments:
+#  None
+#######################################
 handle_ambiguous_networks() {
   echo "Searching for ambiguous Docker networks..."
   local networks_ids
@@ -269,7 +279,8 @@ backup_and_replace_file() {
 }
 
 #######################################
-# description
+# Strips the dry run certbot command flag
+# Additionally, backing up and replacing the original docker-compose.yml file
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:
@@ -284,7 +295,8 @@ remove_dry_run_flag() {
 }
 
 #######################################
-# description
+# Strips the staging certbot command flag
+# Additionally, backing up and replacing the original docker-compose.yml file
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:
@@ -299,7 +311,8 @@ remove_staging_flag() {
 }
 
 #######################################
-# Builds and runs the backend service without caching
+# Builds and runs the backend service
+# Checks to see if caching is disabled, and builds accordingly
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:
@@ -324,7 +337,8 @@ run_backend_service() {
 }
 
 #######################################
-# Builds and runs the frontend service without caching
+# Builds and runs the frontend service
+# Checks to see if caching is disabled, and builds accordingly
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:
@@ -370,7 +384,8 @@ run_certbot_service() {
 }
 
 #######################################
-# Builds the Certbot service without caching
+# Builds the Certbot service
+# Checks to see if caching is disabled, and builds accordingly
 # Arguments:
 #  None
 # Returns:
@@ -387,7 +402,8 @@ build_certbot_service() {
 }
 
 #######################################
-# description
+# Determines whether to use staging or production Let's Encrypt servers
+# Depends on whether the dry run was successful
 # Arguments:
 #  None
 # Returns:
@@ -402,7 +418,8 @@ run_certbot_dry_run() {
   fi
   if [[ $certbot_output == *'The dry run was successful.'* ]]; then
     echo "Certbot dry run successful."
-    handle_ssl_flags
+    remove_dry_run_flag
+    handle_staging_flags
   else
     echo "Certbot dry run failed."
     return 1
@@ -410,14 +427,13 @@ run_certbot_dry_run() {
 }
 
 #######################################
-# description
+# Provides removal of the staging flag when running in production mode
 # Globals:
 #   USE_PRODUCTION_SSL
 # Arguments:
 #  None
 #######################################
-handle_ssl_flags() {
-  remove_dry_run_flag
+handle_staging_flags() {
   if [[ ${USE_PRODUCTION_SSL:-no} == "yes" ]]; then
     echo "Certbot is running in production mode."
     echo "Removing --staging flag from docker-compose.yml..."
@@ -441,7 +457,8 @@ rebuild_and_rerun_certbot() {
 }
 
 #######################################
-# description
+# Iteratively waits for the certbot docker container to have finished
+# Then checks the logs for success or failure and returns accordingly
 # Arguments:
 #  None
 # Returns:
@@ -484,7 +501,8 @@ wait_for_certbot_completion() {
 }
 
 #######################################
-# description
+# Checks the certbot logs for key strings and restarts services accordingly
+# This ensures that services go live after a certificate renewal
 # Arguments:
 #  None
 # Returns:
@@ -515,7 +533,7 @@ check_certbot_success() {
 }
 
 #######################################
-# description
+# Restarts the frontend and backend services depending on the release branch
 # Arguments:
 #  None
 # Returns:
@@ -523,14 +541,21 @@ check_certbot_success() {
 #######################################
 restart_services() {
   echo "Restarting backend and frontend services..."
-  if ! docker compose restart backend || ! docker compose restart frontend; then
-    echo "Failed to restart services."
-    return 1
+  if [[ $release_branch = "full-release" ]]; then
+    if ! docker compose restart backend || ! docker compose restart frontend; then
+      echo "Failed to restart services."
+      return 1
+    fi
+  else
+    if ! docker compose restart frontend; then
+      echo "Failed to restart services."
+      return 1
+    fi
   fi
 }
 
 #######################################
-# description
+# Manages conflicting Docker networks and containers
 # Arguments:
 #  None
 #######################################
@@ -541,20 +566,33 @@ pre_flight() {
     exit 1
   }
 
-  guous networks
   handle_ambiguous_networks || {
     echo "Failed to handle ambiguous networks"
     exit 1
   }
 }
 
+
+#######################################
 # ---- Build and Run Docker ---- #
+# Globals:
+#   PROJECT_ROOT_DIR
+#   USE_AUTO_RENEW_SSL
+#   release_branch
+# Arguments:
+#  None
+#######################################
 build_and_run_docker() {
 
   cd "$PROJECT_ROOT_DIR" || {
     echo "Failed to change directory to $PROJECT_ROOT_DIR"
     exit 1
   }
+
+#  pre_flight || {
+#    echo "Failed pre-flight checks"
+#    exit 1
+#  }
 
   # If Docker Compose is running, bring down the services
   # Ensure that old services are brought down before proceeding

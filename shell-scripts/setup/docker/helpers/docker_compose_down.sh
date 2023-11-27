@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Stops the containers using docker compose
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:

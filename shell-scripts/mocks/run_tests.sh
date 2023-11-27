@@ -1,6 +1,14 @@
 #!/bin/bash
 
-# Run a series of configuration tests
+
+#######################################
+# Run a series of configuration mocks (manually test the configuration scripts)
+# Globals:
+#   PROJECT_ROOT_DIR
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_tests() {
   echo "Running tests..."
   test_output_dir="${PROJECT_ROOT_DIR}/test_output"
@@ -19,6 +27,14 @@ run_tests() {
   echo "Tests complete."
 }
 
+#######################################
+# Mocks the self signed certificate generation nginx configuration
+# Globals:
+#   NGINX_CONF_FILE
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_nginx_ss_configuration() {
   echo "Simulating NGINX configuration..."
   NGINX_CONF_FILE="${test_output_dir}/nginx_ss.conf"
@@ -27,6 +43,14 @@ run_nginx_ss_configuration() {
   configure_nginx
 }
 
+#######################################
+# Mocks the lets encrypt nginx configuration (faux certbot configuration)
+# Globals:
+#   NGINX_CONF_FILE
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_nginx_le_configuration() {
   echo "Simulating NGINX configuration..."
   NGINX_CONF_FILE="${test_output_dir}/nginx_le.conf"
@@ -35,6 +59,14 @@ run_nginx_le_configuration() {
   configure_nginx
 }
 
+#######################################
+# Mocks the development nginx configuration (no ssl/letsencrypt)
+# Globals:
+#   NGINX_CONF_FILE
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_nginx_dev_configuration() {
   echo "Simulating NGINX configuration..."
   NGINX_CONF_FILE="${test_output_dir}/nginx_dev.conf"
@@ -43,6 +75,14 @@ run_nginx_dev_configuration() {
   configure_nginx
 }
 
+#######################################
+# Mocks the docker compose lets encrypt configuration (faux certbot configuration)
+# Globals:
+#   DOCKER_COMPOSE_FILE
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_compose_le_configuration() {
   echo "Simulating Docker Compose configuration with Let's Encrypt..."
   DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose-le.yml"
@@ -51,6 +91,16 @@ run_compose_le_configuration() {
   configure_docker_compose
 }
 
+#######################################
+# Mocks the docker compose self signed certificate configuration
+# Globals:
+#   DOCKER_COMPOSE_FILE
+#   USE_LETS_ENCRYPT
+#   USE_SELF_SIGNED_CERTS
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_compose_ss_configuration() {
   echo "Simulating Docker Compose configuration with self-signed certificates..."
   USE_LETS_ENCRYPT="no"
@@ -61,6 +111,14 @@ run_compose_ss_configuration() {
   configure_docker_compose
 }
 
+#######################################
+# Mocks the docker compose development configuration (no ssl/letsencrypt)
+# Globals:
+#   DOCKER_COMPOSE_FILE
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_compose_dev_configuration() {
   echo "Simulating Docker Compose configuration for development..."
   DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose-ss.yml"
@@ -70,6 +128,15 @@ run_compose_dev_configuration() {
 }
 
 
+#######################################
+# Mocks Backend/Express Dockerfile configuration
+# Globals:
+#   BACKEND_DOCKERFILE
+#   backend_files
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_backend_container_configuration() {
   echo "Simulating backend configuration..."
   BACKEND_DOCKERFILE="${test_output_dir}/Backend.Dockerfile"
@@ -79,6 +146,14 @@ run_backend_container_configuration() {
 }
 
 
+#######################################
+# Mocks Frontend/React Dockerfile configuration
+# Globals:
+#   FRONTEND_DOCKERFILE
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_frontend_container_configuration() {
   echo "Simulating frontend configuration..."
   FRONTEND_DOCKERFILE="${test_output_dir}/Frontend.Dockerfile"
@@ -86,7 +161,15 @@ run_frontend_container_configuration() {
   configure_frontend_docker
 }
 
-# Function to simulate running the Certbot configuration script
+
+#######################################
+# Mocks the certbot Dockerfile configuration
+# Globals:
+#   CERTBOT_DOCKERFILE
+#   test_output_dir
+# Arguments:
+#  None
+#######################################
 run_certbot_container_configuration() {
   echo "Simulating certbot configuration..."
   CERTBOT_DOCKERFILE="${test_output_dir}/Certbot.Dockerfile"
@@ -95,7 +178,21 @@ run_certbot_container_configuration() {
   configure_certbot_docker
 }
 
+
+#######################################
 # Setup common configuration parameters for NGINX and Docker Compose
+# Globals:
+#   BACKEND_PORT
+#   DNS_RESOLVER
+#   DOMAIN_NAME
+#   NGINX_PORT
+#   NGINX_SSL_PORT
+#   NODE_VERSION
+#   SUBDOMAIN
+#   TIMEOUT
+# Arguments:
+#  None
+#######################################
 setup_common_configuration_parameters() {
   NODE_VERSION="latest"
   NGINX_SSL_PORT="443"
@@ -107,6 +204,23 @@ setup_common_configuration_parameters() {
   SUBDOMAIN="test"
 }
 
+#######################################
+# Setup lets encrypt configuration parameters
+# Globals:
+#   USE_LETS_ENCRYPT
+#   dry_run_flag
+#   email_flag
+#   force_renew_flag
+#   hsts_flag
+#   must_staple_flag
+#   ocsp_stapling_flag
+#   overwrite_self_signed_certs_flag
+#   production_certs_flag
+#   strict_permissions_flag
+#   uir_flag
+# Arguments:
+#  None
+#######################################
 setup_lets_encrypt_configuration_parameters() {
   USE_LETS_ENCRYPT="yes"
   email_flag="--email example@example.com"
@@ -121,11 +235,27 @@ setup_lets_encrypt_configuration_parameters() {
   uir_flag="--uir"
 }
 
+#######################################
+# Setup self signed certificate configuration parameters
+# Globals:
+#   NGINX_SSL_PORT
+#   USE_SELF_SIGNED_CERTS
+# Arguments:
+#  None
+#######################################
 setup_self_signed_configuration_parameters() {
   NGINX_SSL_PORT="443"
   USE_SELF_SIGNED_CERTS="yes"
 }
 
+#######################################
+# Setup development configuration parameters
+# Globals:
+#   USE_LETS_ENCRYPT
+#   USE_SELF_SIGNED_CERTS
+# Arguments:
+#  None
+#######################################
 setup_dev_configuration_parameters() {
   USE_LETS_ENCRYPT="no"
   USE_SELF_SIGNED_CERTS="no"

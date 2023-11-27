@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #######################################
-# description
+# Ensures Docker environment variables are set.
+# Critical for standard operation of Docker in rootless mode.
 # Globals:
 #   DOCKER_HOST
 # Arguments:

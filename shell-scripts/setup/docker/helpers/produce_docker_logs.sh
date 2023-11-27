@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Check if Docker Compose exists and prints all services defined in the Compose file
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:

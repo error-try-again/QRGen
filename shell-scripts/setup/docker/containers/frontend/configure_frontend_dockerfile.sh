@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#######################################
+# Provisions npm dependencies for the frontend, depending on the release branch
+# Globals:
+#   release_branch
+# Arguments:
+#  None
+#######################################
 configure_npm_deps() {
     local npm_global_deps=(
         "ts-node"
@@ -42,6 +49,16 @@ configure_npm_deps() {
 }
 
 
+#######################################
+# Configures the Dockerfile for the frontend
+# Globals:
+#   FRONTEND_DOCKERFILE
+#   NGINX_PORT
+#   NODE_VERSION
+#   release_branch
+# Arguments:
+#  None
+#######################################
 configure_frontend_docker() {
     local frontend_submodule_url="https://github.com/error-try-again/QRGen-frontend.git"
     local origin="origin/$release_branch"

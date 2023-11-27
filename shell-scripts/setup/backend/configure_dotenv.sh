@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Configure the .env file for the backend
 # Globals:
 #   BACKEND_DIR
 #   BACKEND_PORT

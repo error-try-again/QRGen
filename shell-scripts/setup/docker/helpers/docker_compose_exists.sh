@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Check if docker compose file exists
 # Globals:
 #   PROJECT_ROOT_DIR
 # Arguments:

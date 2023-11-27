@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# description
+# Configure certbot dockerfile
 # Globals:
 #   CERTBOT_DIR
 #   HOME
