@@ -1,19 +1,13 @@
 #!/bin/bash
 
 #######################################
-# Manages the certbot renewal cron job and script generation with a heredoc
+# Create the certbot renew script with a heredoc
 # Globals:
-#   PROJECT_LOGS_DIR
 #   PROJECT_ROOT_DIR
-#   cron_job
-#   cron_log_path
-#   cron_script_path
 # Arguments:
 #  None
 #######################################
-generate_certbot_renewal_job() {
-
-  # Create the certbot renew script with a heredoc
+generate_certbot_renewal_script() {
   cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
 #!/bin/bash
 
@@ -42,6 +36,22 @@ renew_certbot() {
   renew_certbot
 } | tee -a "${LOG_FILE}"
 EOF
+}
+
+#######################################
+# Manages the certbot renewal cron job
+# Globals:
+#   PROJECT_LOGS_DIR
+#   PROJECT_ROOT_DIR
+#   cron_job
+#   cron_log_path
+#   cron_script_path
+# Arguments:
+#  None
+#######################################
+generate_certbot_renewal_job() {
+
+  generate_certbot_renewal_script
 
   # Make the certbot renew script executable
   chmod +x "${PROJECT_ROOT_DIR}/certbot_renew.sh"

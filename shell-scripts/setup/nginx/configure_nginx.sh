@@ -5,7 +5,6 @@
 # Manage NGINX configuration generation
 # Globals:
 #   DOMAIN_NAME
-#   NGINX_PORT
 #   acme_challenge_server_block
 #   backend_scheme
 #   certs
@@ -19,12 +18,13 @@
 #  None
 #######################################
 configure_nginx() {
+    default_port="80"
     echo "Creating NGINX configuration..."
     backend_scheme="http"
-    server_name="${DOMAIN_NAME}"
-    default_port_directive="listen $NGINX_PORT;"
+    server_name="server_name ${DOMAIN_NAME}"
+    default_port_directive="listen $default_port;"
     default_port_directive+=$'\n'
-    default_port_directive+="        listen [::]:$NGINX_PORT;"
+    default_port_directive+="        listen [::]:$default_port;"
     ssl_listen_directive=""
     ssl_mode_block=""
     resolver_settings=""
@@ -50,7 +50,7 @@ configure_nginx() {
 #######################################
 configure_subdomain() {
     if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
-        server_name="${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME}"
+        server_name="server_name ${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 }
 
@@ -233,7 +233,7 @@ configure_acme_challenge() {
         acme_challenge_server_block="server {
           listen 80;
           listen [::]:80;
-          server_name ${server_name};
+          ${server_name};
           location / {
               return 301 https://\$host\$request_uri;
           }
@@ -316,7 +316,7 @@ http {
     server {
         ${default_port_directive}
         ${ssl_listen_directive}
-        server_name ${server_name};
+        ${server_name};
         ${ssl_mode_block}
         ${resolver_settings}
         ${certs}

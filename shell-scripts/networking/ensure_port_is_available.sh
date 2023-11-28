@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #######################################
 # Check if the given port is a valid number and not in use.
 # Arguments:

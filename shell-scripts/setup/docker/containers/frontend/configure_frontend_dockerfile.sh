@@ -100,6 +100,8 @@ RUN npm run build
 # Setup nginx to serve the built files
 FROM nginx:alpine
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+
 RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge && \
     chmod -R 777 /usr/share/nginx/html/.well-known
 EXPOSE $NGINX_PORT

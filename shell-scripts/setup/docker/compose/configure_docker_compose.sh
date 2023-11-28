@@ -19,7 +19,6 @@ create_ports_or_volumes() {
   echo "$result"
 }
 
-
 #######################################
 # Generates network definition for Docker Compose.
 # Arguments:
@@ -39,7 +38,6 @@ create_network_definition() {
 
   echo "$definition"
 }
-
 
 #######################################
 # Generates volume definition for Docker Compose.

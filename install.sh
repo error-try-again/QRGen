@@ -51,7 +51,8 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   . ./shell-scripts/prompts/user_input.sh
 
   # Tests
-  . ./shell-scripts/mocks/run_tests.sh  # Define global associative arrays.
+  . ./shell-scripts/mocks/run_mocks.sh  # Define global associative arrays.
+
   dirs=(
         [BACKEND_DIR]="${PROJECT_ROOT_DIR}/backend"
         [FRONTEND_DIR]="${PROJECT_ROOT_DIR}/frontend"
