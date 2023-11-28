@@ -15,7 +15,7 @@ configure_npm_deps() {
         "leaflet"
         "react"
         "react-dom"
-    )
+  )
     local npm_project_deps=(
         "typescript"
         "vite"
@@ -28,26 +28,25 @@ configure_npm_deps() {
         "@testing-library/react"
         "@testing-library/jest-dom"
         "@babel/plugin-proposal-private-property-in-object"
-    )
+  )
     local npm_types_deps=(
         "@types/leaflet"
         "@types/react"
         "@types/react-dom"
         "@types/jest"
         "@types/react-leaflet"
-    )
+  )
 
     # Add 'file-saver' and 'qrcode' libraries and their type definitions for full-release branch
     if [[ $release_branch == "minimal-release" ]]; then
         npm_project_deps+=("file-saver" "qrcode" "jszip")
         npm_types_deps+=("@types/file-saver" "@types/qrcode" "@types/jszip")
-    fi
+  fi
 
     echo "RUN npm install -g ${npm_global_deps[*]}"
     echo "RUN npm install --save-dev ${npm_project_deps[*]}"
     echo "RUN npm install --save-dev ${npm_types_deps[*]}"
 }
-
 
 #######################################
 # Configures the Dockerfile for the frontend
@@ -92,6 +91,8 @@ RUN git init && \
     git reset --hard "$origin" && \
     git checkout "$release_branch" && \
     cd ..
+
+COPY frontend/.env frontend/.env
 
 # Build the project
 WORKDIR /usr/app/frontend

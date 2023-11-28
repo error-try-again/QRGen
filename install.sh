@@ -37,7 +37,8 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   . ./shell-scripts/setup/helpers/setup_project_directories.sh
   . ./shell-scripts/setup/helpers/generate_server_files.sh  # Configuration scripts to generate the necessary files for the project.
   . ./shell-scripts/setup/docker/containers/backend/configure_backend_dockerfile.sh
-  . ./shell-scripts/setup/backend/configure_dotenv.sh
+  . ./shell-scripts/setup/dotenv_configure/configure_backend_dotenv.sh
+  . ./shell-scripts/setup/dotenv_configure/configure_frontend_dotenv.sh
   . ./shell-scripts/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
   . ./shell-scripts/setup/nginx/configure_nginx.sh
   . ./shell-scripts/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
