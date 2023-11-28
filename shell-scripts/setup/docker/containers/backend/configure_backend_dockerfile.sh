@@ -19,7 +19,6 @@ install_backend_npm_deps() {
         "dotenv"
         "express"
         "cors"
-        "multer"
         "archiver"
         "express-rate-limit"
         "helmet"
@@ -32,7 +31,6 @@ install_backend_npm_deps() {
         "@types/express"
         "@types/cors"
         "@types/node"
-        "@types/multer"
         "@types/archiver"
         "@types/qrcode"
         "@types/google.maps"
@@ -86,6 +84,7 @@ RUN cd backend \
     && git checkout "$release_branch" \
     && cd ..
 
+# Copies over the user configured environment variables
 COPY backend/.env /usr/app/.env
 
 # Set the backend express port
