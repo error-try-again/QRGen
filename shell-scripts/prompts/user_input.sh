@@ -82,6 +82,8 @@ automatic_staging_selection() {
   USE_STRICT_PERMISSIONS="no"
   USE_OCSP_STAPLING="no"
   USE_MUST_STAPLE="no"
+  USE_TLS13="yes"
+  USE_TLS12="no"
 }
 
 #######################################
@@ -111,6 +113,8 @@ automation_production_selection() {
   USE_OCSP_STAPLING="yes"
   USE_STRICT_PERMISSIONS="no"
   USE_MUST_STAPLE="no"
+  USE_TLS13="yes"
+  USE_TLS12="no"
 }
 
 #######################################
