@@ -11,12 +11,11 @@
 # Arguments:
 #  None
 #######################################
-configure_dot_env() {
+configure_backend_dotenv() {
   cat << EOF > "$BACKEND_DOTENV_FILE"
 ORIGIN=$ORIGIN
 PORT=$BACKEND_PORT
 USE_SSL=$USE_SSL
-USE_GOOGLE_API=$USE_GOOGLE_API_KEY
-GOOGLE_API_KEY=$GOOGLE_API_KEY
+GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
 EOF
 }

@@ -399,13 +399,12 @@ prompt_for_google_api_key() {
   prompt_yes_no "Would you like to use a Google API key? (Will enable google reviews QR Generation)" USE_GOOGLE_API_KEY
   if [[ $USE_GOOGLE_API_KEY == "yes" ]]; then
     while true; do
-      read -rp "Please enter your Google API key (or type 'skip' to skip): " GOOGLE_API_KEY
-      if [[ -n $GOOGLE_API_KEY && $GOOGLE_API_KEY != "skip" ]]; then
+      read -rp "Please enter your Google API key (or type 'skip' to skip): " GOOGLE_MAPS_API_KEY
+      if [[ -n $GOOGLE_MAPS_API_KEY && $GOOGLE_MAPS_API_KEY != "skip" ]]; then
         break
-      elif [[ $GOOGLE_API_KEY == "skip" ]]; then
+      elif [[ $GOOGLE_MAPS_API_KEY == "skip" ]]; then
         echo "Google API key entry skipped."
-        USE_GOOGLE_API_KEY="no"
-        GOOGLE_API_KEY=""  # Clear the variable if skipping
+        GOOGLE_MAPS_API_KEY=""  # Clear the variable if skipping
         break
       else
         echo "Error: Google API key cannot be empty. Type 'skip' to skip."
@@ -413,8 +412,7 @@ prompt_for_google_api_key() {
     done
   else
     echo "Google API key will not be used."
-    USE_GOOGLE_API_KEY="no"
-    GOOGLE_API_KEY=""  # Clear the variable if not using Google API
+    GOOGLE_MAPS_API_KEY=""  # Clear the variable if not using Google API
   fi
 }
 
