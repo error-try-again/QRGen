@@ -9,7 +9,7 @@
 # Arguments:
 #  None
 #######################################
-run_tests() {
+run_mocks() {
   echo "Running tests..."
   test_output_dir="${PROJECT_ROOT_DIR}/test_output"
   mkdir -p "${test_output_dir}"
@@ -194,6 +194,7 @@ run_certbot_container_configuration() {
 #  None
 #######################################
 setup_common_configuration_parameters() {
+  release_branch="full-release"
   NODE_VERSION="latest"
   NGINX_SSL_PORT="443"
   NGINX_PORT=8080

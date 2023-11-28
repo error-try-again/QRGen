@@ -17,7 +17,7 @@ user_prompt() {
   select opt in "Run Setup" "Run Mock Configuration" "Uninstall" "Reload/Refresh" "Dump logs" "Update Project" "Stop Project Docker Containers" "Prune All Docker Builds - Dangerous" "Quit"; do
     case $opt in
       "Run Setup") setup ;;
-      "Run Mock Configuration") run_tests ;;
+      "Run Mock Configuration") run_mocks ;;
       "Uninstall") uninstall ;;
       "Reload/Refresh") reload ;;
       "Dump logs") dump_logs ;;
@@ -39,18 +39,18 @@ user_prompt() {
 #######################################
 custom_install_prompt() {
   prompt_for_input "Please enter your Let's Encrypt email or type 'skip' to skip: " "Error: Email address cannot be empty." LETSENCRYPT_EMAIL
-  prompt_yes_no "Would you like to use a production SSL certificate? (yes/no): " USE_PRODUCTION_SSL
-  prompt_yes_no "Would you like to use a dry run? (yes/no): " USE_DRY_RUN
-  prompt_yes_no "Would you like to force current certificate renewal? (yes/no): " USE_FORCE_RENEW
-  prompt_yes_no "Would you like to automatically renew your SSL certificate? (yes/no): " USE_AUTO_RENEW_SSL
-  prompt_yes_no "Would you like to enable HSTS? (yes/no): " USE_HSTS
-  prompt_yes_no "Would you like to enable OCSP Stapling? (yes/no): " USE_OCSP_STAPLING
-  prompt_yes_no "Would you like to enable Must Staple? (yes/no): " USE_MUST_STAPLE
-  prompt_yes_no "Would you like to enable Strict Permissions? (yes/no): " USE_STRICT_PERMISSIONS
-  prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)? (yes/no): " USE_UIR
-  prompt_yes_no "Would you like to overwrite self-signed certificates? (yes/no): " USE_OVERWRITE_SELF_SIGNED_CERTS
+  prompt_yes_no "Would you like to use a production SSL certificate?" USE_PRODUCTION_SSL
+  prompt_yes_no "Would you like to use a dry run?" USE_DRY_RUN
+  prompt_yes_no "Would you like to force current certificate renewal?" USE_FORCE_RENEW
+  prompt_yes_no "Would you like to automatically renew your SSL certificate?" USE_AUTO_RENEW_SSL
+  prompt_yes_no "Would you like to enable HSTS?" USE_HSTS
+  prompt_yes_no "Would you like to enable OCSP Stapling?" USE_OCSP_STAPLING
+  prompt_yes_no "Would you like to enable Must Staple?" USE_MUST_STAPLE
+  prompt_yes_no "Would you like to enable Strict Permissions?" USE_STRICT_PERMISSIONS
+  prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)?" USE_UIR
+  prompt_yes_no "Would you like to overwrite self-signed certificates?" USE_OVERWRITE_SELF_SIGNED_CERTS
   prompt_yes_no "Would you like to enable TLSv1.3? (yes/no) (Recommended): " USE_TLS13
-  prompt_yes_no "Would you like to enable TLSv1.2? (yes/no): " USE_TLS12
+  prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
 }
 
 #######################################
@@ -193,7 +193,7 @@ construct_certbot_flags() {
 #  None
 #######################################
 disable_docker_build_caching_prompt() {
-  prompt_yes_no "Would you like to disable Docker build caching for this run? (yes/no): " DISABLE_DOCKER_CACHING
+  prompt_yes_no "Would you like to disable Docker build caching for this run?" DISABLE_DOCKER_CACHING
 }
 
 #######################################
@@ -204,7 +204,7 @@ disable_docker_build_caching_prompt() {
 #  None
 #######################################
 prompt_for_self_signed_certificates() {
-  prompt_yes_no "Would you like to enable self-signed certificates? (yes/no): " USE_SELF_SIGNED_CERTS
+  prompt_yes_no "Would you like to enable self-signed certificates?" USE_SELF_SIGNED_CERTS
   if [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     set_ssl_flag
   fi
@@ -217,22 +217,25 @@ prompt_for_self_signed_certificates() {
 #   2
 #######################################
 prompt_yes_no() {
-  local prompt="$1"
+  local prompt_message="$1"
   local result_var="$2"
-  local yn
-  echo "$prompt"
+  local choice
   while true; do
-    read -r yn
-    case "$yn" in
-      [yY] | [yY][eE][sS])
-                    eval "$result_var=yes"
-        break
-        ;;
-      [nN] | [nN][oO])
-                eval "$result_var=no"
-        break
-        ;;
-      *) echo "Invalid selection. Please enter yes or no." ;;
+    read -rp "$prompt_message [Y/n]: " choice
+    case "${choice,,}" in  # Convert to lowercase for easier matching
+      yes | y)
+               eval "$result_var=yes"
+                                       break
+                                             ;;
+      no | n)
+              eval "$result_var=no"
+                                     break
+                                           ;;
+      "")
+          eval "$result_var=yes"
+                                  break
+                                        ;; # Default to 'yes' if the user just presses enter
+      *) echo "Invalid input. Please enter 'yes' or 'no'." ;;
     esac
   done
 }
@@ -384,6 +387,38 @@ prompt_for_install_mode() {
 }
 
 #######################################
+# Prompts the user to select whether they want to use a Google API key.
+# Will enable Google Reviews QR Generation.
+# Globals:
+#   USE_GOOGLE_API_KEY
+#   GOOGLE_API_KEY
+# Arguments:
+#  None
+#######################################
+prompt_for_google_api_key() {
+  prompt_yes_no "Would you like to use a Google API key? (Will enable google reviews QR Generation)" USE_GOOGLE_API_KEY
+  if [[ $USE_GOOGLE_API_KEY == "yes" ]]; then
+    while true; do
+      read -rp "Please enter your Google API key (or type 'skip' to skip): " GOOGLE_API_KEY
+      if [[ -n $GOOGLE_API_KEY && $GOOGLE_API_KEY != "skip" ]]; then
+        break
+      elif [[ $GOOGLE_API_KEY == "skip" ]]; then
+        echo "Google API key entry skipped."
+        USE_GOOGLE_API_KEY="no"
+        GOOGLE_API_KEY=""  # Clear the variable if skipping
+        break
+      else
+        echo "Error: Google API key cannot be empty. Type 'skip' to skip."
+      fi
+    done
+  else
+    echo "Google API key will not be used."
+    USE_GOOGLE_API_KEY="no"
+    GOOGLE_API_KEY=""  # Clear the variable if not using Google API
+  fi
+}
+
+#######################################
 # Prompts for all domain information.
 # Globals:
 #   BACKEND_SCHEME
@@ -397,14 +432,14 @@ prompt_for_install_mode() {
 #  None
 #######################################
 prompt_for_domain_details() {
-  prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost) (yes/no)? " USE_CUSTOM_DOMAIN
+  prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost)" USE_CUSTOM_DOMAIN
   if [[ $USE_CUSTOM_DOMAIN == "yes" ]]; then
     DOMAIN_NAME=$(prompt_with_validation "Enter your domain name (e.g., example.com): " "Error: Domain name cannot be empty.")
     local origin_url
     origin_url="$BACKEND_SCHEME://$DOMAIN_NAME"
     ORIGIN="$origin_url:$ORIGIN_PORT"
     echo "Using custom domain name: $origin_url"
-    prompt_yes_no "Would you like to specify a subdomain other than the default (none) (yes/no)? " USE_SUBDOMAIN
+    prompt_yes_no "Would you like to specify a subdomain other than the default (none)" USE_SUBDOMAIN
     if [[ $USE_SUBDOMAIN == "yes" ]]; then
       SUBDOMAIN=$(prompt_with_validation "Enter your subdomain name (e.g., www): " "Error: subdomain name cannot be empty.")
       origin_url="$BACKEND_SCHEME://$SUBDOMAIN.$DOMAIN_NAME"

@@ -13,6 +13,7 @@ setup() {
   ensure_port_available "$NGINX_PORT"
   prompt_for_install_mode
   disable_docker_build_caching_prompt
+  prompt_for_google_api_key
   prompt_for_domain_and_letsencrypt
   generate_server_files
   configure_nginx
@@ -104,7 +105,7 @@ purge_builds() {
   # Remove images
   if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q '^qrgen'; then
     echo "Removing 'qrgen' images..."
-    docker images --format '{{.Repository}}:{{.Tag}}' | grep '^qrgen' | xargs -r docker rmi
+    docker images --format '{{.Repository}}:{{.Tag}}' | grep '^qrgen' | xargs -r docker rmi --force
   else
     echo "No 'qrgen' images found."
   fi
@@ -112,7 +113,7 @@ purge_builds() {
   # Remove volumes
   if docker volume ls --format '{{.Name}}' | grep -q '^qrgen'; then
     echo "Removing 'qrgen' volumes..."
-    docker volume ls --format '{{.Name}}' | grep '^qrgen' | xargs -r docker volume rm
+    docker volume ls --format '{{.Name}}' | grep '^qrgen' | xargs -r docker volume rm --force
   else
     echo "No 'qrgen' volumes found."
   fi
@@ -120,7 +121,7 @@ purge_builds() {
   # Remove networks
   if docker network ls --format '{{.Name}}' | grep -q '^qrgen'; then
     echo "Removing 'qrgen' networks..."
-    docker network ls --format '{{.Name}}' | grep '^qrgen' | xargs -r docker network rm
+    docker network ls --format '{{.Name}}' | grep '^qrgen' | xargs -r docker network rm --force
   else
     echo "No 'qrgen' networks found."
   fi
@@ -571,7 +572,6 @@ pre_flight() {
     exit 1
   }
 }
-
 
 #######################################
 # ---- Build and Run Docker ---- #

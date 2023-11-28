@@ -3,9 +3,11 @@
 #######################################
 # Configure the .env file for the backend
 # Globals:
-#   BACKEND_DIR
+#   BACKEND_DOTENV_FILE
 #   BACKEND_PORT
-#   origin
+#   GOOGLE_API_KEY
+#   ORIGIN
+#   USE_SSL
 # Arguments:
 #  None
 #######################################
@@ -14,5 +16,7 @@ configure_dot_env() {
 ORIGIN=$ORIGIN
 PORT=$BACKEND_PORT
 USE_SSL=$USE_SSL
+USE_GOOGLE_API=$USE_GOOGLE_API_KEY
+GOOGLE_API_KEY=$GOOGLE_API_KEY
 EOF
 }
