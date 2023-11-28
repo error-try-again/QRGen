@@ -1,4 +1,4 @@
-# QRGen - A self-hostable QR code generation service
+# QRGen - A self-hostable Fullstack QR code generation service
 ## *TS (Express/Backend), TSX (Vite/React/Frontend), Bash/Shell (Automation)*
 ## Overview
 
@@ -24,8 +24,7 @@ I hope that others find it useful too.
 
 
 *Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome.*
-If you have a specific fix for the frontend or backend envrionments, please submit your pull request to the respective submodule.
-
+If you have a specific fix for the frontend or backend envrionments, please submit your pull request to the respective submodule/repo.
 
 A full write up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
@@ -142,124 +141,6 @@ Welcome to the QR Code Generator setup script!
 4) Reload/Refresh			9) Quit
 5) Dump logs
 # Select 1)
-```
-
-### For http only, localhost (frontend/in-browser qr generation)
-```
-...
-1: Install minimal release (frontend QR generation) (Limited features)
-2: Install full release (frontend QR generator and backend API/server side generation) (All features)
-Please enter your choice (1/2): 1
-Would you like to disable Docker build caching for this run? (yes/no):
-yes
-Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
-no
-Using default domain name: localhost
-Would you like to enable self-signed certificates? (yes/no):
-no
-```
-### For self-signed https only, localhost (backend/server-side qr generation)
-```
-Port 8080 is already in use.
-Please provide an alternate port or Ctrl+C to exit: 8081
-Selected port 8081 is available.
-1: Install minimal release (frontend QR generation) (Limited features)
-2: Install full release (frontend QR generator and backend API/server side generation) (All features)
-Please enter your choice (1/2): 2
-Would you like to disable Docker build caching for this run? (yes/no):
-yes
-Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
-no
-Using default domain name: localhost
-Would you like to enable self-signed certificates? (yes/no):
-yes
-```
-
-### For DH paramater generation - select the option that best suits you
-```
-Self-signed certificates for localhost generated at /home/docker-primary/QRGen/certs/live/localhost.
-1: Use 2048-bit DH parameters (Faster)
-2: Use 4096-bit DH parameters (More secure)
-Please enter your choice (1/2): 1
-Generate a Diffie-Hellman (DH) key exchange parameters file with 2048 bits...
-Generating DH parameters, 2048 bit long safe prime
-```
-
-### Updating 
-
-```
-docker-primary@ubuntu:~/QRGen$ ./install.sh
-Welcome to the QR Code Generator setup script!
-1) Run Setup				6) Update Project
-2) Run Mock Configuration		7) Stop Project Docker Containers
-3) Uninstall				8) Prune All Docker Builds - Dangerous
-4) Reload/Refresh			9) Quit
-5) Dump logs
-# Select 6)
-No local changes to save
-remote: Enumerating objects: 241, done.
-remote: Counting objects: 100% (241/241), done.
-remote: Compressing objects: 100% (133/133), done.
-remote: Total 241 (delta 106), reused 218 (delta 93), pack-reused 0
-Receiving objects: 100% (241/241), 48.64 KiB | 3.04 MiB/s, done.
-Resolving deltas: 100% (106/106), completed with 21 local objects.
-From https://github.com/error-try-again/QRGen
-   477e3a5..8ef7a51  main                    -> origin/main
- * [new branch]      error-try-again-patch-1 -> origin/error-try-again-patch-1
- * [new branch]      legacy-frontend-only    -> origin/legacy-frontend-only
- * [new branch]      legacy-full-release     -> origin/legacy-full-release
- * [new branch]      submodule-support       -> origin/submodule-support
-Updating 477e3a5..8ef7a51
-...
-Thanks for using the QR Code Generator setup script!
-```
-### Stop Containers
-```
-docker-primary@ubuntu:~/QRGen$ ./install.sh
-Welcome to the QR Code Generator setup script!
-1) Run Setup				6) Update Project
-2) Run Mock Configuration		7) Stop Project Docker Containers
-3) Uninstall				8) Prune All Docker Builds - Dangerous
-4) Reload/Refresh			9) Quit
-5) Dump logs
-# Select 7)
-Ensuring Docker environment variables are set...
-Set DOCKER_HOST to unix:///run/user/1000/docker.sock
-Stopping containers using docker-compose...
-[+] Running 5/5
- ✔ Container qrgen-certbot-1   Removed                                                                   0.0s
- ✔ Container qrgen-frontend-1  Removed                                                                   0.6s
- ✔ Container qrgen-backend-1   Removed                                                                  10.3s
- ✔ Network qrgen_default       Removed                                                                   0.3s
- ✔ Network qrgen_qrgen         Removed                                                                   0.5s
-Thanks for using the QR Code Generator setup script!
-```
-
-### Prune containers
-
-```
-Welcome to the QR Code Generator setup script!
-1) Run Setup				6) Update Project
-2) Run Mock Configuration		7) Stop Project Docker Containers
-3) Uninstall				8) Prune All Docker Builds - Dangerous
-4) Reload/Refresh			9) Quit
-5) Dump logs
-# Select 8)
-Ensuring Docker environment variables are set...
-Set DOCKER_HOST to unix:///run/user/1000/docker.sock
-Identifying and purging Docker resources associated with 'qrgen'...
-No 'qrgen' containers found.
-Removing 'qrgen' images...
-Untagged: qrgen-certbot:latest
-Deleted: sha256:27274e67793b51028a72c51eb36c691eb690d1cc8eb544889a4417081cb6976c
-Untagged: qrgen-frontend:latest
-Deleted: sha256:087f9ead639be4602c155f1898697da569f44cbf2666e92c5d6ac581202fc860
-Untagged: qrgen-backend:latest
-Deleted: sha256:df2bc734be1ec8b8eac6f1febc842bedf5997a6f4b4aa3cee79a99dddc11b8a2
-Removing 'qrgen' volumes...
-qrgen_nginx-shared-volume
-No 'qrgen' networks found.
-Thanks for using the QR Code Generator setup script!
 ```
 
 ## Remote Setup:
@@ -408,6 +289,126 @@ Please enter your choice (1/2): 2
 Generate a Diffie-Hellman (DH) key exchange parameters file with 4096 bits...
 Generating DH parameters, 4096 bit long safe prime
 ...
+```
+
+# Other Usage
+
+### For http only, localhost (frontend/in-browser qr generation)
+```
+...
+1: Install minimal release (frontend QR generation) (Limited features)
+2: Install full release (frontend QR generator and backend API/server side generation) (All features)
+Please enter your choice (1/2): 1
+Would you like to disable Docker build caching for this run? (yes/no):
+yes
+Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+no
+Using default domain name: localhost
+Would you like to enable self-signed certificates? (yes/no):
+no
+```
+### For self-signed https only, localhost (backend/server-side qr generation)
+```
+Port 8080 is already in use.
+Please provide an alternate port or Ctrl+C to exit: 8081
+Selected port 8081 is available.
+1: Install minimal release (frontend QR generation) (Limited features)
+2: Install full release (frontend QR generator and backend API/server side generation) (All features)
+Please enter your choice (1/2): 2
+Would you like to disable Docker build caching for this run? (yes/no):
+yes
+Would you like to specify a domain name other than the default (http://localhost) (yes/no)?
+no
+Using default domain name: localhost
+Would you like to enable self-signed certificates? (yes/no):
+yes
+```
+
+### For DH paramater generation - select the option that best suits you
+```
+Self-signed certificates for localhost generated at /home/docker-primary/QRGen/certs/live/localhost.
+1: Use 2048-bit DH parameters (Faster)
+2: Use 4096-bit DH parameters (More secure)
+Please enter your choice (1/2): 1
+Generate a Diffie-Hellman (DH) key exchange parameters file with 2048 bits...
+Generating DH parameters, 2048 bit long safe prime
+```
+
+### Updating 
+
+```
+docker-primary@ubuntu:~/QRGen$ ./install.sh
+Welcome to the QR Code Generator setup script!
+1) Run Setup				6) Update Project
+2) Run Mock Configuration		7) Stop Project Docker Containers
+3) Uninstall				8) Prune All Docker Builds - Dangerous
+4) Reload/Refresh			9) Quit
+5) Dump logs
+# Select 6)
+No local changes to save
+remote: Enumerating objects: 241, done.
+remote: Counting objects: 100% (241/241), done.
+remote: Compressing objects: 100% (133/133), done.
+remote: Total 241 (delta 106), reused 218 (delta 93), pack-reused 0
+Receiving objects: 100% (241/241), 48.64 KiB | 3.04 MiB/s, done.
+Resolving deltas: 100% (106/106), completed with 21 local objects.
+From https://github.com/error-try-again/QRGen
+   477e3a5..8ef7a51  main                    -> origin/main
+ * [new branch]      error-try-again-patch-1 -> origin/error-try-again-patch-1
+ * [new branch]      legacy-frontend-only    -> origin/legacy-frontend-only
+ * [new branch]      legacy-full-release     -> origin/legacy-full-release
+ * [new branch]      submodule-support       -> origin/submodule-support
+Updating 477e3a5..8ef7a51
+...
+Thanks for using the QR Code Generator setup script!
+```
+### Stop Containers
+```
+docker-primary@ubuntu:~/QRGen$ ./install.sh
+Welcome to the QR Code Generator setup script!
+1) Run Setup				6) Update Project
+2) Run Mock Configuration		7) Stop Project Docker Containers
+3) Uninstall				8) Prune All Docker Builds - Dangerous
+4) Reload/Refresh			9) Quit
+5) Dump logs
+# Select 7)
+Ensuring Docker environment variables are set...
+Set DOCKER_HOST to unix:///run/user/1000/docker.sock
+Stopping containers using docker-compose...
+[+] Running 5/5
+ ✔ Container qrgen-certbot-1   Removed                                                                   0.0s
+ ✔ Container qrgen-frontend-1  Removed                                                                   0.6s
+ ✔ Container qrgen-backend-1   Removed                                                                  10.3s
+ ✔ Network qrgen_default       Removed                                                                   0.3s
+ ✔ Network qrgen_qrgen         Removed                                                                   0.5s
+Thanks for using the QR Code Generator setup script!
+```
+
+### Prune containers
+
+```
+Welcome to the QR Code Generator setup script!
+1) Run Setup				6) Update Project
+2) Run Mock Configuration		7) Stop Project Docker Containers
+3) Uninstall				8) Prune All Docker Builds - Dangerous
+4) Reload/Refresh			9) Quit
+5) Dump logs
+# Select 8)
+Ensuring Docker environment variables are set...
+Set DOCKER_HOST to unix:///run/user/1000/docker.sock
+Identifying and purging Docker resources associated with 'qrgen'...
+No 'qrgen' containers found.
+Removing 'qrgen' images...
+Untagged: qrgen-certbot:latest
+Deleted: sha256:27274e67793b51028a72c51eb36c691eb690d1cc8eb544889a4417081cb6976c
+Untagged: qrgen-frontend:latest
+Deleted: sha256:087f9ead639be4602c155f1898697da569f44cbf2666e92c5d6ac581202fc860
+Untagged: qrgen-backend:latest
+Deleted: sha256:df2bc734be1ec8b8eac6f1febc842bedf5997a6f4b4aa3cee79a99dddc11b8a2
+Removing 'qrgen' volumes...
+qrgen_nginx-shared-volume
+No 'qrgen' networks found.
+Thanks for using the QR Code Generator setup script!
 ```
 
 # Roadmap
