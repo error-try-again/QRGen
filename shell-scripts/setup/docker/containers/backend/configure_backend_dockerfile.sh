@@ -24,6 +24,7 @@ install_backend_npm_deps() {
         "express-rate-limit"
         "helmet"
         "qrcode"
+        "@googlemaps/google-maps-services-js"
     )
 
     # Backend-specific type dependencies
@@ -34,6 +35,7 @@ install_backend_npm_deps() {
         "@types/multer"
         "@types/archiver"
         "@types/qrcode"
+        "@types/google.maps"
     )
 
     echo "RUN npm init -y"
