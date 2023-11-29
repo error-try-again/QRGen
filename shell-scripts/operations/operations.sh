@@ -203,6 +203,7 @@ handle_ambiguous_networks() {
     local container_id
     container_ids=$(docker network inspect "$network_id" --format '{{range .Containers}}{{.Name}} {{end}}')
 
+   # Loop over each container ID connected to the network and disconnect it
     for container_id in $container_ids; do
       echo "Disconnecting container $container_id from network $network_id..."
       docker network disconnect -f "$network_id" "$container_id" || {
@@ -210,6 +211,7 @@ handle_ambiguous_networks() {
       }
     done
 
+    # Remove the network
     echo "Removing network $network_id..."
     docker network rm "$network_id" || {
       echo "Failed to remove network $network_id"
@@ -589,10 +591,10 @@ build_and_run_docker() {
     exit 1
   }
 
-#  pre_flight || {
-#    echo "Failed pre-flight checks"
-#    exit 1
-#  }
+  pre_flight || {
+    echo "Failed pre-flight checks"
+    exit 1
+  }
 
   # If Docker Compose is running, bring down the services
   # Ensure that old services are brought down before proceeding
