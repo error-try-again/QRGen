@@ -194,7 +194,7 @@ run_certbot_container_configuration() {
 #  None
 #######################################
 setup_common_configuration_parameters() {
-  release_branch="full-release"
+  release_branch="full-release-dev"
   NODE_VERSION="latest"
   NGINX_SSL_PORT="443"
   NGINX_PORT=8080
