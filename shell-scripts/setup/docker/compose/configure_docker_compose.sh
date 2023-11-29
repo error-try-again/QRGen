@@ -303,7 +303,7 @@ configure_docker_compose() {
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     echo "Configuring Docker Compose for Let's Encrypt..."
 
-      if [[ $release_branch == "full-release-dev" ]]; then
+      if [[ $release_branch == "full-release" ]]; then
       backend_ports=$(create_ports_or_volumes \
         "ports" \
         "${BACKEND_PORT}:${BACKEND_PORT}")
@@ -350,7 +350,7 @@ configure_docker_compose() {
   elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     echo "Configuring Docker Compose for self-signed certificates..."
 
-      if [[ $release_branch == "full-release-dev" ]]; then
+      if [[ $release_branch == "full-release" ]]; then
 
       backend_ports=$(create_ports_or_volumes \
         "ports" \
@@ -377,7 +377,7 @@ configure_docker_compose() {
   else
     echo "Configuring Docker Compose for HTTP..."
 
-    if [[ $release_branch == "full-release-dev" ]]; then
+    if [[ $release_branch == "full-release" ]]; then
       backend_ports=$(create_ports_or_volumes \
         "ports" \
         "${BACKEND_PORT}:${BACKEND_PORT}")

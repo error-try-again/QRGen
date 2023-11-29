@@ -385,7 +385,7 @@ prompt_for_install_mode() {
   prompt_numeric "Please enter your choice (1/2): " INSTALL_MODE_CHOICE
   case $INSTALL_MODE_CHOICE in
     1) release_branch="minimal-release" ;;
-    2) release_branch="full-release-dev" ;;
+    2) release_branch="full-release" ;;
     *) echo "Invalid choice. Please enter 1 or 2." ;;
   esac
 }

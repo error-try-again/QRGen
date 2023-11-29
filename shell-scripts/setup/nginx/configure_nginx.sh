@@ -260,7 +260,7 @@ backup_existing_config() {
 }
 
 #######################################
-# Generates an NGINX configuration for the QR endpoint if the release branch is full-release-dev
+# Generates an NGINX configuration for the QR endpoint if the release branch is full-release
 # Globals:
 #   BACKEND_PORT
 #   backend_scheme
@@ -269,7 +269,7 @@ backup_existing_config() {
 #  None
 #######################################
 write_endpoints() {
-        if [[ $release_branch == "full-release-dev" ]]; then
+        if [[ $release_branch == "full-release" ]]; then
     local endpoint="/qr/"
 
     local proxy_pass="proxy_pass ${backend_scheme}://backend:${BACKEND_PORT};"
