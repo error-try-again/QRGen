@@ -58,7 +58,7 @@ install_backend_npm_deps() {
 #######################################
 configure_backend_docker() {
     local backend_submodule_url="https://github.com/error-try-again/QRGen-backend.git"
-    local release_branch="full-release"
+    local release_branch="full-release-dev"
     local origin="origin"/"$release_branch"
 
     cat << EOF > "$BACKEND_DOCKERFILE"
