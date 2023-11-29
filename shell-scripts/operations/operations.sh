@@ -544,7 +544,7 @@ check_certbot_success() {
 #######################################
 restart_services() {
   echo "Restarting backend and frontend services..."
-  if [[ $release_branch = "full-release-dev" ]]; then
+  if [[ $release_branch = "full-release" ]]; then
     if ! docker compose restart backend || ! docker compose restart frontend; then
       echo "Failed to restart services."
       return 1
@@ -612,7 +612,7 @@ build_and_run_docker() {
   }
 
   # Run each service separately - must be active for certbot to work
-  if [[ $release_branch = "full-release-dev" ]]; then
+  if [[ $release_branch = "full-release" ]]; then
     run_backend_service
     run_frontend_service
   else

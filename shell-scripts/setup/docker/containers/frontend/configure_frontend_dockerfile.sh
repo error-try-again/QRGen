@@ -37,13 +37,13 @@ configure_npm_deps() {
         "@types/react-leaflet"
   )
 
-    # Add 'axios' library and its type definitions for full-release-dev branch
-    if [[ $release_branch == "full-release-dev" ]]; then
+    # Add 'axios' library and its type definitions for full-release branch
+    if [[ $release_branch == "full-release" ]]; then
         npm_project_deps+=("axios")
         npm_types_deps+=("@types/axios")
   fi
 
-    # Add 'file-saver' and 'qrcode' libraries and their type definitions for full-release-dev branch
+    # Add 'file-saver' and 'qrcode' libraries and their type definitions for full-release branch
     if [[ $release_branch == "minimal-release" ]]; then
         npm_project_deps+=("file-saver" "qrcode" "jszip")
         npm_types_deps+=("@types/file-saver" "@types/qrcode" "@types/jszip")

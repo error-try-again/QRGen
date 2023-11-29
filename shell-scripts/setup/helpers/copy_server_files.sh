@@ -69,13 +69,13 @@ retrieve_submodules() {
         echo "Navigating to the submodule: $submodule_path..."
         cd "$submodule_path" || return 1
 
-        local branch_name="full-release-dev"
+        local branch_name="full-release"
 
         echo "Fetching latest information from the remote in submodule: $submodule_path..."
         git fetch --all
 
         echo "Hard resetting the submodule to the latest commit in the branch: $branch_name..."
-        git reset --hard origin/full-release-dev
+        git reset --hard origin/full-release
 
         echo "Checking out branch '$branch_name' in submodule: $submodule_path..."
         if git rev-parse --verify "$branch_name" ; then
