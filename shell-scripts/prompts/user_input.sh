@@ -43,13 +43,13 @@ custom_install_prompt() {
   prompt_yes_no "Would you like to use a dry run?" USE_DRY_RUN
   prompt_yes_no "Would you like to force current certificate renewal?" USE_FORCE_RENEW
   prompt_yes_no "Would you like to automatically renew your SSL certificate?" USE_AUTO_RENEW_SSL
-  prompt_yes_no "Would you like to enable HSTS?" USE_HSTS
-  prompt_yes_no "Would you like to enable OCSP Stapling?" USE_OCSP_STAPLING
-  prompt_yes_no "Would you like to enable Must Staple?" USE_MUST_STAPLE
-  prompt_yes_no "Would you like to enable Strict Permissions?" USE_STRICT_PERMISSIONS
+  prompt_yes_no "Would you like to enable HSTS (Recommended)?" USE_HSTS
+  prompt_yes_no "Would you like to enable OCSP Stapling (Recommended)?" USE_OCSP_STAPLING
+  prompt_yes_no "Would you like to enable Must Staple (Not Recommended)?" USE_MUST_STAPLE
   prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)?" USE_UIR
-  prompt_yes_no "Would you like to overwrite self-signed certificates?" USE_OVERWRITE_SELF_SIGNED_CERTS
-  prompt_yes_no "Would you like to enable TLSv1.3? (yes/no) (Recommended): " USE_TLS13
+  prompt_yes_no "Would you like to enable Strict Permissions (Not Recommended)?" USE_STRICT_PERMISSIONS
+  prompt_yes_no "Would you like to overwrite existing certificates?" USE_OVERWRITE_SELF_SIGNED_CERTS
+  prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
   prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
 }
 
