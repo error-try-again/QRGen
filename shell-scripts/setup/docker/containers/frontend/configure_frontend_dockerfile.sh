@@ -27,7 +27,8 @@ configure_npm_deps() {
         "@vitejs/plugin-react"
         "@testing-library/react"
         "@testing-library/jest-dom"
-        "@babel/plugin-proposal-private-property-in-object"
+        "@babel/plugin-transform-private-property-in-object"
+
   )
     local npm_types_deps=(
         "@types/leaflet"
