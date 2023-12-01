@@ -619,6 +619,7 @@ build_and_run_docker() {
     run_frontend_service
   fi
 
+
   if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
     run_certbot_service
     echo "Using auto-renewal for SSL certificates."
