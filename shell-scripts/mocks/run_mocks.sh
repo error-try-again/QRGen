@@ -179,6 +179,7 @@ run_certbot_container_configuration() {
 }
 
 
+
 #######################################
 # Setup common configuration parameters for NGINX and Docker Compose
 # Globals:
@@ -188,13 +189,14 @@ run_certbot_container_configuration() {
 #   NGINX_PORT
 #   NGINX_SSL_PORT
 #   NODE_VERSION
+#   RELEASE_BRANCH
 #   SUBDOMAIN
 #   TIMEOUT
 # Arguments:
 #  None
 #######################################
 setup_common_configuration_parameters() {
-  release_branch="full-release"
+  RELEASE_BRANCH="full-release"
   NODE_VERSION="latest"
   NGINX_SSL_PORT="443"
   NGINX_PORT=8080

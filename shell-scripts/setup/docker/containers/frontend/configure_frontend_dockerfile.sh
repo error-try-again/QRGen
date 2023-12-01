@@ -1,9 +1,10 @@
 #!/bin/bash
 
+
 #######################################
 # Provisions npm dependencies for the frontend, depending on the release branch
 # Globals:
-#   release_branch
+#   RELEASE_BRANCH
 # Arguments:
 #  None
 #######################################
@@ -27,7 +28,8 @@ configure_npm_deps() {
         "@vitejs/plugin-react"
         "@testing-library/react"
         "@testing-library/jest-dom"
-        "@babel/plugin-proposal-private-property-in-object"
+        "@babel/plugin-transform-private-property-in-object"
+
   )
     local npm_types_deps=(
         "@types/leaflet"
@@ -38,13 +40,13 @@ configure_npm_deps() {
   )
 
     # Add 'axios' library and its type definitions for full-release branch
-    if [[ $release_branch == "full-release" ]]; then
+    if [[ $RELEASE_BRANCH == "full-release" ]]; then
         npm_project_deps+=("axios")
         npm_types_deps+=("@types/axios")
   fi
 
     # Add 'file-saver' and 'qrcode' libraries and their type definitions for full-release branch
-    if [[ $release_branch == "minimal-release" ]]; then
+    if [[ $RELEASE_BRANCH == "minimal-release" ]]; then
         npm_project_deps+=("file-saver" "qrcode" "jszip")
         npm_types_deps+=("@types/file-saver" "@types/qrcode" "@types/jszip")
   fi
@@ -54,19 +56,22 @@ configure_npm_deps() {
     echo "RUN npm install --save-dev ${npm_types_deps[*]}"
 }
 
+
+
 #######################################
 # Configures the Dockerfile for the frontend
 # Globals:
 #   FRONTEND_DOCKERFILE
 #   NGINX_PORT
 #   NODE_VERSION
-#   release_branch
+#   RELEASE_BRANCH
 # Arguments:
 #  None
 #######################################
 configure_frontend_docker() {
     local frontend_submodule_url="https://github.com/error-try-again/QRGen-frontend.git"
-    local origin="origin/$release_branch"
+    local origin="origin/$RELEASE_BRANCH"
+
     local template_name="frontend"
 
     cat << EOF > "$FRONTEND_DOCKERFILE"
@@ -95,7 +100,7 @@ RUN git init && \
     cd frontend && \
     git fetch --all && \
     git reset --hard "$origin" && \
-    git checkout "$release_branch" && \
+    git checkout "$RELEASE_BRANCH" && \
     cd ..
 
 COPY frontend/.env frontend/.env

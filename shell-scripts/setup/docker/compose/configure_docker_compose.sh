@@ -143,6 +143,7 @@ specify_network() {
   echo "$networks"
 }
 
+
 #######################################
 # Pulls in global variables if they are defined to generate a certbot command.
 # Globals:
@@ -189,6 +190,7 @@ ${overwrite_self_signed_certs_flag}" \
     --domains "$SUBDOMAIN"."${DOMAIN_NAME}"
 }
 
+
 #######################################
 # Determines how the Docker Compose file should be configured depending on the user's choices.
 # Globals:
@@ -203,6 +205,7 @@ ${overwrite_self_signed_certs_flag}" \
 #   LETS_ENCRYPT_VOLUME_MAPPING
 #   NGINX_PORT
 #   NGINX_SSL_PORT
+#   RELEASE_BRANCH
 #   USE_LETS_ENCRYPT
 #   USE_SELF_SIGNED_CERTS
 #   certbot_volume_mappings
@@ -303,7 +306,7 @@ configure_docker_compose() {
   if [[ $USE_LETS_ENCRYPT == "yes" ]]; then
     echo "Configuring Docker Compose for Let's Encrypt..."
 
-      if [[ $release_branch == "full-release" ]]; then
+      if [[ $RELEASE_BRANCH == "full-release" ]]; then
       backend_ports=$(create_ports_or_volumes \
         "ports" \
         "${BACKEND_PORT}:${BACKEND_PORT}")
@@ -350,7 +353,7 @@ configure_docker_compose() {
   elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     echo "Configuring Docker Compose for self-signed certificates..."
 
-      if [[ $release_branch == "full-release" ]]; then
+      if [[ $RELEASE_BRANCH == "full-release" ]]; then
 
       backend_ports=$(create_ports_or_volumes \
         "ports" \
@@ -377,7 +380,7 @@ configure_docker_compose() {
   else
     echo "Configuring Docker Compose for HTTP..."
 
-    if [[ $release_branch == "full-release" ]]; then
+    if [[ $RELEASE_BRANCH == "full-release" ]]; then
       backend_ports=$(create_ports_or_volumes \
         "ports" \
         "${BACKEND_PORT}:${BACKEND_PORT}")
