@@ -53,13 +53,16 @@ install_backend_npm_deps() {
 #   BACKEND_DOCKERFILE
 #   BACKEND_PORT
 #   NODE_VERSION
+#   RELEASE_BRANCH
 # Arguments:
 #  None
 #######################################
 configure_backend_docker() {
     local backend_submodule_url="https://github.com/error-try-again/QRGen-backend.git"
-    local release_branch="full-release"
-    local origin="origin"/"$release_branch"
+
+
+    local origin="origin"/"$RELEASE_BRANCH"
+
 
     cat << EOF > "$BACKEND_DOCKERFILE"
 # Use the specified version of Node.js
@@ -81,7 +84,7 @@ RUN git submodule add --force "$backend_submodule_url" backend \
 RUN cd backend \
     && git fetch --all \
     && git reset --hard "$origin" \
-    && git checkout "$release_branch" \
+    && git checkout "$RELEASE_BRANCH" \
     && cd ..
 
 # Copies over the user configured environment variables

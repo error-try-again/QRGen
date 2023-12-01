@@ -375,7 +375,7 @@ prompt_for_dhparam_strength() {
 # Prompts the user for the install mode.
 # Globals:
 #   INSTALL_MODE_CHOICE
-#   release_branch
+#   RELEASE_BRANCH
 # Arguments:
 #  None
 #######################################
@@ -384,8 +384,8 @@ prompt_for_install_mode() {
   echo "2: Install full release (frontend QR generator and backend API/server side generation) (All features)"
   prompt_numeric "Please enter your choice (1/2): " INSTALL_MODE_CHOICE
   case $INSTALL_MODE_CHOICE in
-    1) release_branch="minimal-release" ;;
-    2) release_branch="full-release" ;;
+    1) RELEASE_BRANCH="minimal-release" ;;
+    2) RELEASE_BRANCH="full-release" ;;
     *) echo "Invalid choice. Please enter 1 or 2." ;;
   esac
 }

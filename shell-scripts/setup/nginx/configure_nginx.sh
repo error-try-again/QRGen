@@ -264,12 +264,12 @@ backup_existing_config() {
 # Globals:
 #   BACKEND_PORT
 #   backend_scheme
-#   release_branch
+#   RELEASE_BRANCH
 # Arguments:
 #  None
 #######################################
 write_endpoints() {
-        if [[ $release_branch == "full-release" ]]; then
+        if [[ $RELEASE_BRANCH == "full-release" ]]; then
     local endpoint="/qr/"
 
     local proxy_pass="proxy_pass ${backend_scheme}://backend:${BACKEND_PORT};"
