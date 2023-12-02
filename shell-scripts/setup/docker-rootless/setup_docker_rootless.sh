@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #######################################
 # Configures Docker to operate in rootless mode, updating user's bashrc as required.

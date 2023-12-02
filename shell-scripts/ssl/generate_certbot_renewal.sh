@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #######################################
 # Create the certbot renew script with a heredoc
@@ -9,7 +9,7 @@
 #######################################
 generate_certbot_renewal_script() {
   cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Exit on any error
 set -e

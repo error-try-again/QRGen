@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #######################################
 # Setup project directories and configurations.
@@ -618,7 +618,6 @@ build_and_run_docker() {
   else
     run_frontend_service
   fi
-
 
   if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
     run_certbot_service

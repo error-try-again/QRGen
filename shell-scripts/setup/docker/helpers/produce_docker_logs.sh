@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #######################################
 # Check if Docker Compose exists and prints all services defined in the Compose file
