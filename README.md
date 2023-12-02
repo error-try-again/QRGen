@@ -1,3 +1,4 @@
+![qrgen](https://github.com/error-try-again/QRGen/assets/19685177/d3bdf77b-62c1-48d6-bbeb-c49236651ebd)
 # QRGen - A self-hostable Fullstack QR code generation service
 ## *TS (Express/Backend), TSX (Vite/React/Frontend), Bash/Shell (Automation)*
 ## Overview
