@@ -450,7 +450,7 @@ References
 ![Screenshot_20231202_170613](https://github.com/error-try-again/QRGen/assets/19685177/1e8c63de-4cd4-4c2e-834e-ed9e747ae339)
 
 #### Customize upptimerc.yml
-![update-upptimercyml](https://github.com/error-try-again/QRGen/assets/19685177/da8cd5b9-d5ba-4194-9098-291bfc9bc9f1)
+![update-upptimercyml](https://github.com/error-try-again/QRGen/assets/19685177/1cea40b1-d26d-47e8-bd5a-1d5524297cb5)
 
 #### Create a personal access token
 ![pat1](https://github.com/error-try-again/QRGen/assets/19685177/e3800b67-5691-4e48-bab0-eba6a5eb26ab)
