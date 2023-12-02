@@ -427,6 +427,27 @@ Thanks for using the QR Code Generator setup script!
 * Colour QR codes, logos & other customizations
 * Add additional QR code formats (E.g. Google Reviews, etc.)
 
+### Healthcheck Setup
+
+References
+- [geting started with upptime](https://upptime.js.org/docs/get-started)
+- [custom domain health check integration](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)
+
+#### Use this repository/create a new repository
+![setup-status-page-aws-upptime-2](https://github.com/error-try-again/QRGen/assets/19685177/2e7114b9-a658-4799-9bbf-7008ee0db388)
+
+#### Select deploy from branch / master / root
+![setup-status-page-aws-upptime-1](https://github.com/error-try-again/QRGen/assets/19685177/64af6e0f-dc2e-4971-a26a-439f132fb835)
+
+#### Create Github Organization *only if using custom subdomain* 
+![org-create-for-subdomain-upptime](https://github.com/error-try-again/QRGen/assets/19685177/d6d329b2-8946-4a9a-90bf-0e642641084c)
+
+#### Create a CNAME record with your provider that lines up with your domain/custom subdomain 
+![setup-status-page-aws-upptime](https://github.com/error-try-again/QRGen/assets/19685177/2066a56a-6954-4afe-a7c8-d25669f1f046)
+
+#### Test DNS & enable HTTPs 
+![setup-status-page-aws-upptime-3](https://github.com/error-try-again/QRGen/assets/19685177/47a8dd20-3f96-4122-95ae-26f94a27918b)
+
 # Setup Screenshots
 
 ### Local Install
