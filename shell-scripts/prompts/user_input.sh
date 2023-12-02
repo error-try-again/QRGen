@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # bashsupport disable=BP5006
 
 . .env

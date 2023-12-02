@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Produces server-side configuration files essential for backend and frontend operations.
 generate_server_files() {
