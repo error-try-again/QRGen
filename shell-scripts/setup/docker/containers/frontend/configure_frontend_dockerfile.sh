@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 #######################################
 # Provisions npm dependencies for the frontend, depending on the release branch
 # Globals:
@@ -57,7 +56,6 @@ configure_npm_deps() {
 }
 
 
-
 #######################################
 # Configures the Dockerfile for the frontend
 # Globals:
@@ -71,7 +69,6 @@ configure_npm_deps() {
 configure_frontend_docker() {
     local frontend_submodule_url="https://github.com/error-try-again/QRGen-frontend.git"
     local origin="origin/$RELEASE_BRANCH"
-
     local template_name="frontend"
 
     cat << EOF > "$FRONTEND_DOCKERFILE"
@@ -111,6 +108,7 @@ RUN npm run build
 
 # Setup nginx to serve the built files
 FROM nginx:alpine
+COPY frontend/robots.txt /usr/share/nginx/html/robots.txt
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 
