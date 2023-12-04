@@ -433,6 +433,8 @@ Thanks for using the QR Code Generator setup script!
 References
 - [geting started with upptime](https://upptime.js.org/docs/get-started)
 - [custom domain health check integration](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)
+- [Example status page](https://status.qr-gen.net/)
+- [Example github](https://github.com/error-try-again/QRGen-upptime)
 
 #### Use this repository/create a new repository
 ![setup-status-page-aws-upptime-2](https://github.com/error-try-again/QRGen/assets/19685177/2e7114b9-a658-4799-9bbf-7008ee0db388)
