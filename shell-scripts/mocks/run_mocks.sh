@@ -178,8 +178,6 @@ run_certbot_container_configuration() {
   configure_certbot_docker
 }
 
-
-
 #######################################
 # Setup common configuration parameters for NGINX and Docker Compose
 # Globals:
