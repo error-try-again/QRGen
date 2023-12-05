@@ -43,6 +43,7 @@ dump_logs() {
 #######################################
 reload() {
   echo "Reloading the project..."
+  RELOAD_FLAG="yes"
   test_docker_env
   setup_project_directories
   stop_containers
@@ -150,7 +151,6 @@ handle_certs() {
   if [[ $USE_LETS_ENCRYPT == "yes" ]] || [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
     # Generate self-signed certificates if they don't exist
     generate_self_signed_certificates
-
   fi
 }
 
@@ -203,7 +203,7 @@ handle_ambiguous_networks() {
     local container_id
     container_ids=$(docker network inspect "$network_id" --format '{{range .Containers}}{{.Name}} {{end}}')
 
-   # Loop over each container ID connected to the network and disconnect it
+    # Loop over each container ID connected to the network and disconnect it
     for container_id in $container_ids; do
       echo "Disconnecting container $container_id from network $network_id..."
       docker network disconnect -f "$network_id" "$container_id" || {
@@ -576,6 +576,49 @@ pre_flight() {
 }
 
 #######################################
+# Performs common build operations
+# Globals:
+#   PROJECT_ROOT_DIR
+#   RELEASE_BRANCH
+# Arguments:
+#  None
+#######################################
+common_build_operations() {
+      cd "$PROJECT_ROOT_DIR" || {
+      echo "Failed to change directory to $PROJECT_ROOT_DIR"
+      exit 1
+  }
+
+    pre_flight || {
+      echo "Failed pre-flight checks"
+      exit 1
+  }
+
+    # If Docker Compose is running, bring down the services
+    # Ensure that old services are brought down before proceeding
+    if docker compose ps &> /dev/null; then
+      echo "Bringing down existing Docker Compose services..."
+      docker compose down || {
+        echo "Failed to bring down existing Docker Compose services"
+        exit 1
+    }
+  fi
+
+    handle_certs || {
+      echo "Failed to handle certs"
+      exit 1
+  }
+
+    # Run each service separately - must be active for certbot to work
+    if [[ $RELEASE_BRANCH = "full-release" ]]; then
+      run_backend_service
+      run_frontend_service
+  else
+      run_frontend_service
+  fi
+}
+
+#######################################
 # ---- Build and Run Docker ---- #
 # Globals:
 #   PROJECT_ROOT_DIR
@@ -586,48 +629,40 @@ pre_flight() {
 #######################################
 build_and_run_docker() {
 
-  cd "$PROJECT_ROOT_DIR" || {
-    echo "Failed to change directory to $PROJECT_ROOT_DIR"
-    exit 1
-  }
+  if [[ $RELOAD_FLAG == "yes" ]]; then
+    echo "Reloading the project..."
 
-  pre_flight || {
-    echo "Failed pre-flight checks"
-    exit 1
-  }
-
-  # If Docker Compose is running, bring down the services
-  # Ensure that old services are brought down before proceeding
-  if docker compose ps &> /dev/null; then
-    echo "Bringing down existing Docker Compose services..."
-    docker compose down || {
-      echo "Failed to bring down existing Docker Compose services"
+    common_build_operations || {
+      echo "Failed common build operations"
       exit 1
     }
-  fi
 
-  handle_certs || {
-    echo "Failed to handle certs"
-    exit 1
-  }
+    # Dump logs or any other post-run operations
+    dump_logs || {
+      echo "Failed to dump logs"
+      exit 1
+    }
 
-  # Run each service separately - must be active for certbot to work
-  if [[ $RELEASE_BRANCH = "full-release" ]]; then
-    run_backend_service
-    run_frontend_service
   else
-    run_frontend_service
+    echo "Building and running Docker services..."
+
+    common_build_operations || {
+      echo "Failed common build operations"
+      exit 1
+    }
+
+    if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
+      run_certbot_service
+      echo "Using auto-renewal for SSL certificates."
+      generate_certbot_renewal_job
+    fi
+
+    # Dump logs or any other post-run operations
+    dump_logs || {
+      echo "Failed to dump logs"
+      exit 1
+    }
+
   fi
 
-  if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
-    run_certbot_service
-    echo "Using auto-renewal for SSL certificates."
-    generate_certbot_renewal_job
-  fi
-
-  # Dump logs or any other post-run operations
-  dump_logs || {
-    echo "Failed to dump logs"
-    exit 1
-  }
 }
