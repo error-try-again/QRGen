@@ -37,22 +37,6 @@ dump_logs() {
 }
 
 #######################################
-# Cleans current Docker Compose setup, arranges directories, and reinitiates Docker services.
-# Arguments:
-#  None
-#######################################
-reload() {
-  echo "Reloading the project..."
-  RELOAD_FLAG="yes"
-  test_docker_env
-  setup_project_directories
-  stop_containers
-  generate_server_files
-  configure_nginx
-  build_and_run_docker
-}
-
-#######################################
 # Shuts down any running Docker containers associated with the project and deletes the entire project directory.
 # Arguments:
 #  None
@@ -376,13 +360,11 @@ run_frontend_service() {
 #######################################
 run_certbot_service() {
   echo "Running Certbot service..."
-
   build_certbot_service || exit 1
   run_certbot_dry_run || exit 1
   rebuild_and_rerun_certbot || exit 1
   wait_for_certbot_completion || exit 1
   check_certbot_success || exit 1
-
   echo "Certbot process completed successfully."
 }
 
@@ -628,41 +610,22 @@ common_build_operations() {
 #  None
 #######################################
 build_and_run_docker() {
-
-  if [[ $RELOAD_FLAG == "yes" ]]; then
-    echo "Reloading the project..."
-
-    common_build_operations || {
-      echo "Failed common build operations"
-      exit 1
-    }
-
-    # Dump logs or any other post-run operations
-    dump_logs || {
-      echo "Failed to dump logs"
-      exit 1
-    }
-
-  else
     echo "Building and running Docker services..."
 
     common_build_operations || {
       echo "Failed common build operations"
       exit 1
-    }
+  }
 
     if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
       run_certbot_service
       echo "Using auto-renewal for SSL certificates."
       generate_certbot_renewal_job
-    fi
+  fi
 
     # Dump logs or any other post-run operations
     dump_logs || {
       echo "Failed to dump logs"
       exit 1
-    }
-
-  fi
-
+  }
 }
