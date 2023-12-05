@@ -14,12 +14,11 @@ user_prompt() {
   echo "Welcome to the QR Code Generator setup script!"
   local opt
   PS3='Select: '
-  select opt in "Run Setup" "Run Mock Configuration" "Uninstall" "Reload/Refresh" "Dump logs" "Update Project" "Stop Project Docker Containers" "Prune All Docker Builds - Dangerous" "Quit"; do
+  select opt in "Run Setup" "Run Mock Configuration" "Uninstall" "Dump logs" "Update Project" "Stop Project Docker Containers" "Prune All Docker Builds - Dangerous" "Quit"; do
     case $opt in
       "Run Setup") setup ;;
       "Run Mock Configuration") run_mocks ;;
       "Uninstall") uninstall ;;
-      "Reload/Refresh") reload ;;
       "Dump logs") dump_logs ;;
       "Update Project") update_project ;;
       "Stop Project Docker Containers") stop_containers ;;
@@ -81,6 +80,37 @@ automatic_staging_selection() {
   USE_PRODUCTION_SSL="no"
   USE_STRICT_PERMISSIONS="no"
   USE_OCSP_STAPLING="no"
+  USE_MUST_STAPLE="no"
+  USE_TLS13="yes"
+  USE_TLS12="no"
+}
+
+#######################################
+# Provides some sane defaults for reloading the project.
+# Globals:
+#   LETSENCRYPT_EMAIL
+#   USE_AUTO_RENEW_SSL
+#   USE_DRY_RUN
+#   USE_HSTS
+#   USE_MUST_STAPLE
+#   USE_OCSP_STAPLING
+#   USE_OVERWRITE_SELF_SIGNED_CERTS
+#   USE_PRODUCTION_SSL
+#   USE_STRICT_PERMISSIONS
+#   USE_UIR
+# Arguments:
+#  None
+#######################################
+automatic_production_reload_selection() {
+  LETSENCRYPT_EMAIL="skip"
+  USE_AUTO_RENEW_SSL="yes"
+  USE_HSTS="yes"
+  USE_UIR="yes"
+  USE_OVERWRITE_SELF_SIGNED_CERTS="no"
+  USE_DRY_RUN="yes"
+  USE_PRODUCTION_SSL="yes"
+  USE_OCSP_STAPLING="yes"
+  USE_STRICT_PERMISSIONS="no"
   USE_MUST_STAPLE="no"
   USE_TLS13="yes"
   USE_TLS12="no"
@@ -280,8 +310,9 @@ prompt_for_ssl() {
       set_ssl_flag
       echo "1: Run automatic staging setup for Let's Encrypt SSL (Recommended for testing)"
       echo "2: Run automatic production setup for Let's Encrypt SSL (Recommended for production)"
-      echo "3: Run custom setup for Let's Encrypt SSL"
-      prompt_numeric "Please enter your choice (1/2/3): " AUTO_SETUP_CHOICE
+      echo "3: Run automatic reload of production setup for Let's Encrypt SSL (Keeps existing certificates and reloads server)"
+      echo "4: Run custom setup for Let's Encrypt SSL (Advanced)"
+      prompt_numeric "Please enter your choice (1/2/3/4): " AUTO_SETUP_CHOICE
       if [[ $AUTO_SETUP_CHOICE == 1 ]]; then
         set_letsencrypt_flag
         automatic_staging_selection
@@ -290,9 +321,12 @@ prompt_for_ssl() {
         automation_production_selection
       elif [[ $AUTO_SETUP_CHOICE == 3 ]]; then
         set_letsencrypt_flag
+        automatic_production_reload_selection
+      elif [[ $AUTO_SETUP_CHOICE == 4 ]]; then
+        set_letsencrypt_flag
         custom_install_prompt
       else
-        echo "Invalid choice. Please enter 1, 2, or 3."
+        echo "Invalid choice. Please enter 1, 2, 3, or 4."
       fi
       ;;
     2)
