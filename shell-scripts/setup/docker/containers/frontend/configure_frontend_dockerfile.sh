@@ -55,7 +55,6 @@ configure_npm_deps() {
     echo "RUN npm install --save-dev ${npm_types_deps[*]}"
 }
 
-
 #######################################
 # Configures the Dockerfile for the frontend
 # Globals:
