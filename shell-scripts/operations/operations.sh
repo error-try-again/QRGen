@@ -617,8 +617,11 @@ build_and_run_docker() {
       exit 1
   }
 
-    if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
+    if [[ $BUILD_CERTBOT_IMAGE == "yes" ]]; then
+      echo "Building Certbot service..."
       run_certbot_service
+  fi
+    if [[ $USE_AUTO_RENEW_SSL == "yes" ]]; then
       echo "Using auto-renewal for SSL certificates."
       generate_certbot_renewal_job
   fi

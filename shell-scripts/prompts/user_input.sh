@@ -37,24 +37,31 @@ user_prompt() {
 #  None
 #######################################
 custom_install_prompt() {
-  prompt_for_input "Please enter your Let's Encrypt email or type 'skip' to skip: " "Error: Email address cannot be empty." LETSENCRYPT_EMAIL
-  prompt_yes_no "Would you like to use a production SSL certificate?" USE_PRODUCTION_SSL
-  prompt_yes_no "Would you like to use a dry run?" USE_DRY_RUN
-  prompt_yes_no "Would you like to force current certificate renewal?" USE_FORCE_RENEW
-  prompt_yes_no "Would you like to automatically renew your SSL certificate?" USE_AUTO_RENEW_SSL
-  prompt_yes_no "Would you like to enable HSTS (Recommended)?" USE_HSTS
-  prompt_yes_no "Would you like to enable OCSP Stapling (Recommended)?" USE_OCSP_STAPLING
-  prompt_yes_no "Would you like to enable Must Staple (Not Recommended)?" USE_MUST_STAPLE
-  prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)?" USE_UIR
-  prompt_yes_no "Would you like to enable Strict Permissions (Not Recommended)?" USE_STRICT_PERMISSIONS
-  prompt_yes_no "Would you like to overwrite existing certificates?" USE_OVERWRITE_SELF_SIGNED_CERTS
-  prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
-  prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
+  prompt_yes_no "Would you like to build with Certbot? (Recommended)" BUILD_CERTBOT_IMAGE
+  if [[ $BUILD_CERTBOT_IMAGE == "yes" ]]; then
+    prompt_for_input "Please enter your Let's Encrypt email or type 'skip' to skip: " "Error: Email address cannot be empty." LETSENCRYPT_EMAIL
+    prompt_yes_no "Would you like to use a production SSL certificate?" USE_PRODUCTION_SSL
+    prompt_yes_no "Would you like to use a dry run?" USE_DRY_RUN
+    prompt_yes_no "Would you like to force current certificate renewal?" USE_FORCE_RENEW
+    prompt_yes_no "Would you like to automatically renew your SSL certificate?" USE_AUTO_RENEW_SSL
+    prompt_yes_no "Would you like to enable HSTS (Recommended)?" USE_HSTS
+    prompt_yes_no "Would you like to enable OCSP Stapling (Recommended)?" USE_OCSP_STAPLING
+    prompt_yes_no "Would you like to enable Must Staple (Not Recommended)?" USE_MUST_STAPLE
+    prompt_yes_no "Would you like to enable UIR (Unique Identifier for Revocation)?" USE_UIR
+    prompt_yes_no "Would you like to enable Strict Permissions (Not Recommended)?" USE_STRICT_PERMISSIONS
+    prompt_yes_no "Would you like to overwrite existing certificates?" USE_OVERWRITE_SELF_SIGNED_CERTS
+    prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
+    prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
+  else
+    prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
+    prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
+  fi
 }
 
 #######################################
 # Provides some sane defaults for automatic staging/ssl setup.
 # Globals:
+#   BUILD_CERTBOT_IMAGE
 #   LETSENCRYPT_EMAIL
 #   REGENERATE_SSL_CERTS
 #   USE_AUTO_RENEW_SSL
@@ -65,12 +72,15 @@ custom_install_prompt() {
 #   USE_OVERWRITE_SELF_SIGNED_CERTS
 #   USE_PRODUCTION_SSL
 #   USE_STRICT_PERMISSIONS
+#   USE_TLS12
+#   USE_TLS13
 #   USE_UIR
 # Arguments:
 #  None
 #######################################
 automatic_staging_selection() {
   LETSENCRYPT_EMAIL="skip"
+  BUILD_CERTBOT_IMAGE="yes"
   USE_AUTO_RENEW_SSL="yes"
   REGENERATE_SSL_CERTS="yes"
   USE_HSTS="yes"
@@ -88,6 +98,7 @@ automatic_staging_selection() {
 #######################################
 # Provides some sane defaults for reloading the project.
 # Globals:
+#   BUILD_CERTBOT_IMAGE
 #   LETSENCRYPT_EMAIL
 #   USE_AUTO_RENEW_SSL
 #   USE_DRY_RUN
@@ -97,6 +108,8 @@ automatic_staging_selection() {
 #   USE_OVERWRITE_SELF_SIGNED_CERTS
 #   USE_PRODUCTION_SSL
 #   USE_STRICT_PERMISSIONS
+#   USE_TLS12
+#   USE_TLS13
 #   USE_UIR
 # Arguments:
 #  None
@@ -104,6 +117,7 @@ automatic_staging_selection() {
 automatic_production_reload_selection() {
   LETSENCRYPT_EMAIL="skip"
   USE_AUTO_RENEW_SSL="yes"
+  BUILD_CERTBOT_IMAGE="no"
   USE_HSTS="yes"
   USE_UIR="yes"
   USE_OVERWRITE_SELF_SIGNED_CERTS="no"
@@ -119,6 +133,7 @@ automatic_production_reload_selection() {
 #######################################
 # Provides some sane defaults for automatic production/ssl setup.
 # Globals:
+#   BUILD_CERTBOT_IMAGE
 #   LETSENCRYPT_EMAIL
 #   USE_AUTO_RENEW_SSL
 #   USE_DRY_RUN
@@ -128,12 +143,15 @@ automatic_production_reload_selection() {
 #   USE_OVERWRITE_SELF_SIGNED_CERTS
 #   USE_PRODUCTION_SSL
 #   USE_STRICT_PERMISSIONS
+#   USE_TLS12
+#   USE_TLS13
 #   USE_UIR
 # Arguments:
 #  None
 #######################################
 automation_production_selection() {
   LETSENCRYPT_EMAIL="skip"
+  BUILD_CERTBOT_IMAGE="yes"
   USE_AUTO_RENEW_SSL="yes"
   USE_HSTS="yes"
   USE_UIR="yes"
