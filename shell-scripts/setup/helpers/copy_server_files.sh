@@ -40,6 +40,8 @@ add_or_update_submodule() {
 
     echo "Updating and initializing submodule: $submodule_path"
     git submodule update --init --recursive "$submodule_path"
+    git submodule foreach --recursive git pull
+
 }
 
 #######################################
