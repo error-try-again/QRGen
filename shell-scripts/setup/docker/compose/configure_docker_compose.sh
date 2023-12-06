@@ -6,17 +6,21 @@
 #  None
 #######################################
 create_ports_or_volumes() {
-  local type=$1 # "ports" or "volumes"
   local mappings=("${@:2}") # rest of the arguments as an array
 
-  local result="$type:"
+  local result=""
+  local first=true
   local mapping
   for mapping in "${mappings[@]}"; do
-    result+=$'\n'
-    result+="      - $mapping"
+    if [ "$first" = true ]; then
+      first=false
+    else
+      result+=","
+    fi
+    result+="${mapping}"
   done
 
-  echo "$result"
+  echo "${result}"
 }
 
 #######################################
@@ -36,7 +40,7 @@ create_network_definition() {
   definition+=$'\n'
   definition+="    driver: ${network_driver}"
 
-  echo "$definition"
+  echo "${definition}"
 }
 
 #######################################
@@ -67,28 +71,39 @@ create_volume_definition() {
 
 #######################################
 # Created a generic service definition for Docker Compose file.
+# Globals:
+#   ADDR
 # Arguments:
-#   1
-#   2
-#   3
-#   4
-#   5
-#   6
-#   7
-#   8
-#   9
+#  None
 #######################################
 create_service() {
-  local name="$1"
-  local build_context="$2"
-  local dockerfile="$3"
-  local command="$4"
-  local ports="$5"
-  local volumes="$6"
-  local networks="$7"
-  local restart="$8"
-  local depends="$9"
+  local name=""
+  local build_context=""
+  local dockerfile=""
+  local command=""
+  local ports=""
+  local volumes=""
+  local networks=""
+  local restart=""
+  local depends=""
 
+  # Parsing named arguments
+  while [ "$#" -gt 0 ]; do
+    case $1 in
+      --name) name=$2; shift 2 ;;
+      --build-context) build_context=$2; shift 2 ;;
+      --dockerfile) dockerfile=$2; shift 2 ;;
+      --command) command=$2; shift 2 ;;
+      --ports) ports=$2; shift 2 ;;
+      --volumes) volumes=$2; shift 2 ;;
+      --networks) networks=$2; shift 2 ;;
+      --restart) restart=$2; shift 2 ;;
+      --depends-on) depends=$2; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+
+  # Building the service definition
   local definition
   definition="  ${name}:"
   definition+=$'\n'
@@ -97,52 +112,53 @@ create_service() {
   definition+="      context: ${build_context}"
   definition+=$'\n'
   definition+="      dockerfile: ${dockerfile}"
-  if [[ -n $command ]]; then
+
+  if [[ -n ${command} ]]; then
     definition+=$'\n'
     definition+="    command: ${command}"
   fi
-  if [[ -n $ports ]]; then
-    definition+=$'\n'
-    definition+="    ${ports}"
-  fi
-  if [[ -n $networks ]]; then
-    definition+=$'\n'
-    definition+="    ${networks}"
-  fi
-  if [[ -n $volumes ]]; then
-    definition+=$'\n'
-    definition+="    ${volumes}"
-  fi
-  if [[ -n $depends ]]; then
-    definition+=$'\n'
-    definition+="    depends_on:"
-    definition+=$'\n'
-    definition+="      - ${depends}"
-  fi
-  if [[ -n $restart ]]; then
+
+  #######################################
+  # Adds a ports, volumes or networks definition to the service definition.
+  # Globals:
+  #   ADDR
+  #   item
+  # Arguments:
+  #   1
+  #   2
+  #######################################
+  add_to_definition() {
+    local type=$1
+    local values=$2
+    if [[ -n ${values} ]]; then
+      definition+=$'\n'
+      definition+="    ${type}:"
+      IFS=',' read -ra ADDR <<< "$values"
+      local item
+      for item in "${ADDR[@]}"; do
+        if [[ -n $item ]]; then
+          definition+=$'\n'
+          definition+="      - ${item}"
+        fi
+      done
+    fi
+  }
+
+  add_to_definition "ports" "$ports"
+  add_to_definition "volumes" "$volumes"
+  add_to_definition "networks" "$networks"
+
+  if [[ -n ${restart} ]]; then
     definition+=$'\n'
     definition+="    restart: ${restart}"
   fi
 
-  echo "$definition"
+  if [[ -n ${depends} ]]; then
+    add_to_definition "depends_on" "$depends"
+  fi
+
+  echo "${definition}"
 }
-
-#######################################
-# Creates a network definition for Docker Compose file.
-# Arguments:
-#   1
-#######################################
-specify_network() {
-  local network_name="$1"
-
-  local networks
-  networks="networks:"
-  networks+=$'\n'
-  networks+="      - ${network_name}"
-
-  echo "$networks"
-}
-
 
 #######################################
 # Pulls in global variables if they are defined to generate a certbot command.
@@ -189,7 +205,6 @@ ${overwrite_self_signed_certs_flag}" \
     --domains "${DOMAIN_NAME}" \
     --domains "$SUBDOMAIN"."${DOMAIN_NAME}"
 }
-
 
 #######################################
 # Determines how the Docker Compose file should be configured depending on the user's choices.
@@ -297,9 +312,9 @@ configure_docker_compose() {
   frontend_volumes=""
   shared_certbot_volumes=""
 
-  frontend_networks=$(specify_network "$network_name")
-  backend_networks="$(specify_network "$network_name")"
-  certbot_networks=""
+  frontend_networks="qrgen"
+  backend_networks="qrgen"
+  certbot_networks="qrgen"
 
   default_port="80"
 
@@ -332,28 +347,26 @@ configure_docker_compose() {
 
     frontend_volumes=$(create_ports_or_volumes \
       "volumes" \
-      "./frontend:/usr/share/nginx/html" \
+      "./frontend:/usr/share/nginx/html:rw" \
       "./nginx.conf:/etc/nginx/nginx.conf:ro" \
       "${certbot_volume_mappings[LETS_ENCRYPT_VOLUME_MAPPING]}" \
       "${certbot_volume_mappings[LETS_ENCRYPT_LOGS_VOLUME_MAPPING]}" \
       "${certbot_volume_mappings[CERTS_DH_VOLUME_MAPPING]}" \
       "nginx-shared-volume:${internal_dirs[INTERNAL_WEBROOT_DIR]}")
 
-    certbot_service_definition=$( create_service \
-        "${certbot_name}" \
-        "${certbot_context}" \
-        "${certbot_dockerfile}" \
-        "$(generate_certbot_command)" \
-        "" \
-        "${shared_certbot_volumes}" \
-        "${certbot_networks}" \
-        "" \
-        "${certbot_depends_on}")
+    certbot_service_definition=$(create_service \
+      --name "${certbot_name}" \
+      --build-context "${certbot_context}" \
+      --dockerfile "${certbot_dockerfile}" \
+      --command "$(generate_certbot_command)" \
+      --volumes "${shared_certbot_volumes}" \
+      --networks "${certbot_networks}" \
+      --depends-on "${certbot_depends_on}")
 
-  elif [[ $USE_SELF_SIGNED_CERTS == "yes" ]]; then
+  elif [[ ${USE_SELF_SIGNED_CERTS} == "yes" ]]; then
     echo "Configuring Docker Compose for self-signed certificates..."
 
-      if [[ $RELEASE_BRANCH == "full-release" ]]; then
+      if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
 
       backend_ports=$(create_ports_or_volumes \
         "ports" \
@@ -380,7 +393,7 @@ configure_docker_compose() {
   else
     echo "Configuring Docker Compose for HTTP..."
 
-    if [[ $RELEASE_BRANCH == "full-release" ]]; then
+    if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
       backend_ports=$(create_ports_or_volumes \
         "ports" \
         "${BACKEND_PORT}:${BACKEND_PORT}")
@@ -392,43 +405,41 @@ configure_docker_compose() {
   fi
 
   backend_service_definition=$(create_service \
-    "$backend_name" \
-    "$backend_context" \
-    "$backend_dockerfile" \
-    "" \
-    "$backend_ports" \
-    "$backend_volumes" \
-    "$backend_networks" \
-    "$backend_restart" \
-    "$backend_depends_on")
+    --name "${backend_name}" \
+    --build-context "${backend_context}" \
+    --dockerfile "${backend_dockerfile}" \
+    --ports "${backend_ports}" \
+    --volumes "${backend_volumes}" \
+    --networks "${backend_networks}" \
+    --restart "${backend_restart}" \
+    --depends-on "${backend_depends_on}")
 
   frontend_service_definition=$(create_service \
-    "$frontend_name" \
-    "$frontend_context" \
-    "$frontend_dockerfile" \
-    "" \
-    "$frontend_ports" \
-    "$frontend_volumes" \
-    "$frontend_networks" \
-    "$frontend_restart" \
-    "$frontend_depends_on")
+    --name "${frontend_name}" \
+    --build-context "${frontend_context}" \
+    --dockerfile "${frontend_dockerfile}" \
+    --ports "${frontend_ports}" \
+    --volumes "${frontend_volumes}" \
+    --networks "${frontend_networks}" \
+    --restart "${frontend_restart}" \
+    --depends-on "${frontend_depends_on}")
 
   network_definition=$(create_network_definition \
-    "$network_name" \
-    "$network_driver")
+    "${network_name}" \
+    "${network_driver}")
 
   volume_definition=$(create_volume_definition \
-    "$volume_name" \
-    "$volume_driver")
+    "${volume_name}" \
+    "${volume_driver}")
 
   {
     echo "version: '3.8'"
     echo "services:"
-    echo "$backend_service_definition"
-    echo "$frontend_service_definition"
-    echo "$certbot_service_definition"
-    echo "$network_definition"
-    echo "$volume_definition"
+    echo "${backend_service_definition}"
+    echo "${frontend_service_definition}"
+    echo "${certbot_service_definition}"
+    echo "${network_definition}"
+    echo "${volume_definition}"
   } > "${DOCKER_COMPOSE_FILE}"
 
   cat "${DOCKER_COMPOSE_FILE}"
