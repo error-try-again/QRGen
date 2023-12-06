@@ -160,23 +160,6 @@ create_service() {
   echo "${definition}"
 }
 
-
-#######################################
-# Creates a network definition for Docker Compose file.
-# Arguments:
-#   1
-#######################################
-specify_network() {
-  local network_name="$1"
-
-  local networks
-  networks="networks:"
-  networks+=$'\n'
-  networks+="      - ${network_name}"
-
-  echo "${networks}"
-}
-
 #######################################
 # Pulls in global variables if they are defined to generate a certbot command.
 # Globals:
@@ -329,9 +312,9 @@ configure_docker_compose() {
   frontend_volumes=""
   shared_certbot_volumes=""
 
-  frontend_networks=$(specify_network "$network_name")
-  backend_networks="$(specify_network "$network_name")"
-  certbot_networks=""
+  frontend_networks="qrgen"
+  backend_networks="qrgen"
+  certbot_networks="qrgen"
 
   default_port="80"
 
