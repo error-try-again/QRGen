@@ -21,9 +21,6 @@ configure_nginx() {
     echo "Creating NGINX configuration..."
     backend_scheme="http"
     server_name="server_name ${DOMAIN_NAME}"
-    default_port_directive="listen $default_port;"
-    default_port_directive+=$'\n'
-    default_port_directive+="        listen [::]:$default_port;"
     ssl_listen_directive=""
     ssl_mode_block=""
     resolver_settings=""
@@ -49,8 +46,8 @@ configure_nginx() {
 #######################################
 configure_subdomain() {
     if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
-        server_name="server_name ${DOMAIN_NAME} ${SUBDOMAIN}.${DOMAIN_NAME}"
-  fi
+        server_name+=" ${SUBDOMAIN}.${DOMAIN_NAME}"
+    fi
 }
 
 #######################################
@@ -76,7 +73,7 @@ configure_https() {
     configure_ssl_mode
     resolver_settings="resolver ${DNS_RESOLVER} valid=300s;"
     resolver_settings+=$'\n'
-    resolver_settings+="        resolver_timeout ${TIMEOUT}ms;"
+    resolver_settings+="        resolver_timeout ${TIMEOUT}s;"  # Adjusted for correct syntax
     configure_certs
     configure_security_headers
   fi
@@ -108,7 +105,7 @@ configure_ssl_mode() {
 }
 
 #######################################
-# Turn off gzip compression
+# Turn off gzip compression for HTTPS
 # Globals:
 #   None
 # Arguments:
@@ -233,12 +230,12 @@ configure_acme_challenge() {
           listen 80;
           listen [::]:80;
           ${server_name};
-          location / {
-              return 301 https://\$host\$request_uri;
-          }
           location /.well-known/acme-challenge/ {
               allow all;
               root /usr/share/nginx/html;
+          }
+          location / {
+              return 301 https://\$host\$request_uri; # Redirect all non-ACME challenge HTTP traffic to HTTPS
           }
       }"
   fi
@@ -313,7 +310,6 @@ http {
     default_type application/octet-stream;
 
     server {
-        ${default_port_directive}
         ${ssl_listen_directive}
         ${server_name};
         ${ssl_mode_block}
