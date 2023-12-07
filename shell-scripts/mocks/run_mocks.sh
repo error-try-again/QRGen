@@ -247,6 +247,7 @@ setup_lets_encrypt_configuration_parameters() {
 setup_self_signed_configuration_parameters() {
   NGINX_SSL_PORT="443"
   USE_SELF_SIGNED_CERTS="yes"
+  USE_GZIP="yes"
 }
 
 #######################################
