@@ -200,6 +200,17 @@ set_self_signed_flag() {
 }
 
 #######################################
+# Sets the global flag for using gzip to be used throughout the script.
+# Globals:
+#   USE_GZIP
+# Arguments:
+#  None
+#######################################
+set_gzip_flag() {
+  USE_GZIP="yes"
+}
+
+#######################################
 # Echos the relevant flag depending on the user's choice.
 # Globals:
 #   LETSENCRYPT_EMAIL
@@ -246,6 +257,20 @@ construct_certbot_flags() {
 #######################################
 disable_docker_build_caching_prompt() {
   prompt_yes_no "Would you like to disable Docker build caching for this run?" DISABLE_DOCKER_CACHING
+}
+
+#######################################
+# Prompt the user to enable or disable GZIP compression.
+# Globals:
+#   USE_GZIP
+# Arguments:
+#  None
+#######################################
+prompt_for_gzip() {
+  prompt_yes_no "Would you like to enable gzip?" USE_GZIP
+  if [[ $USE_GZIP == "yes" ]]; then
+    set_gzip_flag
+  fi
 }
 
 #######################################

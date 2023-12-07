@@ -47,7 +47,7 @@ configure_nginx() {
 configure_subdomain() {
     if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
         server_name+=" ${SUBDOMAIN}.${DOMAIN_NAME}"
-    fi
+  fi
 }
 
 #######################################
@@ -112,9 +112,20 @@ configure_ssl_mode() {
 #  None
 #######################################
 get_gzip() {
+  if [[ $USE_GZIP == "yes" ]]; then
+        cat <<- EOF
+       gzip on;
+       gzip_comp_level 6;
+       gzip_vary on;
+       gzip_min_length 150;
+       gzip_proxied any;
+       gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+EOF
+  else
         cat <<- EOF
 gzip off;
 EOF
+  fi
 }
 
 #######################################

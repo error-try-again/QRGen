@@ -14,6 +14,7 @@ setup() {
   prompt_for_install_mode
   disable_docker_build_caching_prompt
   prompt_for_google_api_key
+  prompt_for_gzip
   prompt_for_domain_and_letsencrypt
   generate_server_files
   configure_nginx
