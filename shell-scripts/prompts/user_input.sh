@@ -52,9 +52,11 @@ custom_install_prompt() {
     prompt_yes_no "Would you like to overwrite existing certificates?" USE_OVERWRITE_SELF_SIGNED_CERTS
     prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
     prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
+    prompt_yes_no "Would you like to enable gzip?" USE_GZIP
   else
     prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
     prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
+    prompt_yes_no "Would you like to enable gzip?" USE_GZIP
   fi
 }
 
@@ -197,6 +199,17 @@ set_letsencrypt_flag() {
 #######################################
 set_self_signed_flag() {
   USE_SELF_SIGNED_CERTS="yes"
+}
+
+#######################################
+# Sets the global flag for using gzip to be used throughout the script.
+# Globals:
+#   USE_GZIP
+# Arguments:
+#  None
+#######################################
+set_gzip_flag() {
+  USE_GZIP="yes"
 }
 
 #######################################
