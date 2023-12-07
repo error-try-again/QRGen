@@ -114,12 +114,12 @@ configure_ssl_mode() {
 get_gzip() {
   if [[ $USE_GZIP == "yes" ]]; then
         cat <<- EOF
-    gzip on;
-    gzip_comp_level 6;
-    gzip_vary on;
-    gzip_min_length 150;
-    gzip_proxied any;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+       gzip on;
+       gzip_comp_level 6;
+       gzip_vary on;
+       gzip_min_length 150;
+       gzip_proxied any;
+       gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 EOF
   else
         cat <<- EOF
