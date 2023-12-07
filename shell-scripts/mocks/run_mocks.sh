@@ -200,7 +200,7 @@ setup_common_configuration_parameters() {
   NGINX_PORT=8080
   BACKEND_PORT=3001
   DNS_RESOLVER="8.8.8.8"
-  TIMEOUT="5s"
+  TIMEOUT="5"
   DOMAIN_NAME="example.com"
   SUBDOMAIN="test"
 }
