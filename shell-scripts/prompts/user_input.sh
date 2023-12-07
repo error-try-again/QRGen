@@ -52,11 +52,9 @@ custom_install_prompt() {
     prompt_yes_no "Would you like to overwrite existing certificates?" USE_OVERWRITE_SELF_SIGNED_CERTS
     prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
     prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
-    prompt_yes_no "Would you like to enable gzip?" USE_GZIP
   else
     prompt_yes_no "Would you like to enable TLSv1.3? (Recommended): " USE_TLS13
     prompt_yes_no "Would you like to enable TLSv1.2?" USE_TLS12
-    prompt_yes_no "Would you like to enable gzip?" USE_GZIP
   fi
 }
 
@@ -259,6 +257,20 @@ construct_certbot_flags() {
 #######################################
 disable_docker_build_caching_prompt() {
   prompt_yes_no "Would you like to disable Docker build caching for this run?" DISABLE_DOCKER_CACHING
+}
+
+#######################################
+# Prompt the user to enable or disable GZIP compression.
+# Globals:
+#   USE_GZIP
+# Arguments:
+#  None
+#######################################
+prompt_for_gzip() {
+  prompt_yes_no "Would you like to enable gzip?" USE_GZIP
+  if [[ $USE_GZIP == "yes" ]]; then
+    set_gzip_flag
+  fi
 }
 
 #######################################
