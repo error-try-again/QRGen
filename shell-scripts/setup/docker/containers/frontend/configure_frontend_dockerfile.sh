@@ -99,14 +99,13 @@ RUN git init && \
     git checkout "$RELEASE_BRANCH" && \
     cd ..
 
-COPY frontend/.env frontend/.env
-
 # Build the project
 WORKDIR /usr/app/frontend
 RUN npm run build
 
 # Setup nginx to serve the built files
 FROM nginx:alpine
+COPY frontend/sitemap.xml /usr/share/nginx/html/sitemap.xml
 COPY frontend/robots.txt /usr/share/nginx/html/robots.txt
 COPY --from=build /usr/app/frontend/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf

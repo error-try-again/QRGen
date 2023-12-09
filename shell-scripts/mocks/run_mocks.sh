@@ -178,6 +178,7 @@ run_certbot_container_configuration() {
   configure_certbot_docker
 }
 
+
 #######################################
 # Setup common configuration parameters for NGINX and Docker Compose
 # Globals:
@@ -205,9 +206,11 @@ setup_common_configuration_parameters() {
   SUBDOMAIN="test"
 }
 
+
 #######################################
 # Setup lets encrypt configuration parameters
 # Globals:
+#   USE_GZIP
 #   USE_LETS_ENCRYPT
 #   dry_run_flag
 #   email_flag
@@ -234,6 +237,7 @@ setup_lets_encrypt_configuration_parameters() {
   strict_permissions_flag="--strict-permissions"
   hsts_flag="--hsts"
   uir_flag="--uir"
+  USE_GZIP="yes"
 }
 
 #######################################
@@ -247,7 +251,6 @@ setup_lets_encrypt_configuration_parameters() {
 setup_self_signed_configuration_parameters() {
   NGINX_SSL_PORT="443"
   USE_SELF_SIGNED_CERTS="yes"
-  USE_GZIP="yes"
 }
 
 #######################################

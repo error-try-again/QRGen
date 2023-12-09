@@ -22,6 +22,8 @@ generate_server_files() {
   configure_frontend_dotenv
   echo "Configuring the Docker Express..."
   configure_backend_docker
+  echo "Configuring the site map..."
+  configure_frontend_sitemap
   echo "Configuring default robots.txt..."
   create_default_robots_txt
   echo "Configuring the Docker NGINX Proxy..."

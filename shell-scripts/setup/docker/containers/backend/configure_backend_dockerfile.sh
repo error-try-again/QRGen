@@ -24,6 +24,8 @@ install_backend_npm_deps() {
         "helmet"
         "qrcode"
         "@googlemaps/google-maps-services-js"
+        "jest"
+        "supertest"
     )
 
     # Backend-specific type dependencies
@@ -34,6 +36,8 @@ install_backend_npm_deps() {
         "@types/archiver"
         "@types/qrcode"
         "@types/google.maps"
+        "@types/jest"
+        "@types/supertest"
     )
 
     echo "RUN npm init -y"

@@ -39,6 +39,7 @@ if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
   . ./shell-scripts/setup/docker/containers/backend/configure_backend_dockerfile.sh
   . ./shell-scripts/setup/dotenv_configure/configure_backend_dotenv.sh
   . ./shell-scripts/setup/dotenv_configure/configure_frontend_dotenv.sh
+  . ./shell-scripts/setup/sitemap/configure_frontend_sitemap.sh
   . ./shell-scripts/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
   . ./shell-scripts/setup/nginx/configure_nginx.sh
   . ./shell-scripts/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
