@@ -429,44 +429,7 @@ Thanks for using the QR Code Generator setup script!
 * Add additional QR code formats (E.g. Google Reviews, etc.)
 
 ### Healthcheck Setup
-
-References
-- [geting started with upptime](https://upptime.js.org/docs/get-started)
-- [custom domain health check integration](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)
-- [Example status page](https://status.qr-gen.net/)
-- [Example github](https://github.com/error-try-again/QRGen-upptime)
-
-#### Use this repository/create a new repository
-![setup-status-page-aws-upptime-2](https://github.com/error-try-again/QRGen/assets/19685177/2e7114b9-a658-4799-9bbf-7008ee0db388)
-
-#### Include all branches
-![pre-setup](https://github.com/error-try-again/QRGen/assets/19685177/1c004721-b63d-4738-8751-dee52da0d26a)
-
-#### Create Github Organization *only if using custom subdomain* 
-![org-create-for-subdomain-upptime](https://github.com/error-try-again/QRGen/assets/19685177/d6d329b2-8946-4a9a-90bf-0e642641084c)
-
-#### Create a CNAME record with your provider that lines up with your domain/custom subdomain 
-![setup-status-page-aws-upptime](https://github.com/error-try-again/QRGen/assets/19685177/2066a56a-6954-4afe-a7c8-d25669f1f046)
-
-#### Select deploy from branch / gh-pages / root, add domain, enable HTTPs
-![Screenshot_20231202_170613](https://github.com/error-try-again/QRGen/assets/19685177/1e8c63de-4cd4-4c2e-834e-ed9e747ae339)
-
-#### Customize upptimerc.yml
-![update-upptimercyml](https://github.com/error-try-again/QRGen/assets/19685177/1cea40b1-d26d-47e8-bd5a-1d5524297cb5)
-
-#### Create a personal access token
-![pat1](https://github.com/error-try-again/QRGen/assets/19685177/e3800b67-5691-4e48-bab0-eba6a5eb26ab)
-![pat2](https://github.com/error-try-again/QRGen/assets/19685177/6c8be215-dadb-48f0-92ce-f5996e4917f8)
-![pat3](https://github.com/error-try-again/QRGen/assets/19685177/4b776a3e-e5cc-41d1-a33f-b37e8fbe9a00)
-
-#### Add the token to the upptime repository
-![add-ghpat-1](https://github.com/error-try-again/QRGen/assets/19685177/1f9dcbf6-f0ff-40a9-9b9d-0dec6a7a03db)
-![add-ghpat-2](https://github.com/error-try-again/QRGen/assets/19685177/0fcd70ed-9c94-4d48-a6aa-ef1e49948c3f)
-![add-ghpat-3](https://github.com/error-try-again/QRGen/assets/19685177/3f7931f8-7a45-4346-b0c8-e7635aee2bf6)
-
-#### Re-run the Setup CI workflow, pages-build-deployment & any failed jobs, under repo Actions/All Workflows
-![setup-ci](https://github.com/error-try-again/QRGen/assets/19685177/ce6f81a6-6790-461b-b19c-037e3789635b)
-![pages-build-deploy](https://github.com/error-try-again/QRGen/assets/19685177/6922b8b4-233e-4fe9-9db8-eec1c0d4f017)
+[Guide to Installing Upptime on a Self-Hosted Runner](https://insomniacvoid.dev/posts/gh-self-hosted-runner)
 
 # Setup Screenshots
 

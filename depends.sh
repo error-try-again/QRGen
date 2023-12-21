@@ -94,7 +94,6 @@ function setup_user_with_prompt() {
 # Unified User Setup Function
 function setup_user() {
   echo "Setting up $user_name user..."
-
   if id "$user_name" &> /dev/null; then
     local user_choice
     echo "User $user_name already exists."
