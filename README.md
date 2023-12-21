@@ -63,6 +63,7 @@ _QRGen supports the the QR Code generation in the following formats for both bul
 - Zoom
 - Digital Contact Cards
 - Crypto Currencies
+- Google Reviews (user provided API key) 
 
 _UI_
 
@@ -414,7 +415,6 @@ Thanks for using the QR Code Generator setup script!
 
 # Roadmap
 
-* Additional client/server validation for QR code formats
 * Add import mechanism for QR code generation (CSV, JSON, Excel, etc.)
 * API Documentation
 * Improved CI/CD pipeline
@@ -425,8 +425,7 @@ Thanks for using the QR Code Generator setup script!
 * Database support (E.g. MongoDB, etc.) for hosted content persistence (E.g. QR code
   generation history, dynamic QR code generation & linking, etc.)
 * Rewrite the installer in Python
-* Colour QR codes, logos & other customizations
-* Add additional QR code formats (E.g. Google Reviews, etc.)
+* Logo options & other customizations
 
 ### Healthcheck Setup
 [Guide to Installing Upptime on a Self-Hosted Runner](https://insomniacvoid.dev/posts/gh-self-hosted-runner)
