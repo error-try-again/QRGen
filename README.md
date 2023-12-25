@@ -64,13 +64,13 @@ _QRGen supports the the QR Code generation in the following formats for both bul
 - Crypto Currencies
 - Google Reviews (user provided API key)
 
+![Demo-2.png](examples%2FDemo%2FDemo-2.png)
+
 _UI_
 
-- Dark mode, responsive, and mobile-friendly design.
+- Dark mode, responsive, and mobile/tablet friendly design with a focus on accessibility and usability. 
 
 ![mobile-dark.png](examples%2FDemo%2Fmobile-dark.png)
-
-![Demo-2.png](examples%2FDemo%2FDemo-2.png)
 
 _Tech_
 
