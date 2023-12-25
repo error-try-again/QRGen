@@ -13,7 +13,6 @@
 configure_frontend_docker() {
     local frontend_submodule_url="https://github.com/error-try-again/QRGen-frontend.git"
     local origin="origin/$RELEASE_BRANCH"
-    local template_name="frontend"
 
     cat << EOF > "$FRONTEND_DOCKERFILE"
 # Use the latest version of Node.js
@@ -21,11 +20,6 @@ FROM node:$NODE_VERSION as build
 
 # Set the default working directory
 WORKDIR /usr/app
-
-# Install Vite Template and remove default files
-RUN npx create-vite $template_name --template react-ts && \
-    rm /usr/app/frontend/src/App.tsx && \
-    rm /usr/app/frontend/src/App.css
 
 # Initialize the Git repository and handle frontend submodule
 RUN git init && \
@@ -40,7 +34,9 @@ RUN git init && \
     git reset --hard "$origin" && \
     git checkout "$RELEASE_BRANCH" && \
     npm install && \
-    cd ..
+    (if [ "$USE_GOOGLE_API_KEY" = "yes" ]; then \
+        sed -i'' -e 's/export const googleSdkEnabled = false;/export const googleSdkEnabled = true;/' src/config.tsx; \
+    fi)
 
 # Build the project
 WORKDIR /usr/app/frontend

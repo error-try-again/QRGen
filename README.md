@@ -41,11 +41,11 @@ worth checking back in a couple hours_
 
 ### Firefox Dark
 
-![Dark-Text1-Firefox.png](examples%2FDemo%2FDark-Text1-Firefox.png)
+![Dark-Text1-Firefox.png](examples%2FDemo%2FDark-Text1-Firefox.png "Firefox Dark Example Screenshot")
 
 ### Firefox Light
 
-![Demo1.png](examples%2FDemo%2FDemo1.png)
+![Demo1.png](examples%2FDemo%2FDemo1.png "Firefox Light Example Screenshot")
 
 ## Features
 
@@ -66,9 +66,9 @@ _QRGen supports the the QR Code generation in the following formats for both bul
 
 _UI_
 
-- Dark mode, responsive, and mobile/tablet friendly design with a focus on accessibility and usability. 
+- Dark mode, responsive, and mobile/tablet friendly design with a focus on accessibility and usability.
 
-![mobile-dark.png](examples%2FDemo%2Fmobile-dark.png)
+![mobile-dark.png](examples%2FDemo%2Fmobile-dark.png "Dark Mode Mobile Example Screenshot")
 
 _Tech_
 
@@ -212,30 +212,30 @@ For a more detailed usage guide, [head over to the project documentation](https:
 
 ### Local Install
 
-![local-install-1.png](examples%2FLocal%2Flocal-install-1.png)
+![local-install-1.png](examples%2FLocal%2Flocal-install-1.png "Local Install Screenshot")
 
 ### HTTP only
 
-![http-only.png](examples%2FLocal%2Fhttp-only.png)
+![http-only.png](examples%2FLocal%2Fhttp-only.png "HTTP Only Screenshot")
 
 ### Staging environment
 
-![auto-setup-staging.png](examples%2FGeneral%2Fauto-setup-staging.png)
+![auto-setup-staging.png](examples%2FGeneral%2Fauto-setup-staging.png "Auto Setup Staging Screenshot")
 
 ### Production environment
 
-![select-production.png](examples%2FGeneral%2Fselect-production.png)
+![select-production.png](examples%2FGeneral%2Fselect-production.png "Select Production Environment Screenshot")
 
 ### Self-signed SSL certificate
 
-![regen-self-signed.png](examples%2FGeneral%2Fregen-self-signed.png)
+![regen-self-signed.png](examples%2FGeneral%2Fregen-self-signed.png "Self-signed SSL Certificate Screenshot")
 
 ### Pruning containers
 
-![prune-all.png](examples%2FGeneral%2Fprune-all.png)
+![prune-all.png](examples%2FGeneral%2Fprune-all.png "Prune All Containers Screenshot")
 
 ### Updating
-![updating.png](examples%2FGeneral%2Fupdating.png)
+![updating.png](examples%2FGeneral%2Fupdating.png "Updating Screenshot")
 
 ### Stopping containers
-![stop-containers.png](examples%2FGeneral%2Fstop-containers.png)
+![stop-containers.png](examples%2FGeneral%2Fstop-containers.png "Stopping Containers Screenshot")
