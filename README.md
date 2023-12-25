@@ -62,11 +62,15 @@ _QRGen supports the the QR Code generation in the following formats for both bul
 - Zoom
 - Digital Contact Cards
 - Crypto Currencies
-- Google Reviews (user provided API key) 
+- Google Reviews (user provided API key)
 
 _UI_
 
 - Dark mode, responsive, and mobile-friendly design.
+
+![mobile-dark.png](examples%2FDemo%2Fmobile-dark.png)
+
+![Demo-2.png](examples%2FDemo%2FDemo-2.png)
 
 _Tech_
 
