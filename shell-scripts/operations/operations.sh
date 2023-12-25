@@ -309,14 +309,14 @@ remove_staging_flag() {
 run_backend_service() {
   if [[ $DISABLE_DOCKER_CACHING == "yes" ]]; then
     echo "Building and running Backend service without caching..."
-    if ! docker compose build --no-cache --progress=plain backend; then
+    if ! docker compose --progress=plain build --no-cache backend; then
       echo "Failed to build Backend service."
       exit 1
     fi
     docker compose up -d backend
   else
     echo "Building and running Backend service..."
-    if ! docker compose build --progress=plain backend; then
+    if ! docker compose --progress=plain build backend; then
       echo "Failed to build Backend service."
       exit 1
     fi
@@ -335,14 +335,14 @@ run_backend_service() {
 run_frontend_service() {
     if [[ $DISABLE_DOCKER_CACHING == "yes" ]]; then
      echo "Building and running Frontend service without caching..."
-      if ! docker compose build --no-cache --progress=plain frontend; then
+      if ! docker compose --progress=plain build --no-cache frontend; then
           echo "Failed to build Frontend service."
           exit 1
     fi
       docker compose up -d frontend
   else
       echo "Building and running Frontend service..."
-      if ! docker compose build --progress=plain frontend; then
+      if ! docker compose --progress=plain build frontend; then
           echo "Failed to build Frontend service."
           exit 1
     fi
@@ -380,7 +380,7 @@ run_certbot_service() {
 build_certbot_service() {
   if [[ $DISABLE_DOCKER_CACHING == "yes" ]]; then
     echo "Building Certbot service without caching..."
-    if ! docker compose build --no-cache --progress=plain certbot; then
+    if ! docker compose --progress=plain build --no-cache certbot; then
       echo "Failed to build Certbot service."
       return 1
     fi

@@ -1,61 +1,6 @@
 #!/usr/bin/env bash
 
 #######################################
-# Provisions npm dependencies for the frontend, depending on the release branch
-# Globals:
-#   RELEASE_BRANCH
-# Arguments:
-#  None
-#######################################
-configure_npm_deps() {
-    local npm_global_deps=(
-        "ts-node"
-        "typescript"
-        "react-leaflet"
-        "leaflet"
-        "react"
-        "react-dom"
-  )
-    local npm_project_deps=(
-        "typescript"
-        "vite"
-        "jsdom"
-        "vite-tsconfig-paths"
-        "vite-plugin-svgr"
-        "vitest"
-        "vite-plugin-checker"
-        "@vitejs/plugin-react"
-        "@testing-library/react"
-        "@testing-library/jest-dom"
-        "@babel/plugin-transform-private-property-in-object"
-
-  )
-    local npm_types_deps=(
-        "@types/leaflet"
-        "@types/react"
-        "@types/react-dom"
-        "@types/jest"
-        "@types/react-leaflet"
-  )
-
-    # Add 'axios' library and its type definitions for full-release branch
-    if [[ $RELEASE_BRANCH == "full-release" ]]; then
-        npm_project_deps+=("axios")
-        npm_types_deps+=("@types/axios")
-  fi
-
-    # Add 'file-saver' and 'qrcode' libraries and their type definitions for full-release branch
-    if [[ $RELEASE_BRANCH == "minimal-release" ]]; then
-        npm_project_deps+=("file-saver" "qrcode" "jszip")
-        npm_types_deps+=("@types/file-saver" "@types/qrcode" "@types/jszip")
-  fi
-
-    echo "RUN npm install -g ${npm_global_deps[*]}"
-    echo "RUN npm install --save-dev ${npm_project_deps[*]}"
-    echo "RUN npm install --save-dev ${npm_types_deps[*]}"
-}
-
-#######################################
 # Configures the Dockerfile for the frontend
 # Globals:
 #   FRONTEND_DOCKERFILE
@@ -77,9 +22,6 @@ FROM node:$NODE_VERSION as build
 # Set the default working directory
 WORKDIR /usr/app
 
-# Install dependencies
-$(configure_npm_deps)
-
 # Install Vite Template and remove default files
 RUN npx create-vite $template_name --template react-ts && \
     rm /usr/app/frontend/src/App.tsx && \
@@ -97,6 +39,7 @@ RUN git init && \
     git fetch --all && \
     git reset --hard "$origin" && \
     git checkout "$RELEASE_BRANCH" && \
+    npm install && \
     cd ..
 
 # Build the project

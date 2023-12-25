@@ -23,9 +23,8 @@ The idea was initially conceived when I found myself needing to generate a large
 number of QR codes for a project, and I was unable to find a suitable self-hostable solution, so I decided to build my own. 
 I hope that others find it useful too. 
 
-
 *Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome.*
-If you have a specific fix for the frontend or backend envrionments, please submit your pull request to the respective submodule/repo.
+If you have a specific fix for the frontend or backend environments, please submit your pull request to the respective submodule/repo.
 
 A full write up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
@@ -326,7 +325,7 @@ Would you like to enable self-signed certificates? (yes/no):
 yes
 ```
 
-### For DH paramater generation - select the option that best suits you
+### For DH parameter generation - select the option that best suits you
 ```
 Self-signed certificates for localhost generated at /home/docker-primary/QRGen/certs/live/localhost.
 1: Use 2048-bit DH parameters (Faster)
