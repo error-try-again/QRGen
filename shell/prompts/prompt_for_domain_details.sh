@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# bashsupport disable=BP5006
 
 set -euo pipefail
 

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 #######################################
-# description
+# Prompts the user for a yes/no answer and stores the result in a variable as a boolean string.
 # Arguments:
 #   1
 #   2
@@ -12,7 +12,6 @@ yes_no_prompt() {
   local prompt_message="$1"
   local result_var="$2"
   local choice
-
   while true; do
     read -rp "$prompt_message [Y/n]: " choice
     case "${choice,,}" in  # Convert to lowercase for easier matching
