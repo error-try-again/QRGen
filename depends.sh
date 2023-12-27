@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
+# bashsupport disable=BP5006
 
 set -euo pipefail
-
 #######################################
 # Installs necessary packages, sets up Docker, and configures GPG for Docker.
 # Globals:
@@ -274,7 +274,7 @@ function main() {
 
   user_name="${1:-docker-primary}"
   nvm_install_url="https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh"
-  NODE_VERSION="20.8.0"
+  NODE_VERSION="latest"
 
   installation_menu
 }

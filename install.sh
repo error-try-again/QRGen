@@ -1,103 +1,147 @@
 #!/usr/bin/env bash
 
-# Exit on error, undefined variable, or pipe failure.
 set -euo pipefail
 
 # Change to the script's directory.
 cd "$(dirname "$0")"
 
-# Global associative arrays for directory references and configurations.
-declare -A dirs internal_dirs ssl_paths certbot_volume_mappings
+# Directories and their contents
+source ./shell/config/apply_profile.sh
 
-# Load dependencies only if the script is executed directly.
-if [[ ${BASH_SOURCE[0]} == "${0}"   ]]; then
-  # Load environment variables if .env file exists.
-  if [[ -f .env ]]; then
-    . .env
-  else
-    echo "Error: .env file not found."
-    exit 1
-  fi
+# Parser scripts
+source ./shell/config/parser/dispatch_command.sh
+source ./shell/config/parser/display_help.sh
+source ./shell/config/parser/parse_options.sh
 
-  # Helper scripts for setting up the project environment.
-  . ./shell-scripts/setup/helpers/create_directory.sh
-  . ./shell-scripts/setup/helpers/copy_server_files.sh
+# Operations scripts
+source ./shell/operations/backup_replace_file.sh
+source ./shell/operations/build_run_docker.sh
+source ./shell/operations/check_certbot_success.sh
+source ./shell/operations/check_flag_removal.sh
+source ./shell/operations/check_jq_exists.sh
+source ./shell/operations/common_build_operations.sh
+source ./shell/operations/dump_logs.sh
+source ./shell/operations/handle_ambiguous_networks.sh
+source ./shell/operations/handle_certs.sh
+source ./shell/operations/handle_staging_flags.sh
+source ./shell/operations/modify_docker_compose.sh
+source ./shell/operations/pre_flight.sh
+source ./shell/operations/purge_builds.sh
+source ./shell/operations/quit.sh
+source ./shell/operations/rebuild_rerun_certbot.sh
+source ./shell/operations/remove_conflicting_containers.sh
+source ./shell/operations/remove_dry_run_flag.sh
+source ./shell/operations/remove_staging_flag.sh
+source ./shell/operations/restart_services.sh
+source ./shell/operations/run_backend_service.sh
+source ./shell/operations/run_certbot_dry_run.sh
+source ./shell/operations/run_certbot_service.sh
+source ./shell/operations/run_frontend_service.sh
+source ./shell/operations/setup.sh
+source ./shell/operations/uninstall.sh
+source ./shell/operations/update_project.sh
+source ./shell/operations/validate_and_load_dotenv.sh
+source ./shell/operations/validate_installer_profile.sh
+source ./shell/operations/wait_for_certbot_completion.sh
 
-  # Docker-related scripts to manage the container lifecycle.
-  . ./shell-scripts/setup/docker/helpers/docker_compose_exists.sh
-  . ./shell-scripts/setup/docker/helpers/docker_compose_down.sh
-  . ./shell-scripts/setup/docker/helpers/produce_docker_logs.sh
-  . ./shell-scripts/setup/docker/helpers/test_docker_env.sh
+# Prompts scripts
+source ./shell/prompts/custom_install_prompt.sh
+source ./shell/prompts/disable_docker_cache_prompt.sh
+source ./shell/prompts/evaluate_valid_input_string.sh
+source ./shell/prompts/handle_user_selection.sh
+source ./shell/prompts/numeric_prompt.sh
+source ./shell/prompts/prompt_for_dhparam_regen.sh
+source ./shell/prompts/prompt_for_dhparam_strength.sh
+source ./shell/prompts/prompt_for_domain_and_letsencrypt.sh
+source ./shell/prompts/prompt_for_domain_details.sh
+source ./shell/prompts/prompt_for_google_api_key.sh
+source ./shell/prompts/prompt_for_gzip.sh
+source ./shell/prompts/prompt_for_install_mode.sh
+source ./shell/prompts/prompt_for_letsencrypt_options.sh
+source ./shell/prompts/prompt_for_self_signed.sh
+source ./shell/prompts/prompt_for_ssl.sh
+source ./shell/prompts/prompt_with_validation.sh
+source ./shell/prompts/user_input.sh
+source ./shell/prompts/yes_no_prompt.sh
 
-  # Networking scripts to ensure the necessary ports are available for use.
-  . ./shell-scripts/networking/ensure_port_is_available.sh
+# Selection choices scripts
+source ./shell/prompts/selection_choices/certbot_image_selected.sh
+source ./shell/prompts/selection_choices/construct_certbot_flags.sh
+source ./shell/prompts/selection_choices/handle_certbot_image_selection.sh
+source ./shell/prompts/selection_choices/select_tls_version.sh
 
-  # Environment validation and setup, to ensure the system is ready for the project.
-  . ./shell-scripts/setup/docker-rootless/setup_docker_rootless.sh
-  . ./shell-scripts/setup/helpers/setup_project_directories.sh
-  . ./shell-scripts/setup/helpers/generate_server_files.sh  # Configuration scripts to generate the necessary files for the project.
-  . ./shell-scripts/setup/docker/containers/backend/configure_backend_dockerfile.sh
-  . ./shell-scripts/setup/dotenv_configure/configure_backend_dotenv.sh
-  . ./shell-scripts/setup/dotenv_configure/configure_frontend_dotenv.sh
-  . ./shell-scripts/setup/sitemap/configure_frontend_sitemap.sh
-  . ./shell-scripts/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
-  . ./shell-scripts/setup/nginx/configure_nginx.sh
-  . ./shell-scripts/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
-  . ./shell-scripts/setup/self-signed/generate_self_signed_certificates.sh
-  . ./shell-scripts/setup/docker/compose/configure_docker_compose.sh # Helper scripts for user prompts and input.  . ./shell-scripts/prompts/user_input.sh  # Generate the certificate renewal script for cron.
-  . ./shell-scripts/ssl/generate_certbot_renewal.sh
+# Setup helpers scripts
+source ./shell/setup/helpers/copy_server_files.sh
+source ./shell/setup/helpers/create_directory.sh
+source ./shell/setup/helpers/generate_server_files.sh
+source ./shell/setup/helpers/setup_project_directories.sh
 
-  # The main operational scripts that carry out the required tasks.
-  . ./shell-scripts/operations/operations.sh
+# Setup sitemap scripts
+source ./shell/setup/sitemap/configure_frontend_sitemap.sh
 
-  . ./shell-scripts/prompts/user_input.sh
+# Setup dotenv_configure scripts
+source ./shell/setup/dotenv_configure/configure_backend_dotenv.sh
+source ./shell/setup/dotenv_configure/configure_frontend_dotenv.sh
 
-  # Tests
-  . ./shell-scripts/mocks/run_mocks.sh  # Define global associative arrays.
+# Setup nginx scripts
+source ./shell/setup/nginx/configure_nginx.sh
 
-  dirs=(
-        [BACKEND_DIR]="${PROJECT_ROOT_DIR}/backend"
-        [FRONTEND_DIR]="${PROJECT_ROOT_DIR}/frontend"
-        [SERVER_DIR]="${PROJECT_ROOT_DIR}/server"
-        [CERTBOT_DIR]="${PROJECT_ROOT_DIR}/certbot"
-        [CERTS_DIR]="${PROJECT_ROOT_DIR}/certs"
-        [WEBROOT_DIR]="${PROJECT_ROOT_DIR}/webroot"
-        [CERTS_DH_DIR]="${PROJECT_ROOT_DIR}/certs/dhparam"
-  )
+# Setup docker-rootless scripts
+source ./shell/setup/docker-rootless/setup_docker_rootless.sh
 
-  internal_dirs=(
-        [INTERNAL_LETS_ENCRYPT_DIR]="/etc/letsencrypt"
-        [INTERNAL_LETS_ENCRYPT_LOGS_DIR]="/var/log/letsencrypt"
-        [INTERNAL_WEBROOT_DIR]="/usr/share/nginx/html"
-        [INTERNAL_CERTS_DH_DIR]="/etc/ssl/certs/dhparam"
-  )
+# Docker helper scripts
+source ./shell/setup/docker/helpers/docker_compose_down.sh
+source ./shell/setup/docker/helpers/docker_compose_exists.sh
+source ./shell/setup/docker/helpers/produce_docker_logs.sh
+source ./shell/setup/docker/helpers/test_docker_env.sh
 
-  ssl_paths=(
-        [PRIVKEY_PATH]="${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/privkey.pem"
-        [FULLCHAIN_PATH]="${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}/live/${DOMAIN_NAME}/fullchain.pem"
-        [DH_PARAMS_PATH]="${internal_dirs[INTERNAL_CERTS_DH_DIR]}/dhparam.pem"
-  )
+# Docker containers frontend scripts
+source ./shell/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
 
-  certbot_volume_mappings=(
-        [LETS_ENCRYPT_VOLUME_MAPPING]="${dirs[CERTS_DIR]}:${internal_dirs[INTERNAL_LETS_ENCRYPT_DIR]}"
-        [LETS_ENCRYPT_LOGS_VOLUME_MAPPING]="${dirs[CERTBOT_DIR]}/logs:${internal_dirs[INTERNAL_LETS_ENCRYPT_LOGS_DIR]}"
-        [CERTS_DH_VOLUME_MAPPING]="${dirs[CERTS_DH_DIR]}:${internal_dirs[INTERNAL_CERTS_DH_DIR]}"
-        [WEBROOT_VOLUME_MAPPING]="${dirs[WEBROOT_DIR]}:${internal_dirs[INTERNAL_WEBROOT_DIR]}"
-  )
+# Docker containers certbot scripts
+source ./shell/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
 
-fi
+# Docker containers backend scripts
+source ./shell/setup/docker/containers/backend/configure_backend_dockerfile.sh
 
-# Main entry point of the script.
+# Docker compose scripts
+source ./shell/setup/docker/compose/configure_docker_compose.sh
+
+# Setup self-signed scripts
+source ./shell/setup/self-signed/generate_self_signed_certificates.sh
+
+# Networking scripts
+source ./shell/networking/ensure_port_is_available.sh
+
+# Profiles scripts
+source ./shell/profiles/automatic_production_selection.sh
+source ./shell/profiles/automatic_staging_selection.sh
+source ./shell/profiles/automation_production_reload_selection.sh
+
+# Flags scripts
+source ./shell/flags/enable_ssl.sh
+source ./shell/flags/enable_letsencrypt.sh
+
+source ./shell/mocks/run_mocks.sh
+
+source ./shell/operations/certbot/build_certbot_service.sh
+
+source ./shell/ssl/generate_certbot_renewal.sh
+
+#######################################
+# Main function to run the script.
+# Arguments:
+#  None
+#######################################
 main() {
-  # This condition checks if the script is being sourced or executed.
   [[ ${BASH_SOURCE[0]} != "$0" ]] && echo "This script must be run, not sourced." && exit 1
-
   # Trap the SIGINT signal (Ctrl+C) and call the quit function.
   trap quit SIGINT
-
-  # Prompt for user options
-  user_prompt
+  validate_and_load_dotenv
+  check_jq_exists
+  validate_installer_profile_configuration
+  initialize_command_flags
+  dispatch_command "$@"
 }
 
-# Check if script is being sourced or executed directly and call main if necessary.
-[[ ${BASH_SOURCE[0]} == "${0}"   ]] && main
+main "$@"
