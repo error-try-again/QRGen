@@ -12,7 +12,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-setup_project_directories() {
+function setup_project_directories() {
   echo "Staging project directories..."
   local directory
   for directory in "$FRONTEND_DIR" "$BACKEND_DIR" "$CERTBOT_DIR" "$PROJECT_LOGS_DIR"; do

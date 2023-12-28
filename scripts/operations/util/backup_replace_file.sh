@@ -10,7 +10,7 @@ set -euo pipefail
 #   1 - Original file
 #   2 - Modified file
 #######################################
-backup_and_replace_file() {
+function backup_and_replace_file() {
   local original_file=$1
   local modified_file=$2
 

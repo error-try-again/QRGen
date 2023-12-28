@@ -10,7 +10,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-run_backend_service() {
+function run_backend_service() {
   if [[ $DISABLE_DOCKER_CACHING ]]; then
     echo "Building and running Backend service without caching..."
     if ! docker compose --progress=plain build --no-cache backend; then

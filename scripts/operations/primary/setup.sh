@@ -9,7 +9,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-setup() {
+function setup() {
   setup_project_directories
   setup_docker_rootless
   ensure_port_is_available "$EXPOSED_NGINX_PORT" "auto"

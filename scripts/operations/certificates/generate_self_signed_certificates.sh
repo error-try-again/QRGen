@@ -13,7 +13,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-generate_self_signed_certificates() {
+function generate_self_signed_certificates() {
   echo "Generating self-signed certificates for ${DOMAIN_NAME}..."
 
   local certs_path=${CERTS_DIR}/live/${DOMAIN_NAME}

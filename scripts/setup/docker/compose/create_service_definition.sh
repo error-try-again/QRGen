@@ -3,13 +3,39 @@
 set -euo pipefail
 
 #######################################
+# Adds a ports, volumes or networks definition to the service definition.
+# Globals:
+#   ADDR
+#   item
+# Arguments:
+#   1
+#   2
+#######################################
+function add_to_definition() {
+    local type=$1
+    local values=$2
+    if [[ -n ${values} ]]; then
+      definition+=$'\n'
+      definition+="    ${type}:"
+      IFS=',' read -ra ADDR <<< "$values"
+      local item
+      for item in "${ADDR[@]}"; do
+        if [[ -n $item ]]; then
+          definition+=$'\n'
+          definition+="      - ${item}"
+        fi
+      done
+    fi
+  }
+
+#######################################
 # Created a generic service definition for Docker Compose file.
 # Globals:
 #   ADDR
 # Arguments:
 #  None
 #######################################
-create_service_definition() {
+function create_service_definition() {
   local name=""
   local build_context=""
   local dockerfile=""
@@ -77,32 +103,6 @@ create_service_definition() {
     definition+=$'\n'
     definition+="    command: ${command}"
   fi
-
-  #######################################
-  # Adds a ports, volumes or networks definition to the service definition.
-  # Globals:
-  #   ADDR
-  #   item
-  # Arguments:
-  #   1
-  #   2
-  #######################################
-  add_to_definition() {
-    local type=$1
-    local values=$2
-    if [[ -n ${values} ]]; then
-      definition+=$'\n'
-      definition+="    ${type}:"
-      IFS=',' read -ra ADDR <<< "$values"
-      local item
-      for item in "${ADDR[@]}"; do
-        if [[ -n $item ]]; then
-          definition+=$'\n'
-          definition+="      - ${item}"
-        fi
-      done
-    fi
-  }
 
   add_to_definition "ports" "$ports"
   add_to_definition "volumes" "$volumes"

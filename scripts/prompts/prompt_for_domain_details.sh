@@ -16,7 +16,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_for_domain_details() {
+function prompt_for_domain_details() {
   if [[ $SKIP_DOMAIN_PROMPT == "true" ]]; then
      echo "Skipping domain prompt, please ensure that the following environment variables are set correctly:"
       echo "  BACKEND_SCHEME: $BACKEND_SCHEME"

@@ -12,7 +12,7 @@ set -euo pipefail
 #   1 ...
 #   2 ...
 #######################################
-is_port_in_use() {
+function is_port_in_use() {
   local port="$1"
   # Check if the port is a number.
   if ! [[ $port =~ ^[0-9]+$ ]]; then
@@ -35,7 +35,7 @@ is_port_in_use() {
 # Arguments:
 #   1
 #######################################
-ensure_port_is_available() {
+function ensure_port_is_available() {
   local port="$1"
   local auto_increment_port="$2"
   # Check if the port is in use, auto increment if it is and the flag is "true".

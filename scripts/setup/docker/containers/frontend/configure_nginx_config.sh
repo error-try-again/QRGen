@@ -17,7 +17,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-configure_nginx_config() {
+function configure_nginx_config() {
     echo "Creating NGINX configuration..."
     server_name="server_name ${DOMAIN_NAME}"
     ssl_listen_directive=""
@@ -42,7 +42,7 @@ configure_nginx_config() {
 # Arguments:
 #  None
 #######################################
-configure_subdomain() {
+function configure_subdomain() {
     if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
         server_name+=" ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
@@ -63,7 +63,7 @@ configure_subdomain() {
 #  None
 #######################################
 # bashsupport disable=BP5006
-configure_https() {
+function configure_https() {
     if [[ $USE_LETSENCRYPT == "true" ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
       BACKEND_SCHEME="https"
       ssl_listen_directive="listen $NGINX_SSL_PORT ssl;"
@@ -87,7 +87,7 @@ configure_https() {
 # Arguments:
 #  None
 #######################################
-configure_ssl_mode() {
+function configure_ssl_mode() {
     if [[ $USE_TLS12 && $USE_TLS13 ]]; then
     ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
@@ -110,7 +110,7 @@ configure_ssl_mode() {
 # Arguments:
 #  None
 #######################################
-get_gzip() {
+function get_gzip() {
   if [[ $USE_GZIP ]]; then
         cat <<- EOF
 gzip on;
@@ -132,7 +132,7 @@ EOF
 # Arguments:
 #  None
 #######################################
-get_ssl_protocol_compatibility() {
+function get_ssl_protocol_compatibility() {
     cat <<- EOF
         ssl_protocols TLSv1.2 TLSv1.3;
 EOF
@@ -147,7 +147,7 @@ EOF
 # Arguments:
 #  None
 #######################################
-get_ssl_additional_config() {
+function get_ssl_additional_config() {
     cat <<- EOF
         ssl_prefer_server_ciphers on;
         ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:!DH+3DES:!ADH:!AECDH:!MD5:!ECDHE-RSA-AES256-SHA384:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES128-SHA:!RC2:!RC4:!DES:!EXPORT:!NULL:!SHA1';
@@ -166,7 +166,7 @@ EOF
 # Arguments:
 #  None
 #######################################
-tls_protocol_one_three_restrict() {
+function tls_protocol_one_three_restrict() {
     cat <<- EOF
         ssl_protocols TLSv1.3;
 EOF
@@ -182,7 +182,7 @@ EOF
 # Arguments:
 #  None
 #######################################
-configure_certs() {
+function configure_certs() {
       certs="
         ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
@@ -197,7 +197,7 @@ configure_certs() {
 # Arguments:
 #  None
 #######################################
-configure_security_headers() {
+function configure_security_headers() {
   security_headers="
             # Prevent clickjacking by instructing the browser to deny rendering iframes
             add_header X-Frame-Options 'DENY' always;
@@ -234,7 +234,7 @@ configure_security_headers() {
 # Arguments:
 #  None
 #######################################
-configure_acme_challenge() {
+function configure_acme_challenge() {
     if [[ $USE_LETSENCRYPT == "true" ]]; then
         acme_challenge_server_block="server {
           listen 80;
@@ -258,7 +258,7 @@ configure_acme_challenge() {
 # Arguments:
 #  None
 #######################################
-backup_existing_config() {
+function backup_existing_config() {
     if [[ -f ${NGINX_CONF_FILE}   ]]; then
         cp "${NGINX_CONF_FILE}" "${NGINX_CONF_FILE}.bak"
         echo "Backup created at \"${NGINX_CONF_FILE}.bak\""
@@ -274,7 +274,7 @@ backup_existing_config() {
 # Arguments:
 #  None
 #######################################
-write_endpoints() {
+function write_endpoints() {
   if [[ $RELEASE_BRANCH == "full-release" ]]; then
 
     [[ -v BACKEND_SCHEME ]] || echo "Error: BACKEND_SCHEME is not set"
@@ -309,7 +309,7 @@ write_endpoints() {
 # Arguments:
 #  None
 #######################################
-write_nginx_config() {
+function write_nginx_config() {
     cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
 ${NGINX_PID} ${NGINX_PID_FILE};

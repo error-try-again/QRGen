@@ -12,7 +12,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_for_google_api_key() {
+function prompt_for_google_api_key() {
   if [[ $USE_GOOGLE_API_KEY == "true" ]]; then
     echo "Google API key already set. Skipping prompt."
     return

@@ -11,7 +11,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-build_and_run_docker() {
+function build_and_run_docker() {
     echo "Building and running Docker services..."
 
    # Perform pre-flight, and run Docker services, e.g. backend, frontend, etc.

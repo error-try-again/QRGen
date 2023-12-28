@@ -10,7 +10,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-remove_staging_flag() {
+function remove_staging_flag() {
   local temp_file
   echo "Removing --staging flag from docker-compose.yml..."
   temp_file=$(remove_certbot_command_flags_compose '--staging')

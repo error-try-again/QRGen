@@ -9,7 +9,7 @@
 # Returns:
 #   1 ...
 #######################################
-build_certbot_service() {
+function build_certbot_service() {
   if [[ $DISABLE_DOCKER_CACHING ]]; then
     echo "Building Certbot service without caching..."
     if ! docker compose --progress=plain build --no-cache certbot; then

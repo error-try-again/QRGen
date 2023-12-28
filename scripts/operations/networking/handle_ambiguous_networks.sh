@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-handle_ambiguous_networks() {
+function handle_ambiguous_networks() {
   echo "Searching for ambiguous Docker networks..."
   local networks_ids
   local network_id

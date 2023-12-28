@@ -8,7 +8,7 @@ set -euo pipefail
 # This function consolidates all configurations and service definitions
 # into a single Docker Compose YAML file, which is then written to disk.
 #######################################
-assemble_docker_compose_configuration() {
+function assemble_docker_compose_configuration() {
   local backend_service_definition=""
   local frontend_service_definition=""
   local certbot_service_definition=""

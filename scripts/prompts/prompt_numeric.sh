@@ -3,7 +3,8 @@
 set -euo pipefail
 
 #######################################
-# description
+# A numeric prompt that takes the prompt message and the variable name to store the result in.
+# Outputs the result to stdout.
 # Arguments:
 #   1
 #   2

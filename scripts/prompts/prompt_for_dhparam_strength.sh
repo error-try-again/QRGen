@@ -11,7 +11,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_for_dhparam_strength() {
+function prompt_for_dhparam_strength() {
   if [[ -n "${DH_PARAM_SIZE:-}" ]]; then
     echo "DH_PARAM_SIZE is already set to ${DH_PARAM_SIZE}. Skipping prompt."
     return

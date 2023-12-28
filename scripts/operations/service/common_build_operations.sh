@@ -10,7 +10,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-common_build_operations() {
+function common_build_operations() {
       cd "$PROJECT_ROOT_DIR" || {
       echo "Failed to change directory to $PROJECT_ROOT_DIR"
       exit 1

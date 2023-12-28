@@ -9,6 +9,6 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-docker_compose_exists() {
+function docker_compose_exists() {
   [[ -f ${DOCKER_COMPOSE_FILE} ]]
 }

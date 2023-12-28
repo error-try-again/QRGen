@@ -10,7 +10,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-handle_certs() {
+function handle_certs() {
   # Handle Let's Encrypt configuration
   if [[ $USE_LETSENCRYPT == "true" ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
     # Generate self-signed certificates if they don't exist

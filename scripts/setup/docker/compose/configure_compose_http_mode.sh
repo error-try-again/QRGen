@@ -15,7 +15,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-configure_http() {
+function configure_http() {
   echo "Configuring Docker Compose for HTTP..."
 
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then

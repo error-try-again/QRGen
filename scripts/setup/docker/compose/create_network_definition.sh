@@ -8,7 +8,7 @@ set -euo pipefail
 #   1
 #   2
 #######################################
-create_network_definition() {
+function create_network_definition() {
   local network_name="$1"
   local network_driver="$2"
 

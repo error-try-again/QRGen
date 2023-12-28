@@ -7,6 +7,6 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-automatic_production_selection() {
+function automatic_production_selection() {
     apply_profile "prod_config"
 }

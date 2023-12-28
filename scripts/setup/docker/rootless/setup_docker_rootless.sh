@@ -2,6 +2,14 @@
 
 set -euo pipefail
 
+# Append environment settings to the user's bashrc.
+function add_to_bashrc() {
+  local line="$1"
+  if ! grep -q "^${line}$" ~/.bashrc; then
+    echo "$line" >> ~/.bashrc
+  fi
+}
+
 #######################################
 # Configures Docker to operate in rootless mode, updating user's bashrc as required.
 # Globals:
@@ -11,7 +19,7 @@ set -euo pipefail
 # Returns:
 #   1 ...
 #######################################
-setup_docker_rootless() {
+function setup_docker_rootless() {
   echo "Setting up Docker in rootless mode..."
 
   # Validate Docker installation.
@@ -30,14 +38,6 @@ setup_docker_rootless() {
 
   # Ensure Docker environment variables are set.
   test_docker_env
-
-  # Append environment settings to the user's bashrc.
-  add_to_bashrc() {
-    local line="$1"
-    if ! grep -q "^${line}$" ~/.bashrc; then
-      echo "$line" >> ~/.bashrc
-    fi
-  }
 
   add_to_bashrc "export PATH=/usr/bin:$PATH"
   add_to_bashrc "export XDG_RUNTIME_DIR=/run/user/$(id -u)"

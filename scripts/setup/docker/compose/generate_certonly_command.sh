@@ -25,7 +25,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-generate_certonly_command() {
+function generate_certonly_command() {
   echo "certonly \
 --webroot \
 --webroot-path=${INTERNAL_WEBROOT_DIR} \

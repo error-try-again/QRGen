@@ -4,7 +4,7 @@
 set -euo pipefail
 
 #######################################
-# description
+# Prompts the user for the Let's Encrypt email and other Let's Encrypt related settings.
 # Globals:
 #   LETSENCRYPT_EMAIL
 #   USE_AUTO_RENEW_SSL
@@ -20,7 +20,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_for_letsencrypt() {
+function prompt_for_letsencrypt() {
   prompt_and_validate_input "Please enter your Let's Encrypt email or type 'skip' to skip: " "Error: Email address cannot be empty." LETSENCRYPT_EMAIL
   prompt_yes_no "Would you like to use a production SSL certificate?" USE_PRODUCTION_SSL
   prompt_yes_no "Would you like to use a dry run?" USE_DRY_RUN

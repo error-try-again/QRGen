@@ -12,7 +12,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-configure_frontend_docker() {
+function configure_frontend_docker() {
     local origin="origin/$RELEASE_BRANCH"
 
     cat << EOF > "$FRONTEND_DOCKERFILE"

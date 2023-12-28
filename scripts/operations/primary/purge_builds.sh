@@ -9,7 +9,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-purge_builds() {
+function purge_builds() {
   test_docker_env
 
   echo "Identifying and purging Docker resources associated with 'qrgen'..."

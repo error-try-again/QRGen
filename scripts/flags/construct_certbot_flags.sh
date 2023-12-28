@@ -29,7 +29,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-construct_certbot_flags() {
+function construct_certbot_flags() {
   EMAIL_FLAG=$([[ $LETSENCRYPT_EMAIL == "skip" ]] && echo "--register-unsafely-without-email" || echo "--email $LETSENCRYPT_EMAIL")
   PRODUCTION_CERTS_FLAG=$([[ $USE_PRODUCTION_SSL ]] && echo "" || echo "--staging")
   DRY_RUN_FLAG=$([[ $USE_DRY_RUN ]] && echo "--dry-run" || echo "")

@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-update_project() {
+function update_project() {
   git stash
   git pull
 }

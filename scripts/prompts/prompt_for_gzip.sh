@@ -8,7 +8,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_for_gzip() {
+function prompt_for_gzip() {
   if [[ $USE_GZIP == "true" ]]; then
     return
   fi

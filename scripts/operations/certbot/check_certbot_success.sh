@@ -11,7 +11,7 @@ set -euo pipefail
 #   0 ...
 #   1 ...
 #######################################
-check_certbot_success() {
+function check_certbot_success() {
   local certbot_logs
   certbot_logs=$(docker compose logs certbot)
   echo "Certbot logs: $certbot_logs"
