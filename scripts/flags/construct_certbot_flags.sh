@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # bashsupport disable=BP5006
 
-set -euo pipefail#######################################
+set -euo pipefail
+
+#######################################
 # Constructs the certbot flags based on the global variables set by the user.
 # Globals:
 #   DRY_RUN_FLAG
