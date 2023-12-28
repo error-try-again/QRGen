@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-pre_flight() {
+function pre_flight() {
   # Remove containers that would conflict with `docker compose up`
   remove_conflicting_containers || {
     echo "Failed to remove conflicting containers"

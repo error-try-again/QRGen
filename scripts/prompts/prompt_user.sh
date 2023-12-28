@@ -11,7 +11,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_user() {
+function prompt_user() {
   local welcome_message="Welcome to the QR Code Generator setup script!"
   local thanks_message="Thanks for using the QR Code Generator setup script!"
   local select_prompt='Select: '
@@ -26,7 +26,7 @@ prompt_user() {
   select user_selection in "${options[@]}"; do
     if prompt_user_selection_switch "$user_selection"; then
       break
-  fi
+    fi
     echo "${thanks_message}"
-done
+  done
 }

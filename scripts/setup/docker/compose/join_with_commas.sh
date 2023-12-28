@@ -2,12 +2,13 @@
 
 set -euo pipefail
 
+
 #######################################
 # Handle the concatenation of port or volume mappings into a comma-separated string.
 # Arguments:
 #  None
 #######################################
-join_with_commas() {
+function join_with_commas() {
   local mappings=("${@:2}") # Assigns all arguments except the first one to 'mappings' array.
   local result="" # Initializes the result string.
   local first=true # Flag to check if the current mapping is the first one to avoid leading comma.

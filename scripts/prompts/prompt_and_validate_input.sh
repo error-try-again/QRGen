@@ -9,7 +9,7 @@ set -euo pipefail
 #   error_message: Message to display when the input is not valid
 #   result_var: Variable to hold the user input result
 ############################################
-prompt_and_validate_input() {
+function prompt_and_validate_input() {
   local prompt_message="$1"
   local error_message="$2"
   local result_var="$3"
@@ -30,7 +30,7 @@ prompt_and_validate_input() {
 # Arguments:
 #   1
 #######################################
-is_input_valid(){
+function is_input_valid(){
   local inputted_value="$1"
   [[ -n $inputted_value ]]
 }

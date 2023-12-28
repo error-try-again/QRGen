@@ -13,7 +13,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-configure_backend_dotenv() {
+function configure_backend_dotenv() {
   echo "Configuring backend .env file"
   cat << EOF > "$BACKEND_DOTENV_FILE"
 ORIGIN=$ORIGIN

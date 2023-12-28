@@ -3,12 +3,11 @@
 
 set -euo pipefail
 
-
 #######################################
 # Create a temporary Mock Upstream Server to test NGINX configuration
 # Uses netcat to listen on port 12345 and echo "Mock Server" to the client
 #######################################
-mock_upstream_server() {
+function mock_upstream_server() {
     # Start a dummy server in the background and capture its PID
     nc -lk -p 12345 &
     MOCK_PID=$!
@@ -18,18 +17,23 @@ mock_upstream_server() {
     sleep 1
 
     # Check if the server started successfully
-    if ! kill -0 $MOCK_PID 2>/dev/null; then
+    if ! kill -0 $MOCK_PID 2> /dev/null; then
         echo "Failed to start mock server."
         exit 1
-    fi
+  fi
 }
+
+declare -A error_messages=(
+  ["missing_port"]="Missing defined port"
+  ["invalid_configuration"]="Invalid configuration detected"
+)
 
 #######################################
 # Log errors to a file
 # Arguments:
 #   $1 - Message or output to log
 #######################################
-log_error() {
+function log_error() {
   local message=$1
   local error_log="${test_output_dir}/error.log"
 
@@ -45,11 +49,41 @@ log_error() {
 }
 
 #######################################
+# Validate NGINX configuration file
+# Arguments:
+#   $1 - Configuration file path
+#######################################
+function validate_nginx_config() {
+    local file=$1
+
+    # Validate the configuration syntax
+    nginx -t -c "$file" 2>&1 | tee "${test_output_dir}/validation_${file##*/}.log"
+
+    # Specific checks for NGINX configuration
+    assert_nginx_has_port "$file"
+}
+
+#######################################
+# Validate Docker Compose configuration file
+# Arguments:
+#   $1 - Configuration file path
+#######################################
+function validate_docker_compose_config() {
+    local file=$1
+
+    # Validate the configuration
+    docker compose -f "$file" config 2>&1 | tee "${test_output_dir}/validation_${file##*/}.log"
+
+    # Specific checks for Docker Compose configuration
+    assert_compose_has_port "$file"
+}
+
+#######################################
 # Check Configuration Files for Correctness
 # Arguments:
 #   None
 #######################################
-check_configurations() {
+function check_configurations() {
   echo "Checking configuration files for correctness..."
   validate_configuration_file "${NGINX_CONF_FILE}"
   validate_configuration_file "${DOCKER_COMPOSE_FILE}"
@@ -60,7 +94,7 @@ check_configurations() {
 # Arguments:
 #   $1 - Configuration file path
 #######################################
-validate_configuration_file() {
+function validate_configuration_file() {
   local file=$1
   # Validation command depends on the type of file
   # For NGINX config, use nginx -t
@@ -83,7 +117,7 @@ validate_configuration_file() {
 # Arguments:
 #  None
 #######################################
-run_mocks() {
+function run_mocks() {
 
   echo "Running mocks..."
 
@@ -95,6 +129,7 @@ run_mocks() {
   # Ensure NGINX can write to a custom log directory or file
   mkdir -p "${test_output_dir}/logs"
   touch "${test_output_dir}/logs/error.log"
+  touch "${test_output_dir}/logs/access.log"
 
   # Set up a directory for the custom PID file
   mkdir -p "${test_output_dir}/run"
@@ -114,13 +149,41 @@ run_mocks() {
   check_configurations
 
   # Kill the mock upstream server
-  if kill -0 $MOCK_PID 2>/dev/null; then
+  if kill -0 $MOCK_PID 2> /dev/null; then
       echo "Terminating mock server with PID $MOCK_PID"
       kill $MOCK_PID
   else
       echo "Mock server process $MOCK_PID not found"
   fi
   echo "Mocks complete."
+}
+
+#######################################
+# Assert that NGINX config has defined port(s)
+# Arguments:
+#   $1 - NGINX configuration file
+#######################################
+function assert_nginx_has_port() {
+    local file=$1
+
+    # Implement a check for port definition in NGINX config
+    if ! grep -qE 'listen[[:space:]]+[0-9]+' "$file"; then
+        log_error "missing_port"
+  fi
+}
+
+#######################################
+# Assert that Docker Compose config has defined port(s)
+# Arguments:
+#   $1 - Docker Compose configuration file
+#######################################
+function assert_compose_has_port() {
+    local file=$1
+
+    # Implement a check for port definition in Docker Compose config
+    if ! grep -q 'ports:' "$file"; then
+        log_error "missing_port"
+  fi
 }
 
 #######################################
@@ -131,7 +194,7 @@ run_mocks() {
 # Arguments:
 #  None
 #######################################
-run_nginx_ss_configuration() {
+function run_nginx_ss_configuration() {
   echo "Simulating NGINX configuration..."
   NGINX_CONF_FILE="${test_output_dir}/nginx_ss.conf"
   setup_common_configuration_parameters
@@ -152,7 +215,7 @@ run_nginx_ss_configuration() {
 # Arguments:
 #  None
 #######################################
-run_nginx_le_configuration() {
+function run_nginx_le_configuration() {
   echo "Simulating NGINX configuration..."
   NGINX_CONF_FILE="${test_output_dir}/nginx_le.conf"
   setup_common_configuration_parameters
@@ -173,7 +236,7 @@ run_nginx_le_configuration() {
 # Arguments:
 #  None
 #######################################
-run_nginx_dev_configuration() {
+function run_nginx_dev_configuration() {
   echo "Simulating NGINX configuration..."
   NGINX_CONF_FILE="${test_output_dir}/nginx_dev.conf"
   setup_common_configuration_parameters
@@ -194,7 +257,7 @@ run_nginx_dev_configuration() {
 # Arguments:
 #  None
 #######################################
-run_compose_le_configuration() {
+function run_compose_le_configuration() {
   echo "Simulating Docker Compose configuration with Let's Encrypt..."
   DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose-le.yml"
   setup_common_configuration_parameters
@@ -216,7 +279,7 @@ run_compose_le_configuration() {
 # Arguments:
 #  None
 #######################################
-run_compose_ss_configuration() {
+function run_compose_ss_configuration() {
   echo "Simulating Docker Compose configuration with self-signed certificates..."
   USE_LETSENCRYPT=false
   USE_SELF_SIGNED_CERTS=true
@@ -239,7 +302,7 @@ run_compose_ss_configuration() {
 # Arguments:
 #  None
 #######################################
-run_compose_dev_configuration() {
+function run_compose_dev_configuration() {
   echo "Simulating Docker Compose configuration for development..."
   DOCKER_COMPOSE_FILE="${test_output_dir}/docker_compose-ss.yml"
   setup_common_configuration_parameters
@@ -255,7 +318,7 @@ run_compose_dev_configuration() {
 #######################################
 # Mocks Backend/Express Dockerfile configuration
 #######################################
-run_backend_container_configuration() {
+function run_backend_container_configuration() {
   echo "Simulating backend configuration..."
   BACKEND_DOCKERFILE="${test_output_dir}/Backend.Dockerfile"
   setup_common_configuration_parameters
@@ -270,7 +333,7 @@ run_backend_container_configuration() {
 #######################################
 # Mocks Frontend/React Dockerfile configuration
 #######################################
-run_frontend_container_configuration() {
+function run_frontend_container_configuration() {
   echo "Simulating frontend configuration..."
   FRONTEND_DOCKERFILE="${test_output_dir}/Frontend.Dockerfile"
   setup_common_configuration_parameters
@@ -285,7 +348,7 @@ run_frontend_container_configuration() {
 #######################################
 # Mocks the Certbot Dockerfile configuration
 #######################################
-run_certbot_container_configuration() {
+function run_certbot_container_configuration() {
   echo "Simulating certbot configuration..."
   CERTBOT_DOCKERFILE="${test_output_dir}/Certbot.Dockerfile"
   setup_common_configuration_parameters
@@ -313,15 +376,15 @@ run_certbot_container_configuration() {
 # Arguments:
 #  None
 #######################################
-setup_common_configuration_parameters() {
+function setup_common_configuration_parameters() {
   BACKEND_PORT=12345
   BACKEND_UPSTREAM_NAME="localhost"
   NGINX_PID="pid"
   NGINX_PID_FILE="${PROJECT_ROOT_DIR}/nginx.pid"
   NGINX_ERROR_LOG="error_log"
-  NGINX_ERROR_LOG_FILE="${PROJECT_LOGS_DIR}/nginx_error.log"
+  NGINX_ERROR_LOG_FILE="${test_output_dir}/logs/error.log"
   NGINX_ACCESS_LOG="access_log"
-  NGINX_ACCESS_LOG_FILE="${PROJECT_LOGS_DIR}/nginx_access.log"
+  NGINX_ACCESS_LOG_FILE="${test_output_dir}/logs/access.log"
   NGINX_ERROR_LOG_LEVEL="error"
   RELEASE_BRANCH="full-release"
   NODE_VERSION="latest"
@@ -352,7 +415,7 @@ setup_common_configuration_parameters() {
 # Arguments:
 #  None
 #######################################
-setup_letsencrypt_configuration_parameters() {
+function setup_letsencrypt_configuration_parameters() {
   USE_LETSENCRYPT=true
   EMAIL_FLAG="--email example@example.com"
   PRODUCTION_CERTS_FLAG="--production-certs"
@@ -375,7 +438,7 @@ setup_letsencrypt_configuration_parameters() {
 # Arguments:
 #  None
 #######################################
-setup_self_signed_configuration_parameters() {
+function setup_self_signed_configuration_parameters() {
   NGINX_SSL_PORT="443"
   USE_SELF_SIGNED_CERTS=true
 }
@@ -388,7 +451,7 @@ setup_self_signed_configuration_parameters() {
 # Arguments:
 #  None
 #######################################
-setup_dev_configuration_parameters() {
+function setup_dev_configuration_parameters() {
   USE_LETSENCRYPT=false
   USE_SELF_SIGNED_CERTS=false
 }

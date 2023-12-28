@@ -11,7 +11,7 @@ set -euo pipefail
 #   1
 #   2
 #######################################
-create_volume_definition() {
+function create_volume_definition() {
   local volume_name="$1"
   local volume_driver="$2"
   if [[ $USE_LETSENCRYPT == "true" ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then

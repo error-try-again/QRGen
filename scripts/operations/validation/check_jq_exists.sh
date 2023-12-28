@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-check_jq_exists() {
+function check_jq_exists() {
     if ! command -v jq &> /dev/null; then
         echo "jq could not be found. Please install it to run this script."
         exit 1

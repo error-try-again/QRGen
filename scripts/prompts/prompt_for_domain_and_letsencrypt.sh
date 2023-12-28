@@ -9,7 +9,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_for_domain_and_letsencrypt() {
+function prompt_for_domain_and_letsencrypt() {
   prompt_for_domain_details
   if [[ $USE_CUSTOM_DOMAIN ]]; then
     prompt_for_ssl

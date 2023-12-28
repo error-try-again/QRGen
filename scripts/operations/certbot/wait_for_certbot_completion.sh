@@ -11,7 +11,7 @@ set -euo pipefail
 #   0 ...
 #   1 ...
 #######################################
-wait_for_certbot_completion() {
+function wait_for_certbot_completion() {
   local attempt_count=0
   local max_attempts=12
   while ((attempt_count < max_attempts)); do

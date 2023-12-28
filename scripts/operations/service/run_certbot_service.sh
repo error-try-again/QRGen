@@ -11,7 +11,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-run_certbot_service() {
+function run_certbot_service() {
   echo "Running Certbot service..."
   build_certbot_service || {
     echo "Building Certbot service failed. Exiting."

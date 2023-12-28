@@ -11,7 +11,7 @@ set -euo pipefail
 # Returns:
 #   Path to the temporary modified file
 #######################################
-remove_certbot_command_flags_compose() {
+function remove_certbot_command_flags_compose() {
   local flag_to_remove=$1
   local temp_file
   temp_file="$(mktemp)"

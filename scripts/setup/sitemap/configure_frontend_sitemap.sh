@@ -10,7 +10,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-configure_frontend_sitemap() {
+function configure_frontend_sitemap() {
   local date
   local regularity
   local priority

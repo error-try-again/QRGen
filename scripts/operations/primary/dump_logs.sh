@@ -9,7 +9,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-dump_logs() {
+function dump_logs() {
   test_docker_env
   mkdir -p "$PROJECT_LOGS_DIR"
   produce_docker_logs > "$PROJECT_LOGS_DIR/service.log" && {
@@ -27,7 +27,7 @@ dump_logs() {
 # Returns:
 #   1 ...
 #######################################
-produce_docker_logs() {
+function produce_docker_logs() {
   if docker_compose_exists; then
 
     # Get a list of services defined in the Compose file

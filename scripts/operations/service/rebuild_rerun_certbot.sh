@@ -9,7 +9,7 @@ set -euo pipefail
 # Returns:
 #   1 ...
 #######################################
-rebuild_and_rerun_certbot() {
+function rebuild_and_rerun_certbot() {
   echo "Rebuilding and rerunning Certbot without dry-run..."
   if ! docker compose build certbot || ! docker compose up -d certbot; then
     echo "Failed to rebuild or run Certbot service."

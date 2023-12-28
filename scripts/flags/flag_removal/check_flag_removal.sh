@@ -10,7 +10,7 @@ set -euo pipefail
 #   1 - File to check
 #   2 - Flag to check for
 #######################################
-check_flag_removal() {
+function check_flag_removal() {
   local file=$1
   local flag=$2
 

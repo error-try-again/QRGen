@@ -12,7 +12,7 @@ set -euo pipefail
 #  None
 #######################################
 # bashsupport disable=BP2001
-test_docker_env() {
+function test_docker_env() {
   echo "Ensuring Docker environment variables are set..."
 
   # Update or set DOCKER_HOST.

@@ -3,13 +3,13 @@
 set -euo pipefail
 
 #######################################
-# Prompts for Let's Encrypt SSL options
+# Prompts for Let's Encrypt SSL options and runs the appropriate setup.
 # Globals:
 #   AUTO_SETUP_CHOICE
 # Arguments:
 #   None
 #######################################
-prompt_for_letsencrypt_options() {
+function prompt_for_letsencrypt_options() {
   enable_ssl
       echo "1: Run automatic staging setup for Let's Encrypt SSL (Recommended for testing)"
       echo "2: Run automatic production setup for Let's Encrypt SSL (Recommended for production)"
@@ -24,5 +24,5 @@ prompt_for_letsencrypt_options() {
     *)
        echo "Invalid choice, please enter 1, 2, 3, or 4."
                                                           ;;
-esac
+  esac
 }

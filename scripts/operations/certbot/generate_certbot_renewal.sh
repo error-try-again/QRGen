@@ -9,7 +9,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-generate_certbot_renewal_script() {
+function generate_certbot_renewal_script() {
   cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
 #!/usr/bin/env bash
 
@@ -54,7 +54,7 @@ EOF
 # Arguments:
 #  None
 #######################################
-generate_certbot_renewal_job() {
+function generate_certbot_renewal_job() {
 
   generate_certbot_renewal_script
 

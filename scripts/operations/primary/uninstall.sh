@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-uninstall() {
+function uninstall() {
   test_docker_env
   echo "Cleaning up..."
   purge_builds

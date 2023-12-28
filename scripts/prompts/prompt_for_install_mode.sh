@@ -11,7 +11,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_for_install_mode() {
+function prompt_for_install_mode() {
   echo "1: Install minimal release (frontend QR generation) (Limited features)"
   echo "2: Install full release (frontend QR generator and backend API/server side generation) (All features)"
   prompt_numeric "Please enter your choice (1/2): " INSTALL_MODE_CHOICE

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Produces server-side configuration files essential for backend and frontend operations.
-configure_server_files() {
+function configure_server_files() {
   echo "Creating server configuration files..."
   configure_backend_dotenv
   configure_frontend_dotenv

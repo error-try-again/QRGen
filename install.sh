@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-source_files() {
+function source_files() {
     # Parser scripts
     source ./scripts/config/parser/dispatch_command.sh
     source ./scripts/config/parser/display_help.sh
@@ -146,7 +146,7 @@ source_files() {
 # Arguments:
 #  None
 #######################################
-quit() {
+function quit() {
   echo -e "\nQuiting..."
   exit 0
 }
@@ -156,7 +156,7 @@ quit() {
 # Arguments:
 #  None
 #######################################
-main() {
+function main() {
   # Ensures that the script is not sourced. This is to prevent the script from being run in the wrong environment.
   [[ ${BASH_SOURCE[0]} != "$0" ]] && echo "This install.sh script must be run, not sourced." && exit 1
 

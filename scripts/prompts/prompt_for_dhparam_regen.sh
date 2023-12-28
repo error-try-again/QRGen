@@ -12,7 +12,7 @@ set -euo pipefail
 #   0 ...
 #   1 ...
 #######################################
-prompt_for_dhparam_regeneration() {
+function prompt_for_dhparam_regeneration() {
   if [[ $REGENERATE_SSL_CERTS  ]]; then
     return 0
   fi

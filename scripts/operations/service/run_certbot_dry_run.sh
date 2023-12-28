@@ -10,7 +10,7 @@ set -euo pipefail
 # Returns:
 #   1 ...
 #######################################
-run_certbot_dry_run() {
+function run_certbot_dry_run() {
   local certbot_output
   if ! certbot_output=$(docker compose run --rm certbot 2>&1); then
     echo "Certbot dry-run command failed."

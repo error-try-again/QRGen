@@ -8,7 +8,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-validate_and_load_dotenv() {
+function validate_and_load_dotenv() {
   if [[ ! -f .env ]]; then
     echo "Error: .env file not found" >&2
     exit 1

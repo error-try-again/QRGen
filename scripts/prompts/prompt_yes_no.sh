@@ -8,7 +8,7 @@ set -euo pipefail
 #   1
 #   2
 #######################################
-prompt_yes_no() {
+function prompt_yes_no() {
   local prompt_message="$1"
   local result_var="$2"
   local choice

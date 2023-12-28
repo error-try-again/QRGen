@@ -3,7 +3,7 @@
 set -euo pipefail
 
 #######################################
-# Prompts for SSL options
+# Prompts for SSL options.
 # Globals:
 #   AUTO_SETUP_CHOICE
 #   SSL_CHOICE
@@ -22,5 +22,5 @@ prompt_for_ssl() {
     *)
        echo "Invalid choice, please enter 1, 2, or 3."
                                                        ;;
-esac
+  esac
 }

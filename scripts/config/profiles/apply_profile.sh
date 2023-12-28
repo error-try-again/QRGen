@@ -13,7 +13,7 @@ set -euo pipefail
 # Outputs:
 #   The value from the JSON file for the specified key within the given profile.
 #######################################
-get_config_value() {
+function get_config_value() {
     local profile=$1  # The profile within the JSON file.
     local key=$2      # The specific key within the profile.
     jq -r ".$profile.$key" "$JSON_INSTALL_PROFILES"  # Use jq to parse and return the value.
@@ -32,7 +32,7 @@ get_config_value() {
 # Note:
 #   It's crucial that JSON_INSTALL_PROFILES is correctly set to the path of the JSON configuration file before this function is called.
 #######################################
-apply_profile() {
+function apply_profile() {
     local profile=$1  # The name of the profile to apply.
     echo "Applying profile: $profile"
 
@@ -53,11 +53,11 @@ apply_profile() {
         case "$value" in
             true) value=true ;;
             false) value=false ;;
-  esac
+    esac
 
         # Declare the key-value pair as a global variable.
         # This is crucial for the profile to be picked up by the installer.
         # shellcheck disable=SC2034
         declare -g "$key=$value"
-done
+  done
 }

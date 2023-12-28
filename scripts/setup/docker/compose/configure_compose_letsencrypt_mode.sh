@@ -23,7 +23,7 @@ set -euo pipefail
 # Arguments:
 #   None
 #######################################
-configure_compose_letsencrypt_mode() {
+function configure_compose_letsencrypt_mode() {
   echo "Configuring Docker Compose for Let's Encrypt..."
 
   if [[ $RELEASE_BRANCH == "full-release" ]]; then

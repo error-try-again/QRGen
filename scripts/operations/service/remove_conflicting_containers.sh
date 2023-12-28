@@ -9,7 +9,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-remove_conflicting_containers() {
+function remove_conflicting_containers() {
   # Extract service names from docker-compose.yml
   local service_names
   service_names=$(docker compose config --services)

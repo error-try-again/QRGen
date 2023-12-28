@@ -18,16 +18,16 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-configure_certbot_docker() {
+function configure_certbot_docker() {
 
-BASE_IMAGE="python:3.10-alpine3.16 as certbot"
-ENTRYPOINT="[ \"certbot\" ]"
-EXPOSE="80 443"
-VOLUMES="/etc/letsencrypt /var/lib/letsencrypt"
-WORKDIR="/opt/certbot"
-CARGO_NET_GIT_FETCH_WITH_CLI="true"
+  BASE_IMAGE="python:3.10-alpine3.16 as certbot"
+  ENTRYPOINT="[ \"certbot\" ]"
+  EXPOSE="80 443"
+  VOLUMES="/etc/letsencrypt /var/lib/letsencrypt"
+  WORKDIR="/opt/certbot"
+  CARGO_NET_GIT_FETCH_WITH_CLI="true"
 
-DOCKERFILE_TEMPLATE="FROM $BASE_IMAGE
+  DOCKERFILE_TEMPLATE="FROM $BASE_IMAGE
 ENTRYPOINT $ENTRYPOINT
 EXPOSE $EXPOSE
 VOLUME $VOLUMES

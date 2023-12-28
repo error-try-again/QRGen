@@ -8,7 +8,7 @@ set -euo pipefail
 #   1
 #   2
 #######################################
-prompt_with_validation() {
+function prompt_with_validation() {
   local prompt_message="$1"
   local error_message="$2"
   local user_input=""

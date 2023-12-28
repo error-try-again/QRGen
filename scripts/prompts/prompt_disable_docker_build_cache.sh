@@ -8,7 +8,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-prompt_disable_docker_build_cache() {
+function prompt_disable_docker_build_cache() {
   if [[ ${DISABLE_DOCKER_CACHING} == "true" ]]; then
     return
   fi

@@ -9,7 +9,7 @@
 # Arguments:
 #  None
 #######################################
-configure_docker_compose() {
+function configure_docker_compose() {
   initialize_variables
   if [[ $USE_LETSENCRYPT == "true" ]]; then
     configure_compose_letsencrypt_mode

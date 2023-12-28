@@ -13,7 +13,7 @@ set -euo pipefail
 # Exits:
 #   1 - If the flag name does not match expected pattern.
 #######################################
-assign_flag_value() {
+function assign_flag_value() {
   # Transform flag name to adhere to variable naming conventions:
   # Strip leading double-dash and replace hyphens with underscores.
   local flag_name="${1//--/}" # Strip leading double-dash
@@ -40,7 +40,7 @@ assign_flag_value() {
 # Exits:
 #   1 - If options parsing fails.
 #######################################
-options_parser() {
+function options_parser() {
 
   local long_options_list
 
@@ -91,12 +91,12 @@ release-branch:,use-gzip:,help"
           # Otherwise, treat it as an argument for an option.
           if [[ "$2" =~ ^-.* || -z "$2" ]]; then
             assign_flag_value "$1"
-      else
+        else
             assign_flag_value "$1" "$2"
             shift # Move past the argument as it's been handled.
-      fi
+        fi
           ;;
-  esac
+    esac
       shift # Move to the next parameter or option.
-done
+  done
 }

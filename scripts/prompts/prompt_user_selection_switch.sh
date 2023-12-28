@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #   1
 #######################################
-prompt_user_selection_switch() {
+function prompt_user_selection_switch() {
   case $1 in
     "Run Setup") setup ;;
     "Run Mock Configuration") run_mocks ;;

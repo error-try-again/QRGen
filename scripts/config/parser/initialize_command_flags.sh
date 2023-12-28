@@ -14,7 +14,7 @@ set -euo pipefail
 #   uninstall
 #   update_project
 #######################################
-initialize_command_flags() {
+function initialize_command_flags() {
   setup=false
   run_mocks=false
   uninstall=false

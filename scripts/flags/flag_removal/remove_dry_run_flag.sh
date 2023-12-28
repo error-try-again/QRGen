@@ -10,7 +10,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-remove_dry_run_flag() {
+function remove_dry_run_flag() {
   local temp_file
   echo "Removing --dry-run flag from docker-compose.yml..."
   temp_file=$(remove_certbot_command_flags_compose '--dry-run')

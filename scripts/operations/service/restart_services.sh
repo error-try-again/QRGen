@@ -9,7 +9,7 @@ set -euo pipefail
 # Returns:
 #   1 ...
 #######################################
-restart_services() {
+function restart_services() {
   echo "Restarting backend and frontend services..."
   if [[ $RELEASE_BRANCH = "full-release" ]]; then
     if ! docker compose restart backend || ! docker compose restart frontend; then

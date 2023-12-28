@@ -18,20 +18,20 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-dispatch_command() {
+function dispatch_command() {
   trap quit SIGINT
   options_parser "$@"
 
   # Associative array to map the command flag to the corresponding function to execute.
   local -A command_function_map=(
-                      ["$setup"]=setup
-                      ["$run_mocks"]=run_mocks
-                      ["$uninstall"]=uninstall
-                      ["$dump_logs"]=dump_logs
-                      ["$update_project"]=update_project
-                      ["$stop_containers"]=stop_containers
-                      ["$prune_builds"]=purge_builds
-                      ["$quit"]=quit
+                       ["$setup"]=setup
+                       ["$run_mocks"]=run_mocks
+                       ["$uninstall"]=uninstall
+                       ["$dump_logs"]=dump_logs
+                       ["$update_project"]=update_project
+                       ["$stop_containers"]=stop_containers
+                       ["$prune_builds"]=purge_builds
+                       ["$quit"]=quit
   )
 
   local command_executed=false
