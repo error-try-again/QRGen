@@ -8,128 +8,137 @@ set -euo pipefail
 #  None
 #######################################
 source_files() {
-    # Directories and their contents
-  source ./shell/config/apply_profile.sh
+    # Parser scripts
+    source ./scripts/config/parser/dispatch_command.sh
+    source ./scripts/config/parser/display_help.sh
+    source ./scripts/config/parser/initialize_command_flags.sh
+    source ./scripts/config/parser/options_parser.sh
 
-  # Parser scripts
-  source ./shell/config/parser/initialize_command_flags.sh
-  source ./shell/config/parser/dispatch_command.sh
-  source ./shell/config/parser/display_help.sh
-  source ./shell/config/parser/parse_options.sh
+    # Profiles scripts
+    source ./scripts/config/profiles/apply_profile.sh
+    source ./scripts/config/profiles/automatic_production_reload_selection.sh
+    source ./scripts/config/profiles/automatic_production_selection.sh
+    source ./scripts/config/profiles/automatic_staging_selection.sh
 
-  # Operations scripts
-  source ./shell/operations/backup_replace_file.sh
-  source ./shell/operations/build_run_docker.sh
-  source ./shell/operations/check_certbot_success.sh
-  source ./shell/operations/check_flag_removal.sh
-  source ./shell/operations/check_jq_exists.sh
-  source ./shell/operations/common_build_operations.sh
-  source ./shell/operations/dump_logs.sh
-  source ./shell/operations/handle_ambiguous_networks.sh
-  source ./shell/operations/handle_certs.sh
-  source ./shell/operations/handle_staging_flags.sh
-  source ./shell/operations/modify_docker_compose.sh
-  source ./shell/operations/pre_flight.sh
-  source ./shell/operations/purge_builds.sh
-  source ./shell/operations/rebuild_rerun_certbot.sh
-  source ./shell/operations/remove_conflicting_containers.sh
-  source ./shell/operations/remove_dry_run_flag.sh
-  source ./shell/operations/remove_staging_flag.sh
-  source ./shell/operations/restart_services.sh
-  source ./shell/operations/run_backend_service.sh
-  source ./shell/operations/run_certbot_dry_run.sh
-  source ./shell/operations/run_certbot_service.sh
-  source ./shell/operations/run_frontend_service.sh
-  source ./shell/operations/setup.sh
-  source ./shell/operations/uninstall.sh
-  source ./shell/operations/update_project.sh
-  source ./shell/operations/validate_and_load_dotenv.sh
-  source ./shell/operations/validate_installer_profile.sh
-  source ./shell/operations/wait_for_certbot_completion.sh
+    # Flags scripts
+    source ./scripts/flags/construct_certbot_flags.sh
+    source ./scripts/flags/enable_ssl.sh
 
-  # Prompts scripts
-  source ./shell/prompts/custom_install_prompt.sh
-  source ./shell/prompts/disable_docker_cache_prompt.sh
-  source ./shell/prompts/evaluate_valid_input_string.sh
-  source ./shell/prompts/handle_user_selection.sh
-  source ./shell/prompts/numeric_prompt.sh
-  source ./shell/prompts/prompt_for_dhparam_regen.sh
-  source ./shell/prompts/prompt_for_dhparam_strength.sh
-  source ./shell/prompts/prompt_for_domain_and_letsencrypt.sh
-  source ./shell/prompts/prompt_for_domain_details.sh
-  source ./shell/prompts/prompt_for_google_api_key.sh
-  source ./shell/prompts/prompt_for_gzip.sh
-  source ./shell/prompts/prompt_for_install_mode.sh
-  source ./shell/prompts/prompt_for_letsencrypt_options.sh
-  source ./shell/prompts/prompt_for_self_signed.sh
-  source ./shell/prompts/prompt_for_ssl.sh
-  source ./shell/prompts/prompt_with_validation.sh
-  source ./shell/prompts/user_input.sh
-  source ./shell/prompts/yes_no_prompt.sh
+    # Flag Removal scripts
+    source ./scripts/flags/flag_removal/remove_staging_flags.sh
+    source ./scripts/flags/flag_removal/remove_certbot_command_flags_compose.sh
+    source ./scripts/flags/flag_removal/check_flag_removal.sh
+    source ./scripts/flags/flag_removal/remove_dry_run_flag.sh
+    source ./scripts/flags/flag_removal/remove_staging_flag.sh
 
-  # Selection choices scripts
-  source ./shell/prompts/selection_choices/certbot_image_selected.sh
-  source ./shell/prompts/selection_choices/construct_certbot_flags.sh
-  source ./shell/prompts/selection_choices/handle_certbot_image_selection.sh
-  source ./shell/prompts/selection_choices/select_tls_version.sh
+    # Operations - Networking
+    source ./scripts/operations/networking/ensure_port_is_available.sh
+    source ./scripts/operations/networking/handle_ambiguous_networks.sh
 
-  # Setup helpers scripts
-  source ./shell/setup/helpers/copy_server_files.sh
-  source ./shell/setup/helpers/create_directory.sh
-  source ./shell/setup/helpers/generate_server_files.sh
-  source ./shell/setup/helpers/setup_project_directories.sh
+    # Operations - Primary
+    source ./scripts/operations/primary/dump_logs.sh
+    source ./scripts/operations/primary/purge_builds.sh
+    source ./scripts/operations/primary/setup.sh
+    source ./scripts/operations/primary/uninstall.sh
+    source ./scripts/operations/primary/update_project.sh
+    source ./scripts/operations/primary/docker_compose_down.sh
 
-  # Setup sitemap scripts
-  source ./shell/setup/sitemap/configure_frontend_sitemap.sh
+    # Operations - Service
+    source ./scripts/operations/service/build_run_docker.sh
+    source ./scripts/operations/service/common_build_operations.sh
+    source ./scripts/operations/service/pre_flight.sh
+    source ./scripts/operations/service/rebuild_rerun_certbot.sh
+    source ./scripts/operations/service/remove_conflicting_containers.sh
+    source ./scripts/operations/service/restart_services.sh
+    source ./scripts/operations/service/run_backend_service.sh
+    source ./scripts/operations/service/run_certbot_dry_run.sh
+    source ./scripts/operations/service/run_certbot_service.sh
+    source ./scripts/operations/service/run_frontend_service.sh
 
-  # Setup dotenv_configure scripts
-  source ./shell/setup/dotenv_configure/configure_backend_dotenv.sh
-  source ./shell/setup/dotenv_configure/configure_frontend_dotenv.sh
+    # Operations - Validation
+    source ./scripts/operations/validation/validate_and_load_dotenv.sh
+    source ./scripts/operations/validation/validate_installer_profile.sh
+    source ./scripts/operations/validation/validate_project_root.sh
+    source ./scripts/operations/validation/check_jq_exists.sh
 
-  # Setup nginx scripts
-  source ./shell/setup/nginx/configure_nginx.sh
+    # Prompts scripts
+    source ./scripts/prompts/prompt_for_custom_certbot_install.sh
+    source ./scripts/prompts/prompt_disable_docker_build_cache.sh
+    source ./scripts/prompts/prompt_and_validate_input.sh
+    source ./scripts/prompts/prompt_user_selection_switch.sh
+    source ./scripts/prompts/prompt_numeric.sh
+    source ./scripts/prompts/prompt_for_dhparam_regen.sh
+    source ./scripts/prompts/prompt_for_dhparam_strength.sh
+    source ./scripts/prompts/prompt_for_domain_and_letsencrypt.sh
+    source ./scripts/prompts/prompt_for_domain_details.sh
+    source ./scripts/prompts/prompt_for_google_api_key.sh
+    source ./scripts/prompts/prompt_for_gzip.sh
+    source ./scripts/prompts/prompt_for_install_mode.sh
+    source ./scripts/prompts/prompt_for_letsencrypt_options.sh
+    source ./scripts/prompts/prompt_for_self_signed.sh
+    source ./scripts/prompts/prompt_for_ssl.sh
+    source ./scripts/prompts/prompt_with_validation.sh
+    source ./scripts/prompts/prompt_user.sh
+    source ./scripts/prompts/prompt_yes_no.sh
+    source ./scripts/prompts/prompt_for_letsencrypt.sh
+    source ./scripts/prompts/prompt_tls_selection.sh
 
-  # Setup docker-rootless scripts
-  source ./shell/setup/docker-rootless/setup_docker_rootless.sh
+    # Setup - Docker Compose Configuration Scripts
+    source ./scripts/setup/docker/compose/configure_docker_compose.sh
+    source ./scripts/setup/docker/compose/generate_certonly_command.sh
+    source ./scripts/setup/docker/compose/create_network_definition.sh
+    source ./scripts/setup/docker/compose/create_volume_definition.sh
+    source ./scripts/setup/docker/compose/create_service_definition.sh
+    source ./scripts/setup/docker/compose/configure_compose_letsencrypt_mode.sh
+    source ./scripts/setup/docker/compose/configure_compose_self_signed_mode.sh
+    source ./scripts/setup/docker/compose/configure_compose_http_mode.sh
+    source ./scripts/setup/docker/compose/assemble_docker_compose.sh
+    source ./scripts/setup/docker/compose/initialize_compose_variables.sh
+    source ./scripts/setup/docker/compose/join_with_commas.sh
 
-  # Docker helper scripts
-  source ./shell/setup/docker/helpers/docker_compose_down.sh
-  source ./shell/setup/docker/helpers/docker_compose_exists.sh
-  source ./shell/setup/docker/helpers/produce_docker_logs.sh
-  source ./shell/setup/docker/helpers/test_docker_env.sh
+    # Setup - Dockerfile Configuration Scripts
+    source ./scripts/setup/docker/containers/backend/configure_backend_dockerfile.sh
+    source ./scripts/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
+    source ./scripts/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
 
-  # Docker containers frontend scripts
-  source ./shell/setup/docker/containers/frontend/configure_frontend_dockerfile.sh
+    # Setup - Certbot
+    source ./scripts/operations/certbot/generate_certbot_renewal.sh
+    source ./scripts/operations/certbot/wait_for_certbot_completion.sh
+    source ./scripts/operations/certbot/check_certbot_success.sh
 
-  # Docker containers certbot scripts
-  source ./shell/setup/docker/containers/certbot/configure_certbot_dockerfile.sh
+    # Setup - Common
+    source ./scripts/setup/docker/common/docker_compose_exists.sh
+    source ./scripts/setup/docker/common/test_docker_env.sh
 
-  # Docker containers backend scripts
-  source ./shell/setup/docker/containers/backend/configure_backend_dockerfile.sh
+    # Setup - Docker Rootless
+    source ./scripts/setup/docker/rootless/setup_docker_rootless.sh
 
-  # Docker compose scripts
-  source ./shell/setup/docker/compose/configure_docker_compose.sh
+    # Setup - Dotenv Configure
+    source ./scripts/setup/dotenv/configure_backend_dotenv.sh
+    source ./scripts/setup/dotenv/configure_frontend_dotenv.sh
 
-  # Setup self-signed scripts
-  source ./shell/setup/self-signed/generate_self_signed_certificates.sh
+    # Setup - Util Scripts
+    source ./scripts/operations/util/create_directory.sh
+    source ./scripts/operations/util/configure_server_files.sh
+    source ./scripts/operations/util/setup_project_directories.sh
+    source ./scripts/operations/util/backup_replace_file.sh
 
-  # Networking scripts
-  source ./shell/networking/ensure_port_is_available.sh
+    # Setup - Nginx
+    source ./scripts/setup/docker/containers/frontend/configure_nginx_config.sh
 
-  # Profiles scripts
-  source ./shell/profiles/automatic_production_selection.sh
-  source ./shell/profiles/automatic_staging_selection.sh
-  source ./shell/profiles/automation_production_reload_selection.sh
+    # Setup - Self-signed
+    source ./scripts/operations/certificates/generate_self_signed_certificates.sh
+    source ./scripts/operations/certificates/handle_certs.sh
 
-  # Flags scripts
-  source ./shell/flags/enable_ssl.sh
-  source ./shell/flags/enable_letsencrypt.sh
+    # Setup - Sitemap
+    source ./scripts/setup/sitemap/configure_frontend_sitemap.sh
 
-  source ./shell/mocks/run_mocks.sh
+    # Setup - Robots
+    source ./scripts/setup/robots/configure_frontend_robots.sh
 
-  source ./shell/operations/certbot/build_certbot_service.sh
+    # Test Mocks
+    source ./scripts/tests/mocks/run_mocks.sh
 
-  source ./shell/ssl/generate_certbot_renewal.sh
 }
 
 #######################################

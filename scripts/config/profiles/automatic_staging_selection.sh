@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+#######################################
+# Applies the staging configuration profile to the current environment.
+# Arguments:
+#  None
+#######################################
+automatic_staging_selection() {
+    apply_profile "staging_config"
+}

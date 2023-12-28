@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# bashsupport disable=BP5006
+
+#######################################
+# Configures Docker Compose services depending on the selected SSL mode.
+# Globals:
+#   USE_LETSENCRYPT
+#   USE_SELF_SIGNED_CERTS
+# Arguments:
+#  None
+#######################################
+configure_docker_compose() {
+  initialize_variables
+  if [[ $USE_LETSENCRYPT == "true" ]]; then
+    configure_compose_letsencrypt_mode
+  elif [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
+    configure_compose_self_signed_mode
+  else
+    configure_http
+  fi
+
+  # Assemble the Docker Compose configuration
+  assemble_docker_compose_configuration
+}

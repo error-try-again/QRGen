@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+#######################################
+# Applies the production configuration profile to the current environment.
+# Arguments:
+#  None
+#######################################
+automatic_production_reload_selection() {
+    apply_profile "prod_reload_config"
+}
