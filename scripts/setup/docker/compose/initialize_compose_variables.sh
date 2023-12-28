@@ -32,7 +32,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-initialize_variables() {
+function initialize_variables() {
   export backend_service_definition=""
   export frontend_service_definition=""
   export certbot_service_definition=""
