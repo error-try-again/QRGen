@@ -22,13 +22,13 @@ function assign_flag_value() {
 
   # Validate that flag_name adheres to expected naming conventions:
   # Starts with 'use_' or 'no_', followed by lowercase letters or underscores.
-  if ! [[ $flag_name =~ ^(use_|no_)?[a-z_]+$ ]]; then
-    echo "Error: Unexpected flag '$flag_name'"
+  if ! [[ ${flag_name} =~ ^(use_|no_)?[a-z_]+$ ]]; then
+    echo "Error: Unexpected flag '${flag_name}'"
     exit 1
   fi
 
   # Declare a global variable dynamically using the name and value provided.
-  declare -g "$flag_name"="$flag_value"
+  declare -g "${flag_name}"="${flag_value}"
 }
 
 #######################################
@@ -47,16 +47,16 @@ function options_parser() {
   # Define long options for the script. Each option is followed by a comma.
   # Options requiring an argument are followed by a colon.
   long_options_list="setup,run-mocks,uninstall,dump-logs,update-project,\
-stop-containers,prune-builds,quit,use-hsts,use-ocsp-stapling,use-tls13,\
-use-tls12,backend-port:,nginx-port:,nginx-ssl-port:,challenge-port:,\
+stop-containers,purge,quit,use-hsts,use-ocsp-stapling,use-tls13,use-tls12,help\
+backend-port:,nginx-port:,nginx-ssl-port:,challenge-port:,\
 node-version:,dns-resolver:,timeout:,domain-name:,backend-scheme:,\
 subdomain:,regenerate-ssl-certs:,letsencrypt-email:,use-production-ssl:,\
 use-lets-encrypt:,use-custom-domain:,use-must-staple:,use-strict-permissions:,\
 use-uir:,use-dry-run:,use-auto-renew-ssl:,use-overwrite-self-signed-certs:,\
 use-force-renew:,use-self-signed-certs:,use-ssl:,dh-param-size:,tos-flag:,\
 no-eff-email-flag:,non-interactive-flag:,rsa-key-size:,build-certbot-image:,\
-disable-docker-caching:,use-google-api-key:,google-maps-api-key:,\
-release-branch:,use-gzip:,help"
+disable-docker-caching:,use-google-api-key:,google-maps-api-key:,release-branch:,use-gzip:,\
+"
 
   # Parse the provided options using getopt. This prepares them for consumption.
   # -o defines short options, here only 'h' (help) as a short option.
@@ -64,16 +64,16 @@ release-branch:,use-gzip:,help"
   # --long defines the long options.
   # The last -- "$@" passes all the script's command-line arguments for parsing.
   local parsed_options
-  parsed_options=$(getopt -o h -n 'script.bash' --long "$long_options_list" -- "$@")
+  parsed_options=$(getopt -o h -n 'script.bash' --long "${long_options_list}" -- "$@")
 
   # Exit if getopt has encountered an error.
-  if [[ -z $parsed_options ]]; then
+  if [[ -z ${parsed_options} ]]; then
     echo "Failed parsing options." >&2
     exit 1
   fi
 
   # Evaluate the parsed options string to set the positional parameters ($1, $2, etc.)
-  eval set -- "$parsed_options"
+  eval set -- "${parsed_options}"
 
   while true; do
     case "$1" in
@@ -86,17 +86,17 @@ release-branch:,use-gzip:,help"
           break
           ;;
       *)
-           # Default case: handle long option or its argument.
+          # Default case: handle long option or its argument.
           # If the second parameter looks like another option or if it's empty, consider it a boolean flag.
           # Otherwise, treat it as an argument for an option.
           if [[ "$2" =~ ^-.* || -z "$2" ]]; then
             assign_flag_value "$1"
-        else
+    else
             assign_flag_value "$1" "$2"
             shift # Move past the argument as it's been handled.
-        fi
+    fi
           ;;
-    esac
+esac
       shift # Move to the next parameter or option.
   done
 }
