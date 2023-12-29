@@ -3,46 +3,47 @@
 set -euo pipefail
 
 #######################################
-# Dumps logs of all containers orchestrated by the Docker Compose file.
-# Globals:
-#   PROJECT_LOGS_DIR
+# Dumps logs for a given service.
 # Arguments:
-#  None
+#   1 - Service name
+#   2 - Date and time
+# Globals:
+#   DOCKER_COMPOSE_FILE
+#   PROJECT_LOGS_DIR
 #######################################
-function dump_logs() {
-  test_docker_env
-  mkdir -p "$PROJECT_LOGS_DIR"
-  produce_docker_logs > "$PROJECT_LOGS_DIR/service.log" && {
-    echo "Docker logs dumped to $PROJECT_LOGS_DIR/service.log"
-    cat "$PROJECT_LOGS_DIR/service.log"
-  }
+function dump_service_logs() {
+  local service="$1"
+  local datetime="$2"
+  local separator="---------------------------------------"
+
+  echo "Dumping logs for service: ${service} at ${datetime}"
+  local logs
+  logs=$(docker compose -f "${DOCKER_COMPOSE_FILE}" logs "${service}")
+
+  local log_file="${PROJECT_LOGS_DIR}/${service}_${datetime// /_}.log"
+  echo "${logs}" > "${log_file}"
+  echo "Logs for ${service} saved to ${log_file}"
+  echo "${separator}"
 }
 
 #######################################
-# Check if Docker Compose exists and prints all services defined in the Compose file
+# Dumps logs of all containers orchestrated by the Docker Compose file.
 # Globals:
-#   PROJECT_ROOT_DIR
-# Arguments:
-#  None
-# Returns:
-#   1 ...
+#   PROJECT_LOGS_DIR
+#   DOCKER_COMPOSE_FILE
 #######################################
-function produce_docker_logs() {
-  if docker_compose_exists; then
+function dump_logs() {
+  check_docker_compose || return 1
+  mkdir -p "${PROJECT_LOGS_DIR}"
 
-    # Get a list of services defined in the Compose file
-    local services
-    local service
+  local datetime
+  datetime=$(date "+%Y-%m-%d_%H-%M-%S")
 
-    services=$(docker compose -f "$DOCKER_COMPOSE_FILE" config --services)
+  local services
+  services=$(docker compose -f "${DOCKER_COMPOSE_FILE}" config --services)
 
-    # Loop through each service and produce logs
-    for service in $services; do
-      echo "Logs for service: $service" "@" "$(date)"
-      docker compose -f "$DOCKER_COMPOSE_FILE" logs "$service"
-      echo "--------------------------------------------"
-    done
-  else
-    echo "Docker Compose not found. Please install Docker Compose."
-  fi
+  local service
+  for service in ${services}; do
+    dump_service_logs "${service}" "${datetime}"
+  done
 }
