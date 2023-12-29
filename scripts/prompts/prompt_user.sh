@@ -3,30 +3,36 @@
 
 set -euo pipefail
 
-
-#######################################
-# Provides a basic TUI/menu for the user to select from.
-# Globals:
-#   PS3
-# Arguments:
-#  None
-#######################################
-function prompt_user() {
-  local welcome_message="Welcome to the QR Code Generator setup script!"
-  local thanks_message="Thanks for using the QR Code Generator setup script!"
-  local select_prompt='Select: '
-  local options=("Run Setup" "Run Mock Configuration" "Uninstall" "Dump logs"
+# Constants for UI
+readonly HEADER_LINE="----------------------------------------------"
+readonly WELCOME_MESSAGE="Welcome to the QRGen setup script!"
+readonly THANK_YOU_MESSAGE="Thanks for using the QR Code Generator setup script!"
+readonly SELECT_PROMPT='Select: '
+readonly OPTIONS=("Run Setup" "Run Mock Configuration" "Uninstall" "Dump logs"
                  "Update Project" "Stop Project Docker Containers"
-                 "Prune All Docker Builds - Dangerous" "Quit")
-  echo "${welcome_message}"
-  local user_selection
-  PS3=$select_prompt
+                 "Purge Current Builds - Dangerous" "Quit")
 
-  # Provide a menu for the user to select from and pass it to the handle_user_selection switching function.
-  select user_selection in "${options[@]}"; do
-    if prompt_user_selection_switch "$user_selection"; then
-      break
+# Print header function
+function print_header() {
+    echo "${HEADER_LINE}"
+    echo "$1"
+    echo "${HEADER_LINE}"
+}
+
+# Main menu function
+function prompt_user() {
+    print_header "${WELCOME_MESSAGE}"
+    local user_selection
+    PS3=${SELECT_PROMPT}
+
+    select user_selection in "${OPTIONS[@]}"; do
+    if [[ -n ${user_selection} ]]; then
+      if prompt_user_selection_switch "${user_selection}"; then
+        print_header "${THANK_YOU_MESSAGE}"
+        break
+      fi
+    else
+      echo "Invalid option. Please try again."
     fi
-    echo "${thanks_message}"
   done
 }
