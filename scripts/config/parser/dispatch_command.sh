@@ -8,7 +8,7 @@ set -euo pipefail
 # Globals:
 #   BASH_SOURCE
 #   dump_logs
-#   prune_builds
+#   purge
 #   quit
 #   run_mocks
 #   setup
@@ -24,14 +24,14 @@ function dispatch_command() {
 
   # Associative array to map the command flag to the corresponding function to execute.
   local -A command_function_map=(
-                       ["$setup"]=setup
-                       ["$run_mocks"]=run_mocks
-                       ["$uninstall"]=uninstall
-                       ["$dump_logs"]=dump_logs
-                       ["$update_project"]=update_project
-                       ["$stop_containers"]=stop_containers
-                       ["$prune_builds"]=purge_builds
-                       ["$quit"]=quit
+                         ["${setup}"]=setup
+                         ["${run_mocks}"]=run_mocks
+                         ["${uninstall}"]=uninstall
+                         ["${dump_logs}"]=dump_logs
+                         ["${update_project}"]=update_project
+                         ["${stop_containers}"]=stop_containers
+                         ["${purge}"]=purge
+                         ["${quit}"]=quit
   )
 
   local command_executed=false
@@ -41,14 +41,14 @@ function dispatch_command() {
   # If the key is true, then execute the corresponding function and set command_executed to true
   # If no command is executed, then run the user prompt
   for command in "${!command_function_map[@]}"; do
-    if [ "$command" = true ]; then
+    if [[ "${command}" = true ]]; then
       PROMPT_BYPASS=true
-      eval "${command_function_map[$command]}"
+      eval "${command_function_map[${command}]}"
       command_executed=true
       break
     fi
   done
-  if [ "$command_executed" = false ]; then
+  if [[ "${command_executed}" = false ]]; then
     PROMPT_BYPASS=false
     prompt_user
   fi
