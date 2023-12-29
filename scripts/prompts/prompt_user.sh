@@ -6,7 +6,7 @@ set -euo pipefail
 # Constants for UI
 readonly HEADER_LINE="----------------------------------------------"
 readonly WELCOME_MESSAGE="Welcome to the QRGen setup script!"
-readonly THANK_YOU_MESSAGE="Thanks for using the QR Code Generator setup script!"
+readonly THANK_YOU_MESSAGE="Thanks for using the QRGen setup script!"
 readonly SELECT_PROMPT='Select: '
 readonly OPTIONS=("Run Setup" "Run Mock Configuration" "Uninstall" "Dump logs"
   "Update Project" "Stop Project Docker Containers"

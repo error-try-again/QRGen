@@ -123,6 +123,7 @@ function source_files() {
 	source ./scripts/operations/util/configure_server_files.sh
 	source ./scripts/operations/util/setup_project_directories.sh
 	source ./scripts/operations/util/backup_replace_file.sh
+	source ./scripts/operations/util/generate_file_path.sh
 
 	# Setup - Nginx
 	source ./scripts/setup/docker/containers/frontend/configure_nginx_config.sh

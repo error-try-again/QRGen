@@ -69,7 +69,7 @@
     "MUST_STAPLE_FLAG": "--must-staple",
     "NON_INTERACTIVE_FLAG": "--non-interactive",
     "NO_EFF_EMAIL_FLAG": "--no-eff-email",
-    "OCSP_STAPLING_FLAG": "--ocsp-stapling",
+    "OCSP_STAPLING_FLAG": "--staple-ocsp",
     "ORIGIN": "void.qr-gen.net",
     "ORIGIN_PORT": "8080",
     "ORIGIN_URL": "https://void.qr-gen.net",
