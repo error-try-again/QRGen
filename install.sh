@@ -157,7 +157,6 @@ function source_files() {
     source ./scripts/tests/server/gracefully_terminate_mock_server.sh
 
     source ./scripts/tests/validation/validate_service_config.sh
-    source ./scripts/tests/validation/check_mocks.sh
 
     source ./scripts/tests/asserts/assert_nginx_has_port.sh
     source ./scripts/tests/asserts/assert_compose_has_port.sh
