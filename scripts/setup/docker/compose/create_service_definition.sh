@@ -26,7 +26,9 @@ function add_to_definition() {
       fi
     done
   fi
-}#######################################
+}
+
+#######################################
 # Created a generic service definition for Docker Compose file.
 # Globals:
 #   ADDR

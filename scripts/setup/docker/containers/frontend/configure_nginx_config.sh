@@ -311,7 +311,7 @@ function write_endpoints() {
 #  None
 #######################################
 function write_nginx_config() {
-  cat <<-EOF >"${NGINX_CONF_FILE}"
+  cat <<-EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
 ${NGINX_PID}
 ${NGINX_ERROR_LOG}
