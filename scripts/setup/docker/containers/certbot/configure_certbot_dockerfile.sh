@@ -73,6 +73,7 @@ RUN apk add --no-cache --virtual .build-deps \\
     && apk del .build-deps \\
     && rm -rf \"${HOME}\"/.cargo"
 
+  backup_existing_config "${CERTBOT_DOCKERFILE}"
   echo -e "${DOCKERFILE_TEMPLATE}" > "${CERTBOT_DOCKERFILE}"
   echo "Dockerfile for certbot configured successfully at ${CERTBOT_DOCKERFILE}"
 }

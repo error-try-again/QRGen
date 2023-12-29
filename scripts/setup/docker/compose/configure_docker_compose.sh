@@ -11,14 +11,13 @@
 #######################################
 function configure_docker_compose() {
   initialize_variables
+  backup_existing_config "${DOCKER_COMPOSE_FILE}"
   if [[ ${USE_LETSENCRYPT} == "true" ]]; then
     configure_compose_letsencrypt_mode
 elif   [[ ${USE_SELF_SIGNED_CERTS} == "true" ]]; then
     configure_compose_self_signed_mode
 else
     configure_http
-fi
-
-  # Assemble the Docker Compose configuration
+fi  # Assemble the Docker Compose configuration
   assemble_docker_compose_configuration
 }

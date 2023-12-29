@@ -25,7 +25,7 @@ function configure_nginx_config() {
     certs=""
     security_headers=""
     acme_challenge_server_block=""
-    backup_existing_config
+    backup_existing_config "${NGINX_CONF_FILE}"
     configure_subdomain
     configure_https
     configure_acme_challenge
@@ -258,9 +258,11 @@ function configure_acme_challenge() {
 #  None
 #######################################
 function backup_existing_config() {
-    if [[ -f ${NGINX_CONF_FILE}   ]]; then
-        cp "${NGINX_CONF_FILE}" "${NGINX_CONF_FILE}.bak"
-        echo "Backup created at \"${NGINX_CONF_FILE}.bak\""
+    local file
+    file=$1
+    if [[ -f ${file} ]]; then
+        cp "${file}" "${file}.bak"
+        echo "Backup created at \"${file}.bak\""
   fi
 }
 

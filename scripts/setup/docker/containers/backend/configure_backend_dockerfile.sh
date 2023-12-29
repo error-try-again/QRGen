@@ -16,6 +16,7 @@ set -euo pipefail
 #######################################
 function configure_backend_docker() {
     local origin="origin"/"${RELEASE_BRANCH}"
+    backup_existing_config "${BACKEND_DOCKERFILE}"
 
     cat << EOF > "${BACKEND_DOCKERFILE}"
 # Use the specified version of Node.js

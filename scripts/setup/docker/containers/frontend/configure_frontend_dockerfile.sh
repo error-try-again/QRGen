@@ -14,6 +14,7 @@ set -euo pipefail
 #######################################
 function configure_frontend_docker() {
     local origin="origin/${RELEASE_BRANCH}"
+    backup_existing_config "${FRONTEND_DOCKERFILE}"
 
     cat << EOF > "${FRONTEND_DOCKERFILE}"
 # Use the latest version of Node.js
