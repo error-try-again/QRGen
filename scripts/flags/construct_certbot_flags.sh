@@ -34,7 +34,7 @@ function construct_certbot_flags() {
   PRODUCTION_CERTS_FLAG=$([[ -n ${USE_PRODUCTION_SSL} && ${USE_PRODUCTION_SSL} == "true" ]] && echo "--server https://acme-v02.api.letsencrypt.org/directory" || echo "--server https://acme-staging-v02.api.letsencrypt.org/directory")
   DRY_RUN_FLAG=$([[ -n ${USE_DRY_RUN} && ${USE_DRY_RUN} == "true" ]] && echo "--dry-run" || echo "")
   FORCE_RENEW_FLAG=$([[ -n ${USE_FORCE_RENEW} && ${USE_FORCE_RENEW} == "true" ]] && echo "--force-renewal" || echo "")
-  OVERWRITE_SELF_SIGNED_CERTS_FLAG=$([[ -n ${USE_OVERWRITE_SELF_SIGNED_CERTS} && ${USE_OVERWRITE_SELF_SIGNED_CERTS} == "true" ]] && echo "--overwrite" || echo "")
+  OVERWRITE_SELF_SIGNED_CERTS_FLAG=$([[ -n ${USE_OVERWRITE_SELF_SIGNED_CERTS} && ${USE_OVERWRITE_SELF_SIGNED_CERTS} == "true" ]] && echo "--overwrite-cert-dirs" || echo "")
   OCSP_STAPLING_FLAG=$([[ -n ${USE_OCSP_STAPLING} && ${USE_OCSP_STAPLING} == "true" ]] && echo "--staple-ocsp" || echo "")
   MUST_STAPLE_FLAG=$([[ -n ${USE_MUST_STAPLE} && ${USE_MUST_STAPLE} == "true" ]] && echo "--must-staple" || echo "")
   STRICT_PERMISSIONS_FLAG=$([[ -n ${USE_STRICT_PERMISSIONS} && ${USE_STRICT_PERMISSIONS} == "true" ]] && echo "--strict-permissions" || echo "")

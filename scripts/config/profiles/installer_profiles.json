@@ -73,7 +73,7 @@
     "ORIGIN": "void.qr-gen.net",
     "ORIGIN_PORT": "8080",
     "ORIGIN_URL": "https://void.qr-gen.net",
-    "OVERWRITE_SELF_SIGNED_CERTS_FLAG": "--overwrite-self-signed-cert",
+    "OVERWRITE_SELF_SIGNED_CERTS_FLAG": "--overwrite-cert-dirs",
     "PRODUCTION_CERTS_FLAG": "--staging",
     "REGENERATE_SSL_CERTS": false,
     "RELEASE_BRANCH": "full-release",
