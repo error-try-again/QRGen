@@ -14,10 +14,10 @@ function run_certbot_dry_run() {
   local certbot_output
   if ! certbot_output=$(docker compose run --rm certbot 2>&1); then
     echo "Certbot dry-run command failed."
-    echo "Output: $certbot_output"
+    echo "Output: ${certbot_output}"
     return 1
   fi
-  if [[ $certbot_output == *'The dry run was successful.'* ]]; then
+  if [[ ${certbot_output} == *'The dry run was successful.'* ]]; then
     echo "Certbot dry run successful."
     remove_dry_run_flag
     handle_staging_flags
