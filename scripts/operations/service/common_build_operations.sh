@@ -11,8 +11,8 @@ set -euo pipefail
 #  None
 #######################################
 function common_build_operations() {
-      cd "$PROJECT_ROOT_DIR" || {
-      echo "Failed to change directory to $PROJECT_ROOT_DIR"
+      cd "${PROJECT_ROOT_DIR}" || {
+      echo "Failed to change directory to ${PROJECT_ROOT_DIR}"
       exit 1
   }
 
@@ -37,7 +37,7 @@ function common_build_operations() {
   }
 
     # Run each service separately - must be active for certbot to work
-    if [[ $RELEASE_BRANCH = "full-release" ]]; then
+    if [[ ${RELEASE_BRANCH} = "full-release" ]]; then
       run_backend_service
       run_frontend_service
   else
