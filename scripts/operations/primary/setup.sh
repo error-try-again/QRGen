@@ -16,7 +16,7 @@ function setup() {
   if [[ ${PROMPT_BYPASS} == true ]]; then
     echo "Skipping prompts..."
   else
-    prompt_for_install_mode
+    prompt_for_release_install_mode
     prompt_disable_docker_build_cache
     prompt_for_domain_and_letsencrypt
     prompt_for_google_api_key
