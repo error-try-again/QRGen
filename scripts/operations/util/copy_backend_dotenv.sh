@@ -10,5 +10,5 @@ set -euo pipefail
 #  None
 #######################################
 function copy_updated_dotenv() {
-   cp ".env" "$BACKEND_DIR"
+   cp ".env" "${BACKEND_DIR}"
 }
