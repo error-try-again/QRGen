@@ -1,5 +1,6 @@
 {
   "staging_config": {
+    "DISABLE_DOCKER_CACHING": true,
     "BUILD_CERTBOT_IMAGE": true,
     "DH_PARAM_SIZE": 2048,
     "LETSENCRYPT_EMAIL": "skip",
@@ -17,6 +18,7 @@
     "USE_UIR": true
   },
   "prod_reload_config": {
+    "DISABLE_DOCKER_CACHING": true,
     "BUILD_CERTBOT_IMAGE": false,
     "DH_PARAM_SIZE": 2048,
     "LETSENCRYPT_EMAIL": "skip",
@@ -34,6 +36,7 @@
     "USE_UIR": true
   },
   "prod_config": {
+    "DISABLE_DOCKER_CACHING": true,
     "BUILD_CERTBOT_IMAGE": true,
     "DH_PARAM_SIZE": 2048,
     "LETSENCRYPT_EMAIL": "skip",
@@ -54,6 +57,7 @@
     "BACKEND_SCHEME": "https",
     "BUILD_CERTBOT_IMAGE": true,
     "DH_PARAM_SIZE": 2048,
+    "DISABLE_DOCKER_CACHING": true,
     "DOMAIN_NAME": "qr-gen.net",
     "DRY_RUN_FLAG": "--dry-run",
     "EMAIL_FLAG": "--register-unsafely-without-email",
@@ -73,6 +77,7 @@
     "REGENERATE_SSL_CERTS": true,
     "RELEASE_BRANCH": "full-release",
     "RSA_KEY_SIZE_FLAG": "--rsa-key-size",
+    "SKIP_DOMAIN_PROMPT": true,
     "STRICT_PERMISSIONS_FLAG": "--strict-permissions",
     "SUBDOMAIN": "void",
     "TOS_FLAG": "--agree-tos",
