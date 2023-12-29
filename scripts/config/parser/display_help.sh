@@ -14,9 +14,9 @@ General Options:
   --run-mocks                         Execute mock configurations for testing.
   --uninstall                         Clean up and remove project-related data.
   --dump-logs                         Collect and display system logs.
-  --update-project                    Update the project components to the latest version.
+  --update                   Update the project components to the latest version.
   --stop                   Halt all related Docker containers.
-  --prune-builds                      Remove Docker builds and clean up space (Use with caution).
+  --purge                      Remove Docker builds and clean up space (Use with caution).
   --quit                              Exit the script prematurely.
 
 Security and SSL/TLS Options:
