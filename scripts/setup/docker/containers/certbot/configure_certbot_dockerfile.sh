@@ -20,22 +20,22 @@ set -euo pipefail
 #######################################
 function configure_certbot_docker() {
 
-  BASE_IMAGE="python:3.10-alpine3.16 as certbot"
+  BASE_IMAGE="${CERTBOT_BASE_IMAGE} as certbot"
   ENTRYPOINT="[ \"certbot\" ]"
   EXPOSE="80 443"
   VOLUMES="/etc/letsencrypt /var/lib/letsencrypt"
   WORKDIR="/opt/certbot"
   CARGO_NET_GIT_FETCH_WITH_CLI="true"
 
-  DOCKERFILE_TEMPLATE="FROM $BASE_IMAGE
-ENTRYPOINT $ENTRYPOINT
-EXPOSE $EXPOSE
-VOLUME $VOLUMES
-WORKDIR $WORKDIR
+  DOCKERFILE_TEMPLATE="FROM ${BASE_IMAGE}
+ENTRYPOINT ${ENTRYPOINT}
+EXPOSE ${EXPOSE}
+VOLUME ${VOLUMES}
+WORKDIR ${WORKDIR}
 
 # Retrieve certbot code
 RUN mkdir -p src \\
- && wget -O certbot-master.zip https://github.com/error-try-again/certbot/archive/refs/heads/master.zip \\
+ && wget -O certbot-master.zip ${CERTBOT_REPO} \\
  && unzip certbot-master.zip \\
  && cp certbot-master/CHANGELOG.md certbot-master/README.rst src/ \\
  && cp -r certbot-master/tools tools \\
@@ -54,7 +54,7 @@ RUN apk add --no-cache --virtual .certbot-deps \\
 # We set this environment variable and install git while building to try and
 # increase the stability of fetching the rust crates needed to build the
 # cryptography library
-ARG CARGO_NET_GIT_FETCH_WITH_CLI=$CARGO_NET_GIT_FETCH_WITH_CLI
+ARG CARGO_NET_GIT_FETCH_WITH_CLI=${CARGO_NET_GIT_FETCH_WITH_CLI}
 
 # Install certbot from sources
 RUN apk add --no-cache --virtual .build-deps \\
@@ -73,6 +73,6 @@ RUN apk add --no-cache --virtual .build-deps \\
     && apk del .build-deps \\
     && rm -rf \"${HOME}\"/.cargo"
 
-  echo -e "$DOCKERFILE_TEMPLATE" > "$CERTBOT_DOCKERFILE"
-  cat "$CERTBOT_DOCKERFILE"
+  echo -e "${DOCKERFILE_TEMPLATE}" > "${CERTBOT_DOCKERFILE}"
+  echo "Dockerfile for certbot configured successfully at ${CERTBOT_DOCKERFILE}"
 }
