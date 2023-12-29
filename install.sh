@@ -37,7 +37,7 @@ function source_files() {
 
     # Operations - Primary
     source ./scripts/operations/primary/dump_logs.sh
-    source ./scripts/operations/primary/purge_builds.sh
+    source ./scripts/operations/primary/purge.sh
     source ./scripts/operations/primary/setup.sh
     source ./scripts/operations/primary/uninstall.sh
     source ./scripts/operations/primary/update_project.sh
@@ -62,7 +62,7 @@ function source_files() {
     source ./scripts/operations/validation/check_jq_exists.sh
 
     # Prompts scripts
-    source ./scripts/prompts/prompt_for_custom_certbot_install.sh
+    source ./scripts/prompts/prompt_for_custom_letsencrypt_install.sh
     source ./scripts/prompts/prompt_disable_docker_build_cache.sh
     source ./scripts/prompts/prompt_and_validate_input.sh
     source ./scripts/prompts/prompt_user_selection_switch.sh
@@ -73,8 +73,8 @@ function source_files() {
     source ./scripts/prompts/prompt_for_domain_details.sh
     source ./scripts/prompts/prompt_for_google_api_key.sh
     source ./scripts/prompts/prompt_for_gzip.sh
-    source ./scripts/prompts/prompt_for_install_mode.sh
-    source ./scripts/prompts/prompt_for_letsencrypt_options.sh
+    source ./scripts/prompts/prompt_for_release_install_mode.sh
+    source ./scripts/prompts/prompt_for_letsencrypt_install_type.sh
     source ./scripts/prompts/prompt_for_self_signed.sh
     source ./scripts/prompts/prompt_for_ssl.sh
     source ./scripts/prompts/prompt_with_validation.sh
@@ -107,7 +107,7 @@ function source_files() {
     source ./scripts/operations/certbot/check_certbot_success.sh
 
     # Setup - Common
-    source ./scripts/setup/docker/common/docker_compose_exists.sh
+    source ./scripts/setup/docker/common/check_docker_compose.sh
     source ./scripts/setup/docker/common/test_docker_env.sh
 
     # Setup - Docker Rootless
