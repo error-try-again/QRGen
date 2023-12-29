@@ -17,7 +17,7 @@ set -euo pipefail
 #  None
 #######################################
 function prompt_for_domain_details() {
-  if [[ ${SKIP_DOMAIN_PROMPT} == "true" ]]; then
+  if [[ ${SKIP_DOMAIN_PROMPT} == true ]]; then
      echo "Skipping domain prompt, please ensure that the following environment variables are set correctly:"
       echo "  BACKEND_SCHEME: ${BACKEND_SCHEME}"
       echo "  DOMAIN_NAME: ${DOMAIN_NAME}"
@@ -25,7 +25,6 @@ function prompt_for_domain_details() {
       echo "  ORIGIN_PORT: ${ORIGIN_PORT}"
       echo "  SUBDOMAIN: ${SUBDOMAIN}"
       echo "  USE_CUSTOM_DOMAIN: ${USE_CUSTOM_DOMAIN}"
-      echo "  USE_SUBDOMAIN: ${USE_SUBDOMAIN}"
     return
   fi
   prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost)" USE_CUSTOM_DOMAIN
@@ -41,10 +40,10 @@ function prompt_for_domain_details() {
       origin_url="${BACKEND_SCHEME}://${SUBDOMAIN}.${DOMAIN_NAME}"
       ORIGIN="${origin_url}:${ORIGIN_PORT}"
       echo "Using custom subdomain: ${origin_url}"
-  fi
-else
+    fi
+  else
     DOMAIN_NAME="localhost"
     ORIGIN="${BACKEND_SCHEME}://${DOMAIN_NAME}:${ORIGIN_PORT}"
     echo "Using default domain name: ${ORIGIN}"
-fi
+  fi
 }
