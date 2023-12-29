@@ -17,10 +17,10 @@ function add_to_definition() {
     if [[ -n ${values} ]]; then
       definition+=$'\n'
       definition+="    ${type}:"
-      IFS=',' read -ra ADDR <<< "$values"
+      IFS=',' read -ra ADDR <<< "${values}"
       local item
       for item in "${ADDR[@]}"; do
-        if [[ -n $item ]]; then
+        if [[ -n ${item} ]]; then
           definition+=$'\n'
           definition+="      - ${item}"
         fi
@@ -47,7 +47,7 @@ function create_service_definition() {
   local depends=""
 
   # Parsing named arguments
-  while [ "$#" -gt 0 ]; do
+  while [[ "$#" -gt 0 ]]; do
     case $1 in
       --name)
               name=$2
@@ -104,9 +104,9 @@ function create_service_definition() {
     definition+="    command: ${command}"
   fi
 
-  add_to_definition "ports" "$ports"
-  add_to_definition "volumes" "$volumes"
-  add_to_definition "networks" "$networks"
+  add_to_definition "ports" "${ports}"
+  add_to_definition "volumes" "${volumes}"
+  add_to_definition "networks" "${networks}"
 
   if [[ -n ${restart} ]]; then
     definition+=$'\n'
@@ -114,7 +114,7 @@ function create_service_definition() {
   fi
 
   if [[ -n ${depends} ]]; then
-    add_to_definition "depends_on" "$depends"
+    add_to_definition "depends_on" "${depends}"
   fi
 
   echo "${definition}"
