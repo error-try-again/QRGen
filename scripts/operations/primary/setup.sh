@@ -16,6 +16,7 @@ function setup() {
   if [[ ${PROMPT_BYPASS} == true ]]; then
     echo "Skipping prompts..."
   else
+    select_and_apply_profile
     prompt_for_release_install_mode
     prompt_disable_docker_build_cache
     prompt_for_domain_and_letsencrypt

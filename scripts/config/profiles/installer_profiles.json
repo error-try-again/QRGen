@@ -51,7 +51,8 @@
     "USE_STRICT_PERMISSIONS": false,
     "USE_TLS12": false,
     "USE_TLS13": true,
-    "USE_UIR": true
+    "USE_UIR": true,
+    "RSA_KEY_SIZE_FLAG": "--rsa-key-size 4096"
   },
   "trial_config": {
     "BACKEND_SCHEME": "https",
@@ -76,7 +77,7 @@
     "PRODUCTION_CERTS_FLAG": "--staging",
     "REGENERATE_SSL_CERTS": true,
     "RELEASE_BRANCH": "full-release",
-    "RSA_KEY_SIZE_FLAG": "--rsa-key-size",
+    "RSA_KEY_SIZE_FLAG": "--rsa-key-size 4096",
     "SKIP_DOMAIN_PROMPT": true,
     "STRICT_PERMISSIONS_FLAG": "--strict-permissions",
     "SUBDOMAIN": "void",

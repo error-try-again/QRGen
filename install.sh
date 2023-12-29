@@ -103,6 +103,7 @@ function source_files() {
 
     # Setup - Certbot
     source ./scripts/operations/certbot/generate_certbot_renewal.sh
+    source ./scripts/operations/certbot/build_certbot_service.sh
     source ./scripts/operations/certbot/wait_for_certbot_completion.sh
     source ./scripts/operations/certbot/check_certbot_success.sh
 

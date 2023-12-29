@@ -24,6 +24,10 @@ function generate_self_signed_certificates() {
 
   local dh_params_path="${CERTS_DH_DIR}/dhparam.pem"
 
+  if [[ ! -f "${dh_params_path}" ]]; then
+    echo "DH parameters file not found at ${dh_params_path}."
+fi
+
   # Check and generate new self-signed certificates if needed
   if [[ ! -f "${certs_path}/fullchain.pem" ]] || prompt_for_dhparam_regeneration "${certs_path}"; then
     # Create self-signed certificate and private key
