@@ -30,14 +30,14 @@ set -euo pipefail
 #  None
 #######################################
 function construct_certbot_flags() {
-  EMAIL_FLAG=$([[ $LETSENCRYPT_EMAIL == "skip" ]] && echo "--register-unsafely-without-email" || echo "--email $LETSENCRYPT_EMAIL")
-  PRODUCTION_CERTS_FLAG=$([[ $USE_PRODUCTION_SSL ]] && echo "" || echo "--staging")
-  DRY_RUN_FLAG=$([[ $USE_DRY_RUN ]] && echo "--dry-run" || echo "")
-  FORCE_RENEW_FLAG=$([[ $USE_FORCE_RENEW ]] && echo "--force-renewal" || echo "")
-  OVERWRITE_SELF_SIGNED_CERTS_FLAG=$([[ $USE_OVERWRITE_SELF_SIGNED_CERTS ]] && echo "--overwrite-cert-dirs" || echo "")
-  OCSP_STAPLING_FLAG=$([[ $USE_OCSP_STAPLING ]] && echo "--staple-ocsp" || echo "")
-  MUST_STAPLE_FLAG=$([[ $USE_MUST_STAPLE ]] && echo "--must-staple" || echo "")
-  STRICT_PERMISSIONS_FLAG=$([[ $USE_STRICT_PERMISSIONS ]] && echo "--strict-permissions" || echo "")
-  HSTS_FLAG=$([[ $USE_HSTS ]] && echo "--hsts" || echo "")
-  UIR_FLAG=$([[ $USE_UIR ]] && echo "--uir" || echo "")
+  EMAIL_FLAG=$([[ ${LETSENCRYPT_EMAIL} == "skip" ]] && echo "--register-unsafely-without-email" || echo "--email ${LETSENCRYPT_EMAIL}")
+  PRODUCTION_CERTS_FLAG=$([[ -n ${USE_PRODUCTION_SSL} ]] && echo "" || echo "--staging")
+  DRY_RUN_FLAG=$([[ -n ${USE_DRY_RUN} ]] && echo "--dry-run" || echo "")
+  FORCE_RENEW_FLAG=$([[ -n ${USE_FORCE_RENEW} ]] && echo "--force-renewal" || echo "")
+  OVERWRITE_SELF_SIGNED_CERTS_FLAG=$([[ -n ${USE_OVERWRITE_SELF_SIGNED_CERTS} ]] && echo "--overwrite-cert-dirs" || echo "")
+  OCSP_STAPLING_FLAG=$([[ -n ${USE_OCSP_STAPLING} ]] && echo "--staple-ocsp" || echo "")
+  MUST_STAPLE_FLAG=$([[ -n ${USE_MUST_STAPLE} ]] && echo "--must-staple" || echo "")
+  STRICT_PERMISSIONS_FLAG=$([[ -n ${USE_STRICT_PERMISSIONS} ]] && echo "--strict-permissions" || echo "")
+  HSTS_FLAG=$([[ -n ${USE_HSTS} ]] && echo "--hsts" || echo "")
+  UIR_FLAG=$([[ -n ${USE_UIR} ]] && echo "--uir" || echo "")
 }

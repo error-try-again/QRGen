@@ -50,5 +50,5 @@ EXPOSE ${BACKEND_PORT}
 CMD ["npx", "ts-node", "/usr/app/backend/src/server.ts"]
 
 EOF
-    echo "Successfully generated backend Dockerfile at $BACKEND_DOCKERFILE"
+    echo "Successfully generated backend Dockerfile at ${BACKEND_DOCKERFILE}"
 }
