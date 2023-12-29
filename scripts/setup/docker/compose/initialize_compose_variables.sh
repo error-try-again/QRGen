@@ -52,8 +52,8 @@ function initialize_variables() {
   export frontend_dockerfile="./frontend/Dockerfile"
   export certbot_dockerfile="./certbot/Dockerfile"
 
-  local frontend_ports=""
-  local backend_ports=""
+  export frontend_ports=""
+  export backend_ports=""
 
   export backend_depends_on=""
   export frontend_depends_on="backend"
