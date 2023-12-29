@@ -18,7 +18,6 @@ set -euo pipefail
 #  None
 #######################################
 function configure_nginx_config() {
-    echo "Creating NGINX configuration..."
     server_name="server_name ${DOMAIN_NAME}"
     ssl_listen_directive=""
     ssl_mode_block=""
@@ -43,7 +42,7 @@ function configure_nginx_config() {
 #  None
 #######################################
 function configure_subdomain() {
-    if [[ $SUBDOMAIN != "www" && -n $SUBDOMAIN ]]; then
+    if [[ ${SUBDOMAIN} != "www" && -n ${SUBDOMAIN} ]]; then
         server_name+=" ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 }
@@ -64,11 +63,11 @@ function configure_subdomain() {
 #######################################
 # bashsupport disable=BP5006
 function configure_https() {
-    if [[ $USE_LETSENCRYPT == "true" ]] || [[ $USE_SELF_SIGNED_CERTS == "true" ]]; then
+    if [[ ${USE_LETSENCRYPT} == "true" ]] || [[ ${USE_SELF_SIGNED_CERTS} == "true" ]]; then
       BACKEND_SCHEME="https"
-      ssl_listen_directive="listen $NGINX_SSL_PORT ssl;"
+      ssl_listen_directive="listen ${NGINX_SSL_PORT} ssl;"
       ssl_listen_directive+=$'\n'
-      ssl_listen_directive+="        listen [::]:""$NGINX_SSL_PORT ssl;"
+      ssl_listen_directive+="        listen [::]:""${NGINX_SSL_PORT} ssl;"
       configure_ssl_mode
       resolver_settings="resolver ${DNS_RESOLVER} valid=300s;"
       resolver_settings+=$'\n'
@@ -88,7 +87,7 @@ function configure_https() {
 #  None
 #######################################
 function configure_ssl_mode() {
-    if [[ $USE_TLS12 && $USE_TLS13 ]]; then
+    if [[ -n ${USE_TLS12} && -n ${USE_TLS13} ]]; then
     ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
     ssl_mode_block+=$(get_ssl_protocol_compatibility)
@@ -111,7 +110,7 @@ function configure_ssl_mode() {
 #  None
 #######################################
 function get_gzip() {
-  if [[ $USE_GZIP ]]; then
+  if [[ -n ${USE_GZIP} ]]; then
         cat <<- EOF
 gzip on;
         gzip_comp_level 6;
@@ -217,7 +216,7 @@ function configure_security_headers() {
             # Adjust the policy directives based on your application's specific needs
             add_header Content-Security-Policy \"default-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.tile.openstreetmap.org; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self';\";"
 
-  if [[ $USE_LETSENCRYPT == "true" ]]; then
+  if [[ ${USE_LETSENCRYPT} == "true" ]]; then
     security_headers+="
 
             # HTTP Strict Transport Security (HSTS) for 1 year, including subdomains
@@ -235,7 +234,7 @@ function configure_security_headers() {
 #  None
 #######################################
 function configure_acme_challenge() {
-    if [[ $USE_LETSENCRYPT == "true" ]]; then
+    if [[ ${USE_LETSENCRYPT} == "true" ]]; then
         acme_challenge_server_block="server {
           listen 80;
           listen [::]:80;
@@ -275,7 +274,7 @@ function backup_existing_config() {
 #  None
 #######################################
 function write_endpoints() {
-  if [[ $RELEASE_BRANCH == "full-release" ]]; then
+  if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
 
     [[ -v BACKEND_SCHEME ]] || echo "Error: BACKEND_SCHEME is not set"
     [[ -v BACKEND_PORT  ]] || echo "Error: BACKEND_PORT is not set"
@@ -312,8 +311,8 @@ function write_endpoints() {
 function write_nginx_config() {
     cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
-${NGINX_PID} ${NGINX_PID_FILE};
-${NGINX_ERROR_LOG} ${NGINX_ERROR_LOG_FILE} ${NGINX_ERROR_LOG_LEVEL};
+${NGINX_PID}
+${NGINX_ERROR_LOG}
 
 events {
     worker_connections 1024;
@@ -324,7 +323,7 @@ http {
     default_type application/octet-stream;
 
     server {
-        ${NGINX_ACCESS_LOG} ${NGINX_ACCESS_LOG_FILE};
+        ${NGINX_ACCESS_LOG}
         ${ssl_listen_directive}
         ${server_name};
         ${ssl_mode_block}
@@ -353,7 +352,5 @@ http {
     ${acme_challenge_server_block}
 }
 EOF
-
-        cat "${NGINX_CONF_FILE}"
-        echo "NGINX configuration written to ${NGINX_CONF_FILE}"
+   echo "NGINX configuration written to ${NGINX_CONF_FILE}"
 }

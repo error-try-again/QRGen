@@ -11,7 +11,7 @@ set -euo pipefail
 #  None
 #######################################
 function configure_frontend_dotenv() {
-  cat << EOF > "$FRONTEND_DOTENV_FILE"
-USE_GOOGLE_API_KEY=$USE_GOOGLE_API_KEY
+  cat << EOF > "${FRONTEND_DOTENV_FILE}"
+USE_GOOGLE_API_KEY=${USE_GOOGLE_API_KEY}
 EOF
 }

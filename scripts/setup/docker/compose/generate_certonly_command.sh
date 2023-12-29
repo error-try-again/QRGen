@@ -44,5 +44,5 @@ ${PRODUCTION_CERTS_FLAG} \
 ${DRY_RUN_FLAG} \
 ${OVERWRITE_SELF_SIGNED_CERTS_FLAG}" \
     --domains "${DOMAIN_NAME}" \
-    --domains "$SUBDOMAIN"."${DOMAIN_NAME}"
+    --domains "${SUBDOMAIN}"."${DOMAIN_NAME}"
 }

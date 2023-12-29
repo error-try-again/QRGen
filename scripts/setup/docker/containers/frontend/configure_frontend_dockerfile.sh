@@ -13,11 +13,11 @@ set -euo pipefail
 #  None
 #######################################
 function configure_frontend_docker() {
-    local origin="origin/$RELEASE_BRANCH"
+    local origin="origin/${RELEASE_BRANCH}"
 
-    cat << EOF > "$FRONTEND_DOCKERFILE"
+    cat << EOF > "${FRONTEND_DOCKERFILE}"
 # Use the latest version of Node.js
-FROM node:$NODE_VERSION as build
+FROM node:${NODE_VERSION} as build
 
 # Set the default working directory
 WORKDIR /usr/app
@@ -28,14 +28,14 @@ RUN git init && \
         echo "Removing existing frontend directory"; \
         rm -rf frontend; \
     fi) && \
-    git submodule add --force "$FRONTEND_SUBMODULE_URL" frontend && \
+    git submodule add --force "${FRONTEND_SUBMODULE_URL}" frontend && \
     git submodule update --init --recursive && \
     cd frontend && \
     git fetch --all && \
-    git reset --hard "$origin" && \
-    git checkout "$RELEASE_BRANCH" && \
+    git reset --hard "${origin}" && \
+    git checkout "${RELEASE_BRANCH}" && \
     npm install && \
-    (if [ "$USE_GOOGLE_API_KEY" = "yes" ]; then \
+    (if [ "${USE_GOOGLE_API_KEY}" = "yes" ]; then \
         sed -i'' -e 's/export const googleSdkEnabled = false;/export const googleSdkEnabled = true;/' src/config.tsx; \
     fi)
 
@@ -52,9 +52,9 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge && \
     chmod -R 777 /usr/share/nginx/html/.well-known
-EXPOSE $EXPOSED_NGINX_PORT
+EXPOSE ${EXPOSED_NGINX_PORT}
 CMD ["nginx", "-g", "daemon off;"]
 EOF
 
-    cat "$FRONTEND_DOCKERFILE"
+    echo "Successfully configured frontend Dockerfile at ${FRONTEND_DOCKERFILE}"
 }

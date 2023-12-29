@@ -69,11 +69,11 @@ function generate_certbot_renewal_job() {
   local cron_job="0 0 * * 1-7 ${cron_script_path} >> ${cron_log_path} 2>&1"
 
   # Check if the cron job already exists
-  if ! crontab -l | grep -Fq "$cron_job"; then
+  if ! crontab -l | grep -Fq "${cron_job}"; then
     # Add the cron job if it doesn't exist
     (
       crontab -l 2> /dev/null
-                               echo "$cron_job"
+                               echo "${cron_job}"
     )                                             | crontab -
     echo "Cron job added."
   else
