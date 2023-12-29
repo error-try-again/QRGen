@@ -11,6 +11,10 @@ set -euo pipefail
 #  None
 #######################################
 function prompt_for_ssl() {
+if [[ "${USE_SSL}" == "true" && "${BACKEND_SCHEME}" == "https" ]]; then
+  echo "SSL is already enabled. Skipping SSL prompt."
+  return
+else
   echo "1: Enable SSL"
   echo "2: Do not enable SSL"
   prompt_numeric "Please enter your choice (1/2): " SSL_CHOICE
@@ -19,4 +23,5 @@ function prompt_for_ssl() {
     2) echo "SSL will not be enabled." ;;
     *) echo "Invalid choice, please enter 1 or 2." ;;
   esac
+fi
 }
