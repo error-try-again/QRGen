@@ -15,11 +15,11 @@ set -euo pipefail
 #  None
 #######################################
 function configure_backend_docker() {
-    local origin="origin"/"$RELEASE_BRANCH"
+    local origin="origin"/"${RELEASE_BRANCH}"
 
-    cat << EOF > "$BACKEND_DOCKERFILE"
+    cat << EOF > "${BACKEND_DOCKERFILE}"
 # Use the specified version of Node.js
-FROM node:$NODE_VERSION
+FROM node:${NODE_VERSION}
 
 # Set the default working directory
 WORKDIR /usr/app
@@ -28,14 +28,14 @@ WORKDIR /usr/app
 RUN git init
 
 # Add or update the backend submodule
-RUN git submodule add --force "$BACKEND_SUBMODULE_URL" backend \
+RUN git submodule add --force "${BACKEND_SUBMODULE_URL}" backend \
     && git submodule update --init --recursive
 
 # Checkout the specific branch for each submodule
 RUN cd backend \
     && git fetch --all \
-    && git reset --hard "$origin" \
-    && git checkout "$RELEASE_BRANCH" \
+    && git reset --hard "${origin}" \
+    && git checkout "${RELEASE_BRANCH}" \
     && npm install \
     && cd ..
 
@@ -43,11 +43,11 @@ RUN cd backend \
 COPY backend/.env /usr/app/.env
 
 # Set the backend express port
-EXPOSE $BACKEND_PORT
+EXPOSE ${BACKEND_PORT}
 
 # Use ts-node to run the TypeScript server file from the correct directory
 CMD ["npx", "ts-node", "/usr/app/backend/src/server.ts"]
 
 EOF
-    cat "$BACKEND_DOCKERFILE"
+    echo "Successfully generated backend Dockerfile at $BACKEND_DOCKERFILE"
 }
