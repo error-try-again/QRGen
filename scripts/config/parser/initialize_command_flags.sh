@@ -6,7 +6,7 @@ set -euo pipefail
 # Set command flags to their default false state
 # Globals:
 #   dump_logs
-#   prune_builds
+#   purge
 #   quit
 #   run_mocks
 #   setup
@@ -21,6 +21,6 @@ function initialize_command_flags() {
   dump_logs=false
   update_project=false
   stop_containers=false
-  prune_builds=false
+  purge=false
   quit=false
 }
