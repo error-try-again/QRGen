@@ -12,6 +12,6 @@ set -euo pipefail
 #   None
 #######################################
 function enable_ssl() {
-      USE_SSL=true
-      BACKEND_SCHEME="https"
+  USE_SSL=true
+  BACKEND_SCHEME="https"
 }

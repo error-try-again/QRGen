@@ -11,8 +11,8 @@ set -euo pipefail
 function assert_nginx_has_port() {
   local file=$1
 
-    # Implement a check for port definition in NGINX config
+  # Implement a check for port definition in NGINX config
   if ! grep -qE 'listen[[:space:]]+[0-9]+' "${file}"; then
-        log_mock_error "missing_port"
+    log_mock_error "missing_port"
   fi
 }

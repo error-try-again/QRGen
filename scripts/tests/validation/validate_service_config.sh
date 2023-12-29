@@ -20,23 +20,23 @@ function validate_service_config() {
   log_file="${test_output_dir}/validation_${file##*/}.log"
 
   case ${type} in
-    nginx)
-      command="nginx -t -c ${file}"
-      assert_nginx_has_port "${file}"
-      ;;
-    docker)
-      command="docker compose -f ${file} config"
-      assert_compose_has_port "${file}"
-      ;;
-    *)
-      echo "Invalid configuration type: ${type}" >&2
-      exit 1
-      ;;
+  nginx)
+    command="nginx -t -c ${file}"
+    assert_nginx_has_port "${file}"
+    ;;
+  docker)
+    command="docker compose -f ${file} config"
+    assert_compose_has_port "${file}"
+    ;;
+  *)
+    echo "Invalid configuration type: ${type}" >&2
+    exit 1
+    ;;
   esac
 
   echo "---------------------------------------"
   echo "Validating ${type} configuration: ${file}"
-  if ! ${command} &> "${log_file}"; then
+  if ! ${command} &>"${log_file}"; then
     log_mock_error "Validation failed for ${type} with configuration file ${file}"
     echo "Complete log can be found at ${log_file}"
   else

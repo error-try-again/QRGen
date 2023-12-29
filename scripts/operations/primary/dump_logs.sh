@@ -21,7 +21,7 @@ function dump_service_logs() {
   logs=$(docker compose -f "${DOCKER_COMPOSE_FILE}" logs "${service}")
 
   local log_file="${PROJECT_LOGS_DIR}/${service}_${datetime// /_}.log"
-  echo "${logs}" > "${log_file}"
+  echo "${logs}" >"${log_file}"
   echo "Logs for ${service} saved to ${log_file}"
   echo "${separator}"
 }

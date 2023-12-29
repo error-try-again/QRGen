@@ -29,10 +29,10 @@ function wait_for_certbot_completion() {
 
       if [[ ${certbot_status} == "exited" ]]; then
         return 0
-elif       [[ ${certbot_status} != "running" ]]; then
+      elif [[ ${certbot_status} != "running" ]]; then
         echo "Certbot container is in an unexpected state: ${certbot_status}"
         return 1
-fi
+      fi
     else
       echo "Certbot container is not running."
       break

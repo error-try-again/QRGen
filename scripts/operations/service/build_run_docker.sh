@@ -22,9 +22,9 @@ function build_and_run_docker() {
     echo "Building Certbot service..."
     run_certbot_service
   fi
-    if [[ -n ${USE_AUTO_RENEW_SSL} ]]; then
-      echo "Using auto-renewal for SSL certificates."
-      generate_certbot_renewal_job
+  if [[ -n ${USE_AUTO_RENEW_SSL} ]]; then
+    echo "Using auto-renewal for SSL certificates."
+    generate_certbot_renewal_job
   fi
 
   # Dump logs or any other post-run operations

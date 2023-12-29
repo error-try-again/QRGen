@@ -6,7 +6,7 @@ set -euo pipefail
 function add_to_bashrc() {
   local line="$1"
   if ! grep -q "^${line}$" ~/.bashrc; then
-    echo "${line}" >> ~/.bashrc
+    echo "${line}" >>~/.bashrc
   fi
 }
 
@@ -23,13 +23,13 @@ function setup_docker_rootless() {
   echo "Setting up Docker in rootless mode..."
 
   # Validate Docker installation.
-  if ! command -v docker &> /dev/null; then
+  if ! command -v docker &>/dev/null; then
     echo "Docker is not installed. Please install Docker to continue."
     exit 1
   fi
 
   # Ensure rootless setup tool is available before attempting setup.
-  if ! command -v dockerd-rootless-setuptool.sh > /dev/null 2>&1; then
+  if ! command -v dockerd-rootless-setuptool.sh >/dev/null 2>&1; then
     echo "dockerd-rootless-setuptool.sh not found. Exiting."
     return 1
   else

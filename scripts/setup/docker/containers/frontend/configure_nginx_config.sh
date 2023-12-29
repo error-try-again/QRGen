@@ -18,18 +18,18 @@ set -euo pipefail
 #  None
 #######################################
 function configure_nginx_config() {
-    server_name="server_name ${DOMAIN_NAME}"
-    ssl_listen_directive=""
-    ssl_mode_block=""
-    resolver_settings=""
-    certs=""
-    security_headers=""
-    acme_challenge_server_block=""
-    backup_existing_config "${NGINX_CONF_FILE}"
-    configure_subdomain
-    configure_https
-    configure_acme_challenge
-    write_nginx_config
+  server_name="server_name ${DOMAIN_NAME}"
+  ssl_listen_directive=""
+  ssl_mode_block=""
+  resolver_settings=""
+  certs=""
+  security_headers=""
+  acme_challenge_server_block=""
+  backup_existing_config "${NGINX_CONF_FILE}"
+  configure_subdomain
+  configure_https
+  configure_acme_challenge
+  write_nginx_config
 }
 
 #######################################
@@ -42,8 +42,8 @@ function configure_nginx_config() {
 #  None
 #######################################
 function configure_subdomain() {
-    if [[ ${SUBDOMAIN} != "www" && -n ${SUBDOMAIN} ]]; then
-        server_name+=" ${SUBDOMAIN}.${DOMAIN_NAME}"
+  if [[ ${SUBDOMAIN} != "www" && -n ${SUBDOMAIN} ]]; then
+    server_name+=" ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 }
 
@@ -63,17 +63,17 @@ function configure_subdomain() {
 #######################################
 # bashsupport disable=BP5006
 function configure_https() {
-    if [[ ${USE_LETSENCRYPT} == "true" ]] || [[ ${USE_SELF_SIGNED_CERTS} == "true" ]]; then
-      BACKEND_SCHEME="https"
-      ssl_listen_directive="listen ${NGINX_SSL_PORT} ssl;"
-      ssl_listen_directive+=$'\n'
-      ssl_listen_directive+="        listen [::]:""${NGINX_SSL_PORT} ssl;"
-      configure_ssl_mode
-      resolver_settings="resolver ${DNS_RESOLVER} valid=300s;"
-      resolver_settings+=$'\n'
-      resolver_settings+="        resolver_timeout ${TIMEOUT}s;"
-      configure_certs
-      configure_security_headers
+  if [[ ${USE_LETSENCRYPT} == "true" ]] || [[ ${USE_SELF_SIGNED_CERTS} == "true" ]]; then
+    BACKEND_SCHEME="https"
+    ssl_listen_directive="listen ${NGINX_SSL_PORT} ssl;"
+    ssl_listen_directive+=$'\n'
+    ssl_listen_directive+="        listen [::]:""${NGINX_SSL_PORT} ssl;"
+    configure_ssl_mode
+    resolver_settings="resolver ${DNS_RESOLVER} valid=300s;"
+    resolver_settings+=$'\n'
+    resolver_settings+="        resolver_timeout ${TIMEOUT}s;"
+    configure_certs
+    configure_security_headers
   fi
 }
 
@@ -87,7 +87,7 @@ function configure_https() {
 #  None
 #######################################
 function configure_ssl_mode() {
-    if [[ -n ${USE_TLS12} && -n ${USE_TLS13} ]]; then
+  if [[ -n ${USE_TLS12} && -n ${USE_TLS13} ]]; then
     ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
     ssl_mode_block+=$(get_ssl_protocol_compatibility)
@@ -111,7 +111,7 @@ function configure_ssl_mode() {
 #######################################
 function get_gzip() {
   if [[ -n ${USE_GZIP} ]]; then
-        cat <<- EOF
+    cat <<-EOF
 gzip on;
         gzip_comp_level 6;
         gzip_vary on;
@@ -120,7 +120,7 @@ gzip on;
         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 EOF
   else
-        cat <<- EOF
+    cat <<-EOF
 gzip off;
 EOF
   fi
@@ -132,7 +132,7 @@ EOF
 #  None
 #######################################
 function get_ssl_protocol_compatibility() {
-    cat <<- EOF
+  cat <<-EOF
         ssl_protocols TLSv1.2 TLSv1.3;
 EOF
 }
@@ -147,7 +147,7 @@ EOF
 #  None
 #######################################
 function get_ssl_additional_config() {
-    cat <<- EOF
+  cat <<-EOF
         ssl_prefer_server_ciphers on;
         ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:!DH+3DES:!ADH:!AECDH:!MD5:!ECDHE-RSA-AES256-SHA384:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES128-SHA:!RC2:!RC4:!DES:!EXPORT:!NULL:!SHA1';
         ssl_buffer_size 8k;
@@ -166,7 +166,7 @@ EOF
 #  None
 #######################################
 function tls_protocol_one_three_restrict() {
-    cat <<- EOF
+  cat <<-EOF
         ssl_protocols TLSv1.3;
 EOF
 }
@@ -182,7 +182,7 @@ EOF
 #  None
 #######################################
 function configure_certs() {
-      certs="
+  certs="
         ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
         ssl_trusted_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;"
@@ -234,8 +234,8 @@ function configure_security_headers() {
 #  None
 #######################################
 function configure_acme_challenge() {
-    if [[ ${USE_LETSENCRYPT} == "true" ]]; then
-        acme_challenge_server_block="server {
+  if [[ ${USE_LETSENCRYPT} == "true" ]]; then
+    acme_challenge_server_block="server {
           listen 80;
           listen [::]:80;
           ${server_name};
@@ -258,11 +258,11 @@ function configure_acme_challenge() {
 #  None
 #######################################
 function backup_existing_config() {
-    local file
-    file=$1
-    if [[ -f ${file} ]]; then
-        cp "${file}" "${file}.bak"
-        echo "Backup created at \"${file}.bak\""
+  local file
+  file=$1
+  if [[ -f ${file} ]]; then
+    cp "${file}" "${file}.bak"
+    echo "Backup created at \"${file}.bak\""
   fi
 }
 
@@ -279,7 +279,7 @@ function write_endpoints() {
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
 
     [[ -v BACKEND_SCHEME ]] || echo "Error: BACKEND_SCHEME is not set"
-    [[ -v BACKEND_PORT  ]] || echo "Error: BACKEND_PORT is not set"
+    [[ -v BACKEND_PORT ]] || echo "Error: BACKEND_PORT is not set"
 
     local endpoint="/qr/"
     local proxy_pass="proxy_pass ${BACKEND_SCHEME}://${BACKEND_UPSTREAM_NAME}:${BACKEND_PORT};"
@@ -311,7 +311,7 @@ function write_endpoints() {
 #  None
 #######################################
 function write_nginx_config() {
-    cat <<- EOF > "${NGINX_CONF_FILE}"
+  cat <<-EOF >"${NGINX_CONF_FILE}"
 worker_processes auto;
 ${NGINX_PID}
 ${NGINX_ERROR_LOG}
@@ -354,5 +354,5 @@ http {
     ${acme_challenge_server_block}
 }
 EOF
-   echo "NGINX configuration written to ${NGINX_CONF_FILE}"
+  echo "NGINX configuration written to ${NGINX_CONF_FILE}"
 }

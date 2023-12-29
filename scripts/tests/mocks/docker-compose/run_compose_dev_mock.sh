@@ -21,7 +21,7 @@ function run_compose_dev_mock() {
 
   # Check for errors in the output and log them
   local compose_output
-  compose_output=$(< "${test_output_dir}/compose_dev_output.log")
+  compose_output=$(<"${test_output_dir}/compose_dev_output.log")
 
   log_mock_error "${compose_output}"
 

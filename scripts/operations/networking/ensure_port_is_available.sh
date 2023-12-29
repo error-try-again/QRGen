@@ -21,7 +21,7 @@ function is_port_in_use() {
   fi
 
   # Check if the port is in use. Using netcat (nc) as it is more commonly available.
-  if nc -z 127.0.0.1 "${port}" > /dev/null 2>&1; then
+  if nc -z 127.0.0.1 "${port}" >/dev/null 2>&1; then
     return 0 # Port is in use
   else
     return 1 # Port is not in use
@@ -41,12 +41,12 @@ function ensure_port_is_available() {
   # Check if the port is in use, auto increment if it is and the flag is "true".
   while "is_port_in_use" "${port}"; do
     if [[ ${auto_increment_port} == "auto" ]]; then
-        ((port++))
+      ((port++))
     else
-        local alternate_port
-        echo "Port ${port} is already in use."
-        read -rp "Please provide an alternate port or Ctrl+C to exit: " alternate_port
-        port="${alternate_port:-${port}}"
+      local alternate_port
+      echo "Port ${port} is already in use."
+      read -rp "Please provide an alternate port or Ctrl+C to exit: " alternate_port
+      port="${alternate_port:-${port}}"
     fi
   done
   # Set the EXPOSED_NGINX_PORT to the selected port that is not in use.

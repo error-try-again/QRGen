@@ -15,10 +15,10 @@ set -euo pipefail
 #  None
 #######################################
 function configure_backend_docker() {
-    local origin="origin"/"${RELEASE_BRANCH}"
-    backup_existing_config "${BACKEND_DOCKERFILE}"
+  local origin="origin"/"${RELEASE_BRANCH}"
+  backup_existing_config "${BACKEND_DOCKERFILE}"
 
-    cat << EOF > "${BACKEND_DOCKERFILE}"
+  cat <<EOF >"${BACKEND_DOCKERFILE}"
 # Use the specified version of Node.js
 FROM node:${NODE_VERSION}
 
@@ -50,5 +50,5 @@ EXPOSE ${BACKEND_PORT}
 CMD ["npx", "ts-node", "/usr/app/backend/src/server.ts"]
 
 EOF
-    echo "Successfully generated backend Dockerfile at ${BACKEND_DOCKERFILE}"
+  echo "Successfully generated backend Dockerfile at ${BACKEND_DOCKERFILE}"
 }

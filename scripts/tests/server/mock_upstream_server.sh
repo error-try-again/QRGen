@@ -29,7 +29,7 @@ function check_port_and_kill_process_if_needed() {
         echo "Would you like to kill it? (y/n):" >&2
         local response
         read -n 1 -r response
-        echo >&2  # move to a new line
+        echo >&2 # move to a new line
 
         if [[ ${response} =~ ^[Yy]$ ]]; then
           kill -9 "${pid}" && echo "Process ${pid} (${process_name}) has been killed."
@@ -69,7 +69,7 @@ function start_mock_server() {
 #   Error message if the server failed to start.
 #######################################
 function validate_server_start() {
-  if ! kill -0 "${MOCK_SERVER_PID}" 2> /dev/null; then
+  if ! kill -0 "${MOCK_SERVER_PID}" 2>/dev/null; then
     echo "Starting the mock server failed. Check connectivity or port availability." >&2
     exit 1
   fi

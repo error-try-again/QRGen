@@ -8,5 +8,5 @@ set -euo pipefail
 #  None
 #######################################
 function automatic_production_reload_selection() {
-    apply_profile "prod_reload_config"
+  apply_profile "prod_reload_config"
 }

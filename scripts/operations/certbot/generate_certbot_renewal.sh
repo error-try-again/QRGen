@@ -10,7 +10,7 @@ set -euo pipefail
 #  None
 #######################################
 function generate_certbot_renewal_script() {
-  cat << 'EOF' > "${PROJECT_ROOT_DIR}/certbot_renew.sh"
+  cat <<'EOF' >"${PROJECT_ROOT_DIR}/certbot_renew.sh"
 #!/usr/bin/env bash
 
 set -euo pipefail
@@ -72,9 +72,9 @@ function generate_certbot_renewal_job() {
   if ! crontab -l | grep -Fq "${cron_job}"; then
     # Add the cron job if it doesn't exist
     (
-      crontab -l 2> /dev/null
-                               echo "${cron_job}"
-    )                                             | crontab -
+      crontab -l 2>/dev/null
+      echo "${cron_job}"
+    ) | crontab -
     echo "Cron job added."
   else
     echo "Cron job already exists. No action taken."

@@ -8,5 +8,5 @@ set -euo pipefail
 #  None
 #######################################
 function automatic_staging_selection() {
-    apply_profile "staging_config"
+  apply_profile "staging_config"
 }

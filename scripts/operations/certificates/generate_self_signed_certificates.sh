@@ -68,7 +68,7 @@ function generate_dh_parameters() {
     echo "DH parameters file not found at ${dh_params_path}. Generating new DH parameters."
 
     prompt_for_dhparam_strength
-    echo "Generate a Diffie-Hellman (DH) key exchange parameters file with ${DH_PARAM_SIZE} bits..."  openssl dhparam -out "${dh_params_path}" "${DH_PARAM_SIZE}"
+    echo "Generate a Diffie-Hellman (DH) key exchange parameters file with ${DH_PARAM_SIZE} bits..." openssl dhparam -out "${dh_params_path}" "${DH_PARAM_SIZE}"
     echo "DH parameters generated at ${dh_params_path}."
   fi
 }

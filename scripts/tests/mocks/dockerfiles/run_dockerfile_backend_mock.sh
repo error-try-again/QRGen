@@ -16,7 +16,7 @@ function run_dockerfile_backend_mock() {
 
   # Check for errors in the output and log them
   local docker_output
-  docker_output=$(< "${test_output_dir}/backend_docker_output.log")
+  docker_output=$(<"${test_output_dir}/backend_docker_output.log")
 
   log_mock_error "${docker_output}"
 }

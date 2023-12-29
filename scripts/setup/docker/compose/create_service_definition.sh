@@ -23,12 +23,10 @@ function add_to_definition() {
         if [[ -n ${item} ]]; then
           definition+=$'\n'
           definition+="      - ${item}"
-        fi
-      done
-    fi
-  }
-
-#######################################
+      fi
+    done
+  fi
+}#######################################
 # Created a generic service definition for Docker Compose file.
 # Globals:
 #   ADDR

@@ -22,7 +22,7 @@ function run_nginx_le_mock() {
 
   # Check for errors in the output and log them
   local nginx_output
-  nginx_output=$(< "${test_output_dir}/nginx_le_output.log")
+  nginx_output=$(<"${test_output_dir}/nginx_le_output.log")
 
   log_mock_error "${nginx_output}"
 

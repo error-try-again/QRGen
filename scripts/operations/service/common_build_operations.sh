@@ -21,9 +21,9 @@ function common_build_operations() {
     exit 1
   }
 
-    # If Docker Compose is running, bring down the services
-    # Ensure that old services are brought down before proceeding
-  if docker compose ps &> /dev/null; then
+  # If Docker Compose is running, bring down the services
+  # Ensure that old services are brought down before proceeding
+  if docker compose ps &>/dev/null; then
     echo "Bringing down existing Docker Compose services..."
     docker compose down || {
       echo "Failed to bring down existing Docker Compose services"

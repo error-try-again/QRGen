@@ -18,6 +18,4 @@ elif   [[ ${USE_SELF_SIGNED_CERTS} == "true" ]]; then
     configure_compose_self_signed_mode
 else
     configure_http
-fi  # Assemble the Docker Compose configuration
-  assemble_docker_compose_configuration
-}
+fi   # Assemble the Docker Compose configuration  assemble_docker_compose_configuration}

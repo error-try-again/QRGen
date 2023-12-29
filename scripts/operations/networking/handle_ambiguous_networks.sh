@@ -27,13 +27,13 @@ function handle_ambiguous_networks() {
       echo "Disconnecting container ${container_id} from network ${network_id}..."
       docker network disconnect -f "${network_id}" "${container_id}" || {
         echo "Failed to disconnect container ${container_id} from network ${network_id}"
-    }
-  done
+      }
+    done
 
     # Remove the network
     echo "Removing network ${network_id}..."
     docker network rm "${network_id}" || {
       echo "Failed to remove network ${network_id}"
-  }
-done
+    }
+  done
 }

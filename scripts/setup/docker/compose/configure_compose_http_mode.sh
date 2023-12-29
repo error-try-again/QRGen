@@ -25,6 +25,6 @@ function configure_http() {
   fi
 
   frontend_ports=$(join_with_commas \
-      "ports" \
-      "${EXPOSED_NGINX_PORT}:${INTERNAL_NGINX_PORT}")
+    "ports" \
+    "${EXPOSED_NGINX_PORT}:${INTERNAL_NGINX_PORT}")
 }

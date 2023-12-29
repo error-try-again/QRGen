@@ -10,7 +10,7 @@ set -euo pipefail
 #  None
 #######################################
 function configure_frontend_robots() {
-    cat <<- EOF > "${ROBOTS_FILE}"
+  cat <<-EOF >"${ROBOTS_FILE}"
 User-agent: *
 Disallow:
 EOF

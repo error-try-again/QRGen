@@ -14,9 +14,7 @@ set -euo pipefail
 function prompt_for_release_install_mode() {
   if [[ ${RELEASE_BRANCH} == "minimal-release" ]] || [[ ${RELEASE_BRANCH} == "full-release" ]]; then
     return
-fi
-
-  echo "1: Install minimal release (frontend QR generation) (Limited features)"
+fi  echo "1: Install minimal release (frontend QR generation) (Limited features)"
   echo "2: Install full release (frontend QR generator and backend API/server side generation) (All features)"
   prompt_numeric "Please enter your choice (1/2): " INSTALL_MODE_CHOICE
   case ${INSTALL_MODE_CHOICE} in

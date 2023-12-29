@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-
 #######################################
 # Builds and runs the backend service using docker compose.
 # Arguments:

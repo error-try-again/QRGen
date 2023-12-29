@@ -17,8 +17,8 @@ function prompt_with_validation() {
     if [[ -n ${user_input} ]]; then
       echo "${user_input}"
       break
-else
+    else
       echo "${error_message}"
-fi
+    fi
   done
 }

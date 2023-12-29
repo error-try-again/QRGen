@@ -20,8 +20,8 @@ function prompt_for_dhparam_strength() {
   echo "2: Use 4096-bit DH parameters (More secure)"
   prompt_numeric "Please enter your choice (1/2): " DH_PARAM_CHOICE
   case ${DH_PARAM_CHOICE} in
-    1) DH_PARAM_SIZE=2048 ;;
-    2) DH_PARAM_SIZE=4096 ;;
-    *) echo "Invalid choice. Please enter 1 or 2." ;;
+  1) DH_PARAM_SIZE=2048 ;;
+  2) DH_PARAM_SIZE=4096 ;;
+  *) echo "Invalid choice. Please enter 1 or 2." ;;
   esac
 }

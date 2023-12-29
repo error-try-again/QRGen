@@ -14,9 +14,9 @@ set -euo pipefail
 #   The value from the JSON file for the specified key within the given profile.
 #######################################
 function get_config_value() {
-    local profile=$1  # The profile within the JSON file.
-    local key=$2      # The specific key within the profile.
-    jq -r ".${profile}.${key}" "${JSON_INSTALL_PROFILES}"  # Use jq to parse and return the value.
+  local profile=$1                                      # The profile within the JSON file.
+  local key=$2                                          # The specific key within the profile.
+  jq -r ".${profile}.${key}" "${JSON_INSTALL_PROFILES}" # Use jq to parse and return the value.
 }
 
 #######################################
@@ -33,26 +33,26 @@ function get_config_value() {
 #   It's crucial that JSON_INSTALL_PROFILES is correctly set to the path of the JSON configuration file before this function is called.
 #######################################
 function apply_profile() {
-    local profile=$1  # The name of the profile to apply.
-    echo "Applying profile: ${profile}"
+  local profile=$1 # The name of the profile to apply.
+  echo "Applying profile: ${profile}"
 
-    # Retrieve the keys from the specified profile within the JSON file.
+  # Retrieve the keys from the specified profile within the JSON file.
   local keys
-    keys=$(jq -r ".${profile} | keys | .[]" "${JSON_INSTALL_PROFILES}")
-    echo "Found keys in ${profile}: ${keys}"
+  keys=$(jq -r ".${profile} | keys | .[]" "${JSON_INSTALL_PROFILES}")
+  echo "Found keys in ${profile}: ${keys}"
 
-    # Iterate over each key in the profile.
-    local key
-    for key in ${keys}; do
+  # Iterate over each key in the profile.
+  local key
+  for key in ${keys}; do
     local value
-        # Retrieve the value for the current key from the profile.
-        value=$(get_config_value "${profile}" "${key}")
-        echo "Setting ${key}=${value}"
+    # Retrieve the value for the current key from the profile.
+    value=$(get_config_value "${profile}" "${key}")
+    echo "Setting ${key}=${value}"
 
     # Handle boolean values explicitly if needed
     case "${value}" in
-        true | false) ;; # No operation needed if it's already a boolean
-        *) echo "Setting ${key} to non-boolean value: ${value}" ;;
+    true | false) ;; # No operation needed if it's already a boolean
+    *) echo "Setting ${key} to non-boolean value: ${value}" ;;
     esac
 
     # Declare the key-value pair as a global variable.
@@ -71,30 +71,30 @@ function apply_profile() {
 #   Prompts and informational messages about the profile selection and application process.
 #######################################
 function select_and_apply_profile() {
-    echo "Available profiles:"
+  echo "Available profiles:"
 
-    # Read profiles into an array
-    local profiles
-    readarray -t profiles < <(jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
+  # Read profiles into an array
+  local profiles
+  readarray -t profiles < <(jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
 
-    # Display options
-    local index=1
-    for profile in "${profiles[@]}"; do
-        echo "${index}) ${profile}"
-        ((index++))
+  # Display options
+  local index=1
+  for profile in "${profiles[@]}"; do
+    echo "${index}) ${profile}"
+    ((index++))
   done
 
-    # Prompt the user to choose a profile
-    local selection
-    read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
+  # Prompt the user to choose a profile
+  local selection
+  read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
 
-    # Validate selection and apply profile
-    if [[ ${selection} =~ ^[0-9]+$ ]] && [[ "${selection}" -ge 1 ]] && [[ "${selection}" -le ${#profiles[@]} ]]; then
-        local selected_profile=${profiles[${selection} - 1]}
-        echo "You selected: ${selected_profile}"
-        apply_profile "${selected_profile}"
+  # Validate selection and apply profile
+  if [[ ${selection} =~ ^[0-9]+$ ]] && [[ "${selection}" -ge 1 ]] && [[ "${selection}" -le ${#profiles[@]} ]]; then
+    local selected_profile=${profiles[${selection} - 1]}
+    echo "You selected: ${selected_profile}"
+    apply_profile "${selected_profile}"
   else
-        echo "Invalid selection. Please try again."
-        exit 1
+    echo "Invalid selection. Please try again."
+    exit 1
   fi
 }

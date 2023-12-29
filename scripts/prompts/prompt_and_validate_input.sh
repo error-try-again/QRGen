@@ -30,7 +30,7 @@ function prompt_and_validate_input() {
 # Arguments:
 #   1
 #######################################
-function is_input_valid(){
+function is_input_valid() {
   local inputted_value="$1"
   [[ -n ${inputted_value} ]]
 }

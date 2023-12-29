@@ -20,16 +20,16 @@ function check_certbot_success() {
   if [[ ${certbot_logs} == *'Certificate not yet due for renewal'* ]]; then
     echo "Certificate is not yet due for renewal."
     return 0
-elif   [[ ${certbot_logs} == *'Renewing an existing certificate'* ]]; then
+  elif [[ ${certbot_logs} == *'Renewing an existing certificate'* ]]; then
     echo "Certificate renewal successful."
     restart_services
     return 0
-elif   [[ ${certbot_logs} == *'Successfully received certificate.'* ]]; then
+  elif [[ ${certbot_logs} == *'Successfully received certificate.'* ]]; then
     echo "Certificate creation successful."
     restart_services
     return 0
-else
+  else
     echo "Certbot process failed."
     return 1
-fi
+  fi
 }
