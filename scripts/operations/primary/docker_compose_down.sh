@@ -11,7 +11,7 @@ set -euo pipefail
 #######################################
 function stop_containers() {
   test_docker_env
-  if docker_compose_exists; then
+  if check_docker_compose; then
     echo "Stopping containers using docker-compose..."
     docker compose -f "${DOCKER_COMPOSE_FILE}" down
   fi
