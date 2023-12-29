@@ -12,8 +12,10 @@ set -euo pipefail
 #   1 ...
 #######################################
 function validate_project_root_dir() {
-    if [ -z "$PROJECT_ROOT_DIR" ]; then
-        echo "Error: PROJECT_ROOT_DIR is not set."
-        return 1
+  if [[ -n "${PROJECT_ROOT_DIR}" ]]; then
+      return 0
+  else
+      echo "PROJECT_ROOT_DIR is not set"
+      return 1
   fi
 }
