@@ -31,7 +31,7 @@ set -euo pipefail
 #######################################
 function construct_certbot_flags() {
   EMAIL_FLAG=$([[ ${LETSENCRYPT_EMAIL} == "skip" ]] && echo "--register-unsafely-without-email" || echo "--email ${LETSENCRYPT_EMAIL}")
-  PRODUCTION_CERTS_FLAG=$([[ -n ${USE_PRODUCTION_SSL} && ${USE_PRODUCTION_SSL} == "true" ]] && echo "--server https://acme-v02.api.letsencrypt.org/directory" || echo "--server https://acme-staging-v02.api.letsencrypt.org/directory")
+  PRODUCTION_CERTS_FLAG=$([[ -n ${USE_PRODUCTION_SSL} && ${USE_PRODUCTION_SSL} == "true" ]] && echo "" || echo "--staging")
   DRY_RUN_FLAG=$([[ -n ${USE_DRY_RUN} && ${USE_DRY_RUN} == "true" ]] && echo "--dry-run" || echo "")
   FORCE_RENEW_FLAG=$([[ -n ${USE_FORCE_RENEW} && ${USE_FORCE_RENEW} == "true" ]] && echo "--force-renewal" || echo "")
   OVERWRITE_SELF_SIGNED_CERTS_FLAG=$([[ -n ${USE_OVERWRITE_SELF_SIGNED_CERTS} && ${USE_OVERWRITE_SELF_SIGNED_CERTS} == "true" ]] && echo "--overwrite-cert-dirs" || echo "")
