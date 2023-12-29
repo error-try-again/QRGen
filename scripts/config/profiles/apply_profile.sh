@@ -16,7 +16,7 @@ set -euo pipefail
 function get_config_value() {
     local profile=$1  # The profile within the JSON file.
     local key=$2      # The specific key within the profile.
-    jq -r ".$profile.$key" "$JSON_INSTALL_PROFILES"  # Use jq to parse and return the value.
+    jq -r ".${profile}.${key}" "${JSON_INSTALL_PROFILES}"  # Use jq to parse and return the value.
 }
 
 #######################################
@@ -34,30 +34,67 @@ function get_config_value() {
 #######################################
 function apply_profile() {
     local profile=$1  # The name of the profile to apply.
-    echo "Applying profile: $profile"
+    echo "Applying profile: ${profile}"
 
     # Retrieve the keys from the specified profile within the JSON file.
-    local keys
-    keys=$(jq -r ".$profile | keys | .[]" "$JSON_INSTALL_PROFILES")
-    echo "Found keys in $profile: $keys"
+  local keys
+    keys=$(jq -r ".${profile} | keys | .[]" "${JSON_INSTALL_PROFILES}")
+    echo "Found keys in ${profile}: ${keys}"
 
     # Iterate over each key in the profile.
     local key
-    for key in $keys; do
-        local value
+    for key in ${keys}; do
+    local value
         # Retrieve the value for the current key from the profile.
-        value=$(get_config_value "$profile" "$key")
-        echo "Setting $key=$value"
+        value=$(get_config_value "${profile}" "${key}")
+        echo "Setting ${key}=${value}"
 
-        # Explicitly handle boolean values.
-        case "$value" in
-            true) value=true ;;
-            false) value=false ;;
+    # Handle boolean values explicitly if needed
+    case "${value}" in
+        true | false) ;; # No operation needed if it's already a boolean
+        *) echo "Setting ${key} to non-boolean value: ${value}" ;;
     esac
 
-        # Declare the key-value pair as a global variable.
-        # This is crucial for the profile to be picked up by the installer.
-        # shellcheck disable=SC2034
-        declare -g "$key=$value"
+    # Declare the key-value pair as a global variable.
+    # This is crucial for the profile to be picked up by the installer.
+    # shellcheck disable=SC2034
+    declare -g "${key}=${value}"
+    echo "Applied ${key}=${value}"
   done
+}
+
+#######################################
+# Lists all profiles from the JSON configuration file and prompts the user to select one to apply.
+# Globals:
+#   JSON_INSTALL_PROFILES - Path to the JSON file containing installer profiles.
+# Outputs:
+#   Prompts and informational messages about the profile selection and application process.
+#######################################
+function select_and_apply_profile() {
+    echo "Available profiles:"
+
+    # Read profiles into an array
+    local profiles
+    readarray -t profiles < <(jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
+
+    # Display options
+    local index=1
+    for profile in "${profiles[@]}"; do
+        echo "${index}) ${profile}"
+        ((index++))
+  done
+
+    # Prompt the user to choose a profile
+    local selection
+    read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
+
+    # Validate selection and apply profile
+    if [[ ${selection} =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#profiles[@]} ]]; then
+        local selected_profile=${profiles[${selection} - 1]}
+        echo "You selected: ${selected_profile}"
+        apply_profile "${selected_profile}"
+  else
+        echo "Invalid selection. Please try again."
+        exit 1
+  fi
 }
