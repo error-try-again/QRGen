@@ -6,7 +6,7 @@ set -euo pipefail
 function add_to_bashrc() {
   local line="$1"
   if ! grep -q "^${line}$" ~/.bashrc; then
-    echo "$line" >> ~/.bashrc
+    echo "${line}" >> ~/.bashrc
   fi
 }
 
