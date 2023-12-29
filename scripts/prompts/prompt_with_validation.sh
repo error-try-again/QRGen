@@ -14,11 +14,11 @@ function prompt_with_validation() {
   local user_input=""
   while true; do
     read -rp "${prompt_message}" user_input
-    if [[ -z ${user_input} ]]; then
-      echo "${error_message}"
-    else
+    if [[ -n ${user_input} ]]; then
       echo "${user_input}"
       break
-    fi
+else
+      echo "${error_message}"
+fi
   done
 }
