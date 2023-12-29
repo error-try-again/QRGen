@@ -12,8 +12,8 @@ set -euo pipefail
 #######################################
 function validate_installer_profile_configuration() {
   # Ensure the configuration file exists
-  if [ ! -f "$JSON_INSTALL_PROFILES" ]; then
-    echo "Configuration file $JSON_INSTALL_PROFILES does not exist."
+  if [[ ! -f "${JSON_INSTALL_PROFILES}" ]]; then
+    echo "Configuration file ${JSON_INSTALL_PROFILES} does not exist."
     exit 1
   fi
 }
