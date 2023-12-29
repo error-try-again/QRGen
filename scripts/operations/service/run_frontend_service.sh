@@ -11,7 +11,7 @@ set -euo pipefail
 #  None
 #######################################
 function run_frontend_service() {
-    if [[ $DISABLE_DOCKER_CACHING ]]; then
+    if [[ -n ${DISABLE_DOCKER_CACHING} ]]; then
      echo "Building and running Frontend service without caching..."
       if ! docker compose --progress=plain build --no-cache frontend; then
           echo "Failed to build Frontend service."
