@@ -15,9 +15,9 @@ function backup_and_replace_file() {
   local modified_file=$2
 
   # Backup the original file
-  cp -rf "$original_file" "${original_file}.bak"
+  cp -rf "${original_file}" "${original_file}.bak"
 
   # Replace the original file with the modified version
-  mv "$modified_file" "$original_file"
+  mv "${modified_file}" "${original_file}"
   echo "File updated and original version backed up."
 }
