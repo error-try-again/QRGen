@@ -20,11 +20,11 @@ function build_and_run_docker() {
       exit 1
   }
 
-    if [[ $BUILD_CERTBOT_IMAGE ]]; then
+    if [[ -n ${BUILD_CERTBOT_IMAGE} ]]; then
       echo "Building Certbot service..."
       run_certbot_service
   fi
-    if [[ $USE_AUTO_RENEW_SSL ]]; then
+    if [[ -n ${USE_AUTO_RENEW_SSL} ]]; then
       echo "Using auto-renewal for SSL certificates."
       generate_certbot_renewal_job
   fi

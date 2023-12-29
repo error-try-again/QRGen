@@ -14,22 +14,22 @@ set -euo pipefail
 function check_certbot_success() {
   local certbot_logs
   certbot_logs=$(docker compose logs certbot)
-  echo "Certbot logs: $certbot_logs"
+  echo "Certbot logs: ${certbot_logs}"
 
   # Check for specific messages indicating certificate renewal success or failure
-  if [[ $certbot_logs == *'Certificate not yet due for renewal'* ]]; then
+  if [[ ${certbot_logs} == *'Certificate not yet due for renewal'* ]]; then
     echo "Certificate is not yet due for renewal."
     return 0
-  elif [[ $certbot_logs == *'Renewing an existing certificate'* ]]; then
+elif   [[ ${certbot_logs} == *'Renewing an existing certificate'* ]]; then
     echo "Certificate renewal successful."
     restart_services
     return 0
-  elif [[ $certbot_logs == *'Successfully received certificate.'* ]]; then
+elif   [[ ${certbot_logs} == *'Successfully received certificate.'* ]]; then
     echo "Certificate creation successful."
     restart_services
     return 0
-  else
+else
     echo "Certbot process failed."
     return 1
-  fi
+fi
 }

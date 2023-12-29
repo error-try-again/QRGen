@@ -48,6 +48,5 @@ function assemble_docker_compose_configuration() {
     echo "${volume_definition}"
   } > "${DOCKER_COMPOSE_FILE}"
 
-  cat "${DOCKER_COMPOSE_FILE}"
   echo "Docker Compose configuration written to ${DOCKER_COMPOSE_FILE}"
 }
