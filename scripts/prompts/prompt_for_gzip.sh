@@ -9,7 +9,7 @@ set -euo pipefail
 #  None
 #######################################
 function prompt_for_gzip() {
-  if [[ $USE_GZIP == "true" ]]; then
+  if [[ ${USE_GZIP} == "true" ]]; then
     return
   fi
   prompt_yes_no "Would you like to enable gzip?" USE_GZIP
