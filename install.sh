@@ -138,9 +138,35 @@ function source_files() {
 
     # Test Mocks
     source ./scripts/tests/mocks/run_mocks.sh
+    source ./scripts/tests/mocks/docker-compose/run_compose_ss_mock.sh
+    source ./scripts/tests/mocks/docker-compose/run_compose_le_mock.sh
+    source ./scripts/tests/mocks/docker-compose/run_compose_dev_mock.sh
+
+    source ./scripts/tests/mocks/dockerfiles/run_dockerfile_backend_mock.sh
+    source ./scripts/tests/mocks/dockerfiles/run_dockerfile_frontend_mock.sh
+    source ./scripts/tests/mocks/dockerfiles/run_dockerfile_certbot_mock.sh
+
+    source ./scripts/tests/init/setup_common_mock_parameters.sh
+    source ./scripts/tests/init/setup_dev_mock_parameters.sh
+    source ./scripts/tests/init/setup_letsencrypt_mock_parameters.sh
+    source ./scripts/tests/init/setup_self_signed_mock_parameters.sh
+
+    source ./scripts/tests/logging/log_mock_error.sh
+
+    source ./scripts/tests/server/mock_upstream_server.sh
+    source ./scripts/tests/server/gracefully_terminate_mock_server.sh
+
+    source ./scripts/tests/validation/validate_service_config.sh
+    source ./scripts/tests/validation/check_mocks.sh
+
+    source ./scripts/tests/asserts/assert_nginx_has_port.sh
+    source ./scripts/tests/asserts/assert_compose_has_port.sh
+
+    source ./scripts/tests/nginx/run_nginx_ss_configuration.sh
+    source ./scripts/tests/nginx/run_nginx_le_configuration.sh
+    source ./scripts/tests/nginx/run_nginx_dev_configuration.sh
 
 }
-
 #######################################
 # Exits the script cleanly.
 # Arguments:
