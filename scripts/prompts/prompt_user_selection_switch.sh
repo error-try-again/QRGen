@@ -8,15 +8,15 @@ set -euo pipefail
 #   1
 #######################################
 function prompt_user_selection_switch() {
-  case $1 in
-    "Run Setup") setup ;;
-    "Run Mock Configuration") run_mocks ;;
-    "Uninstall") uninstall ;;
-    "Dump logs") dump_logs ;;
-    "Update Project") update_project ;;
-    "Stop Project Docker Containers") stop_containers ;;
-    "Prune All Docker Builds - Dangerous") purge_builds ;;
-    "Quit") quit ;;
-    *) echo "Invalid option." ;;
-  esac
+    case $1 in
+        "Run Setup") setup ;;
+        "Run Mock Configuration") run_mocks ;;
+        "Uninstall") uninstall ;;
+        "Dump logs") dump_logs ;;
+        "Update Project") update_project ;;
+        "Stop Project Docker Containers") stop_containers ;;
+        "Purge Current Builds - Dangerous") purge ;;
+        "Quit") quit ;;
+        *) echo "Invalid selection: $1" ;;
+esac
 }
