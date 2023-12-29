@@ -10,7 +10,7 @@ set -euo pipefail
 function uninstall() {
   test_docker_env
   echo "Cleaning up..."
-  purge_builds
+  purge
 
   # Directly delete the project root directory
   if [[ -d $PROJECT_ROOT_DIR ]]; then
