@@ -18,6 +18,8 @@ function run_nginx_le_mock() {
   NGINX_CONF_FILE="${test_output_dir}/nginx-le.conf"
   DOCKER_COMPOSE_FILE="${test_output_dir}/docker-compose-le.yml"
 
+  generate_file_paths "${NGINX_CONF_FILE}"
+
   configure_nginx_config 2>&1 | tee "${test_output_dir}/nginx_le_output.log"
 
   # Check for errors in the output and log them

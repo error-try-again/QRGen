@@ -19,6 +19,10 @@ function run_compose_ss_mock() {
 
   setup_self_signed_mock_parameters
 
+  DOCKER_COMPOSE_FILE="${test_output_dir}/docker-compose-ss.yml"
+
+  generate_file_paths "${DOCKER_COMPOSE_FILE}"
+
   configure_docker_compose 2>&1 | tee "${test_output_dir}/compose_ss_output.log"
 
   # Check for errors in the output and log them

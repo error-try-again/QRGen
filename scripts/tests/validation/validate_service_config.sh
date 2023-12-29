@@ -38,6 +38,7 @@ function validate_service_config() {
   echo "Validating ${type} configuration: ${file}"
   if ! ${command} &>"${log_file}"; then
     log_mock_error "Validation failed for ${type} with configuration file ${file}"
+    echo "Error: Validation failed for ${type} with configuration file ${file}"
     echo "Complete log can be found at ${log_file}"
   else
     echo "Validation successful for ${type} with configuration file ${file}"

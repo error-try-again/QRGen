@@ -14,6 +14,8 @@ function run_dockerfile_certbot_mock() {
 
   CERTBOT_DOCKERFILE="${test_output_dir}/Certbot.Dockerfile"
 
+  generate_file_paths "${CERTBOT_DOCKERFILE}"
+
   configure_certbot_docker 2>&1 | tee "${test_output_dir}/certbot_docker_output.log"
 
   # Check for errors in the output and log them

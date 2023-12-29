@@ -15,8 +15,9 @@ function run_nginx_ss_mock() {
 
   setup_self_signed_mock_parameters
 
-  DOCKER_COMPOSE_FILE="${test_output_dir}/docker-compose-ss.yml"
   NGINX_CONF_FILE="${test_output_dir}/nginx-ss.conf"
+
+  generate_file_paths "${NGINX_CONF_FILE}"
 
   configure_nginx_config 2>&1 | tee "${test_output_dir}/nginx_ss_output.log"
 

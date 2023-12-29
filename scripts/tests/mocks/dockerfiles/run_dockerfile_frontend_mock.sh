@@ -12,6 +12,8 @@ function run_dockerfile_frontend_mock() {
 
   FRONTEND_DOCKERFILE="${test_output_dir}/Frontend.Dockerfile"
 
+  generate_file_paths "${FRONTEND_DOCKERFILE}"
+
   configure_frontend_docker 2>&1 | tee "${test_output_dir}/frontend_docker_output.log"
 
   # Check for errors in the output and log them

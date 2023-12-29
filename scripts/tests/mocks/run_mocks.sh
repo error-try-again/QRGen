@@ -41,8 +41,8 @@ function run_mocks() {
   echo "${separator}"
   echo "${compose_section_message}"
 
-  run_compose_le_mock
   run_compose_ss_mock
+  run_compose_le_mock
   run_compose_dev_mock
 
   echo "${separator}"

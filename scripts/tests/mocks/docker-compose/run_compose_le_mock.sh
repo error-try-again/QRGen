@@ -17,6 +17,8 @@ function run_compose_le_mock() {
 
   setup_letsencrypt_mock_parameters
 
+  generate_file_paths "${DOCKER_COMPOSE_FILE}"
+
   configure_docker_compose 2>&1 | tee "${test_output_dir}/compose_le_output.log"
 
   # Check for errors in the output and log them

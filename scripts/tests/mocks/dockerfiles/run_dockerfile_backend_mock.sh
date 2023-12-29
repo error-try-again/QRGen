@@ -12,6 +12,8 @@ function run_dockerfile_backend_mock() {
 
   setup_dev_mock_parameters
 
+  generate_file_paths "${BACKEND_DOCKERFILE}"
+
   configure_backend_docker 2>&1 | tee "${test_output_dir}/backend_docker_output.log"
 
   # Check for errors in the output and log them
