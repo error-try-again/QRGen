@@ -89,7 +89,7 @@ function select_and_apply_profile() {
     read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
 
     # Validate selection and apply profile
-    if [[ ${selection} =~ ^[0-9]+$ ]] && [[ "$selection" -ge 1 ]] && [[ "$selection" -le ${#profiles[@]} ]]; then
+    if [[ ${selection} =~ ^[0-9]+$ ]] && [[ "${selection}" -ge 1 ]] && [[ "${selection}" -le ${#profiles[@]} ]]; then
         local selected_profile=${profiles[${selection} - 1]}
         echo "You selected: ${selected_profile}"
         apply_profile "${selected_profile}"
