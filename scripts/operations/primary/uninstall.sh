@@ -13,10 +13,10 @@ function uninstall() {
   purge
 
   # Directly delete the project root directory
-  if [[ -d $PROJECT_ROOT_DIR ]]; then
-    echo "Deleting Project directory $PROJECT_ROOT_DIR..."
-    rm -rf "$PROJECT_ROOT_DIR"
-    echo "Project directory $PROJECT_ROOT_DIR deleted."
+  if [[ -d ${PROJECT_ROOT_DIR} ]]; then
+    echo "Deleting Project directory ${PROJECT_ROOT_DIR}..."
+    rm -rf "${PROJECT_ROOT_DIR}"
+    echo "Project directory ${PROJECT_ROOT_DIR} deleted."
   fi
 
   echo "Uninstallation complete."
