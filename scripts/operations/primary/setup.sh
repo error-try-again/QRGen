@@ -12,8 +12,8 @@ set -euo pipefail
 function setup() {
   setup_project_directories
   setup_docker_rootless
-  ensure_port_is_available "$EXPOSED_NGINX_PORT" "auto"
-  if [[ $PROMPT_BYPASS == true ]]; then
+  ensure_port_is_available "${EXPOSED_NGINX_PORT}" "auto"
+  if [[ ${PROMPT_BYPASS} == true ]]; then
     echo "Skipping prompts..."
   else
     prompt_for_install_mode
