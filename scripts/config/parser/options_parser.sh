@@ -46,7 +46,7 @@ function options_parser() {
 
   # Define long options for the script. Each option is followed by a comma.
   # Options requiring an argument are followed by a colon.
-  long_options_list="setup,run-mocks,uninstall,dump-logs,update-project,\
+  long_options_list="setup,mock,uninstall,dump-logs,update-project,\
 stop-containers,purge,quit,use-hsts,use-ocsp-stapling,use-tls13,use-tls12,help\
 backend-port:,nginx-port:,nginx-ssl-port:,challenge-port:,\
 node-version:,dns-resolver:,timeout:,domain-name:,backend-scheme:,\
