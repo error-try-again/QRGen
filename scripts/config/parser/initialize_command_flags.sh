@@ -8,7 +8,7 @@ set -euo pipefail
 #   dump_logs
 #   purge
 #   quit
-#   run_mocks
+#   mock
 #   setup
 #   stop_containers
 #   uninstall
@@ -16,7 +16,7 @@ set -euo pipefail
 #######################################
 function initialize_command_flags() {
   setup=false
-  run_mocks=false
+  mock=false
   uninstall=false
   dump_logs=false
   update_project=false
