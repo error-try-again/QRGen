@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-shopt -s inherit_errexit
 
 #######################################
 # Manage NGINX configuration generation
@@ -18,7 +17,7 @@ shopt -s inherit_errexit
 # Arguments:
 #  None
 #######################################
-function configure_nginx_config() {
+function generate_nginx_config() {
   server_name="server_name ${DOMAIN_NAME}"
   ssl_listen_directive=""
   ssl_mode_block=""
@@ -262,8 +261,8 @@ function backup_existing_config() {
   local file
   file=$1
   if [[ -f ${file} ]]; then
-    cp "${file}" "${file}.bak"
-    echo "Backup created at \"${file}.bak\""
+    cp "${file}" "${file}.backup"
+    echo "Backup created at \"${file}.backup\""
   fi
 }
 
@@ -312,7 +311,11 @@ function write_endpoints() {
 #  None
 #######################################
 function write_nginx_config() {
-  cat <<-EOF > "${NGINX_CONF_FILE}"
+
+  local write_endpoints_output
+  write_endpoints_output=$(write_endpoints)
+
+  cat <<-EOF >"${NGINX_CONF_FILE}"
 worker_processes auto;
 ${NGINX_PID}
 ${NGINX_ERROR_LOG}
@@ -349,11 +352,11 @@ http {
             access_log off;
             log_not_found off;
         }
-
-        $(write_endpoints)
+         ${write_endpoints_output}
     }
     ${acme_challenge_server_block}
 }
 EOF
+
   echo "NGINX configuration written to ${NGINX_CONF_FILE}"
 }
