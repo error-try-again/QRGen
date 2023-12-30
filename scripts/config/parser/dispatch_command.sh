@@ -10,7 +10,7 @@ set -euo pipefail
 #   dump_logs
 #   purge
 #   quit
-#   run_mocks
+#   mock
 #   setup
 #   stop_containers
 #   uninstall
@@ -25,7 +25,7 @@ function dispatch_command() {
   # Associative array to map the command flag to the corresponding function to execute.
   local -A command_function_map=(
     ["${setup}"]=setup
-    ["${run_mocks}"]=run_mocks
+    ["${mock}"]=mock
     ["${uninstall}"]=uninstall
     ["${dump_logs}"]=dump_logs
     ["${update_project}"]=update_project

@@ -11,7 +11,7 @@ A comprehensive script for managing and deploying web environments.
 
 General Options:
   --setup                             Initialize and configure the project setup.
-  --run-mocks                         Execute mock configurations for testing.
+  --mock                         Execute mock configurations for testing.
   --uninstall                         Clean up and remove project-related data.
   --dump-logs                         Collect and display system logs.
   --update                   Update the project components to the latest version.
