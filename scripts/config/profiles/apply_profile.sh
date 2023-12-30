@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-shopt -s inherit_errexit
 
 #######################################
 # Retrieves a specific configuration value from a JSON file.
@@ -42,6 +41,7 @@ function get_config_value() {
 #   It's crucial that JSON_INSTALL_PROFILES is correctly set to the path of the JSON configuration file before this function is called.
 #######################################
 function apply_profile() {
+  shopt -s inherit_errexit
 
   if [[ $# -lt 1 ]]; then
     echo "Error: Not enough arguments"
@@ -69,7 +69,7 @@ function apply_profile() {
 
     # Declare the key-value pair as a global variable.
     # This is crucial for the profile to be picked up by the installer.
-    declare -g "$key=$value"
+    declare -g "${key}=${value}"
 
     echo "Applied ${key}=${value}"
   done

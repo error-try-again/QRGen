@@ -11,7 +11,7 @@ set -euo pipefail
 function assert_compose_has_port() {
   local file=$1
 
-  # Implement a check for port definition in Docker Compose config
+  # A check for port definition in Docker Compose config
   if ! grep -q 'ports:' "${file}"; then
     log_mock_error "missing_port"
   fi
