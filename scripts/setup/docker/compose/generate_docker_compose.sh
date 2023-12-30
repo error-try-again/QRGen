@@ -9,7 +9,7 @@
 # Arguments:
 #  None
 #######################################
-function configure_docker_compose() {
+function generate_docker_compose() {
   initialize_variables
   backup_existing_config "${DOCKER_COMPOSE_FILE}"
   if [[ ${USE_LETSENCRYPT} == "true" ]]; then
