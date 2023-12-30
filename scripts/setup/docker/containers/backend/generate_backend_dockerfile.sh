@@ -14,7 +14,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-function configure_backend_docker() {
+function generate_backend_dockerfile() {
   local origin="origin"/"${RELEASE_BRANCH}"
   backup_existing_config "${BACKEND_DOCKERFILE}"
 

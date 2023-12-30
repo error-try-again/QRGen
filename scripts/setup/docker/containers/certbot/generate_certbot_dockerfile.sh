@@ -18,7 +18,7 @@ set -euo pipefail
 # Arguments:
 #  None
 #######################################
-function configure_certbot_docker() {
+function generate_certbot_dockerfile() {
 
   BASE_IMAGE="${CERTBOT_BASE_IMAGE} as certbot"
   ENTRYPOINT="[ \"certbot\" ]"
