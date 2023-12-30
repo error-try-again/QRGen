@@ -61,7 +61,7 @@ function apply_profile() {
     local value
 
     # Retrieve the value for the current key from the profile.
-    value=$(get_config_value "${profile}" "${key}")
+    value=$(set -e get_config_value "${profile}" "${key}")
 
     # Declare the key-value pair as a global variable.
     # This is crucial for the profile to be picked up by the installer.
@@ -81,11 +81,16 @@ function apply_profile() {
 function select_and_apply_profile() {
   echo "Available profiles:"
 
-  # Read profiles into an array
-  local profiles
-  readarray -t profiles < <(jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
+# Declare a local array called 'profiles'
+local profiles
 
-  # Display options
+# Use readarray command to read lines from the output of a command into the array
+# 'jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}"' - This will process the content of the JSON_INSTALL_PROFILES variable by jq utility and return the keys as lines
+# 'set -e' is used to stop the script if any subsequent command fails (essential as we're using command substitution)
+# These lines are then stored into the 'profiles' array
+readarray -t profiles < <(set -e jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
+
+  # For each profile, print an index and the profile name to the console (starting at 1)
   local index=1
   for profile in "${profiles[@]}"; do
     echo "${index}) ${profile}"
