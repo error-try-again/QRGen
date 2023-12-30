@@ -18,15 +18,14 @@ function check_port_and_kill_process_if_needed() {
   process_ids=$(lsof -Pi :"${PORT}" -sTCP:LISTEN -t || true)
 
   if [[ -n "${process_ids}" ]]; then
-    echo "Port ${PORT} is in use. Found the following processes:"
+    print_message "Port ${PORT} is in use. Found the following processes:"
     local pid
     for pid in ${process_ids}; do
       if [[ "${pid}" =~ ^[0-9]+$ ]]; then
         local process_name
         process_name=$(ps -p "${pid}" -o comm=)
-        echo "PID: ${pid} - Process Name: ${process_name}"
-
-        echo "Would you like to kill it? (y/n):" >&2
+        print_message "PID: ${pid} - Process Name: ${process_name}"
+        echo "| Would you like to kill it? (y/n):" >&2
         local response
         read -n 1 -r response
         echo >&2 # move to a new line
@@ -34,14 +33,15 @@ function check_port_and_kill_process_if_needed() {
         if [[ ${response} =~ ^[Yy]$ ]]; then
           kill -9 "${pid}" && echo "Process ${pid} (${process_name}) has been killed."
         else
-          echo "Process ${pid} not killed."
+          print_message "Process ${pid} not killed."
+          print_message "Please kill the process manually and try again."
         fi
       else
-        echo "Error: Found non-numeric process ID '${pid}' for port ${PORT}." >&2
+        print_message "Error: Found non-numeric process ID '${pid}' for port ${PORT}." >&2
       fi
     done
   else
-    echo "Port ${PORT} is available."
+    print_message "Port ${PORT} is available."
   fi
 }
 
@@ -57,7 +57,7 @@ function check_port_and_kill_process_if_needed() {
 function start_mock_server() {
   nc -lk -p "${PORT}" &
   MOCK_SERVER_PID=$!
-  echo "Mock server has been started with PID: ${MOCK_SERVER_PID}" >&2
+echo "| Mock server has been started with PID: ${MOCK_SERVER_PID}" >&2
   sleep "${SLEEP_DURATION}"
 }
 

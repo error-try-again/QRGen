@@ -20,7 +20,6 @@ set -euo pipefail
 #######################################
 function setup_common_mock_parameters() {
   local default_root="${PROJECT_ROOT_DIR:-$(pwd)}"
-
   test_output_dir="${default_root}/test_output"
 
   # Create directories if they don't exist
