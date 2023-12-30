@@ -10,7 +10,7 @@ set -euo pipefail
 function prompt_user_selection_switch() {
   case $1 in
   "Run Setup") setup ;;
-  "Run Mock Configuration") run_mocks ;;
+  "Run Mock Configuration") mock ;;
   "Uninstall") uninstall ;;
   "Dump logs") dump_logs ;;
   "Update Project") update_project ;;
