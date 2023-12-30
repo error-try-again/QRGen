@@ -149,7 +149,7 @@ script._
 cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
 ```
 ```bash
-Welcome to the QR Code Generator setup script!
+Welcome to the QRGen setup script!
 1) Run Setup				6) Update Project
 2) Run Mock Configuration		7) Stop Project Docker Containers
 3) Uninstall				8) Purge Current Builds - Dangerous
