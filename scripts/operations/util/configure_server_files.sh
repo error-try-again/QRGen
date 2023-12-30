@@ -8,15 +8,15 @@ function configure_server_files() {
   configure_backend_dotenv
   configure_frontend_dotenv
   echo "Configuring the Docker Express..."
-  configure_backend_docker
+  generate_backend_dockerfile
   echo "Configuring the site map..."
   configure_frontend_sitemap
   echo "Configuring default robots.txt..."
   configure_frontend_robots
   echo "Configuring the frontend Docker environment..."
-  configure_frontend_docker
+  generate_frontend_dockerfile
   echo "Configuring the Docker Certbot Image..."
-  configure_certbot_docker
+  generate_certbot_dockerfile
   echo "Configuring Docker Compose..."
-  configure_docker_compose
+  generate_docker_compose
 }
