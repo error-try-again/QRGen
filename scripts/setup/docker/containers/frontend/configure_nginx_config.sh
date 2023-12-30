@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 #######################################
 # Manage NGINX configuration generation
@@ -88,17 +89,17 @@ function configure_https() {
 #######################################
 function configure_ssl_mode() {
   if [[ -n ${USE_TLS12} && -n ${USE_TLS13} ]]; then
-    ssl_mode_block=$(set -e get_gzip)
+    ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
-    ssl_mode_block+=$(set -e get_ssl_protocol_compatibility)
+    ssl_mode_block+=$(get_ssl_protocol_compatibility)
     ssl_mode_block+=$'\n'
-    ssl_mode_block+=$(set -e get_ssl_additional_config)
+    ssl_mode_block+=$(get_ssl_additional_config)
   else
-    ssl_mode_block=$(set -e get_gzip)
+    ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
-    ssl_mode_block+=$(set -e tls_protocol_one_three_restrict)
+    ssl_mode_block+=$(tls_protocol_one_three_restrict)
     ssl_mode_block+=$'\n'
-    ssl_mode_block+=$(set -e get_ssl_additional_config)
+    ssl_mode_block+=$(get_ssl_additional_config)
   fi
 }
 
