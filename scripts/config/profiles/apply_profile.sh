@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 #######################################
 # Retrieves a specific configuration value from a JSON file.
@@ -51,7 +52,10 @@ function apply_profile() {
   local profile=$1 # The name of the profile to apply.
   echo "Applying profile: ${profile}"
 
-  # Retrieve the keys from the specified profile within the JSON file.
+  # The 'jq' command is used to parse JSON data. The '-r' option outputs raw strings instead of JSON-encoded ones.
+  # ".${profile} | keys | .[]" is a filter that finds the keys of the object at the path specified by '${profile}',
+  # and outputs them one per line. These keys are then stored in the 'keys' variable.
+  # "${JSON_INSTALL_PROFILES}" is the JSON file being processed.
   local keys
   keys=$(jq -r ".${profile} | keys | .[]" "${JSON_INSTALL_PROFILES}")
 
@@ -61,7 +65,7 @@ function apply_profile() {
     local value
 
     # Retrieve the value for the current key from the profile.
-    value=$(set -e get_config_value "${profile}" "${key}")
+    value=$(get_config_value "${profile}" "${key}")
 
     # Declare the key-value pair as a global variable.
     # This is crucial for the profile to be picked up by the installer.
@@ -81,14 +85,10 @@ function apply_profile() {
 function select_and_apply_profile() {
   echo "Available profiles:"
 
-# Declare a local array called 'profiles'
-local profiles
-
-# Use readarray command to read lines from the output of a command into the array
-# 'jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}"' - This will process the content of the JSON_INSTALL_PROFILES variable by jq utility and return the keys as lines
-# 'set -e' is used to stop the script if any subsequent command fails (essential as we're using command substitution)
-# These lines are then stored into the 'profiles' array
-readarray -t profiles < <(set -e jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
+  # Read profiles into an array
+  local profiles
+  output=$(jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
+  readarray -t profiles <<<"${output}"
 
   # For each profile, print an index and the profile name to the console (starting at 1)
   local index=1
