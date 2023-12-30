@@ -13,7 +13,7 @@ function install_packages() {
   echo "Removing conflicting packages..."
   local remove_packages=(docker.io docker-doc docker-compose podman-docker containerd runc)
   for package in "${remove_packages[@]}"; do
-    sudo apt-get remove -y "$package"
+    sudo apt-get remove -y "${package}"
   done
 
   echo "Installing required packages..."
@@ -25,7 +25,7 @@ function install_packages() {
   sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$(. /etc/os-release && echo "${VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
   sudo apt-get update -y
   sudo apt-get install -y jq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -40,14 +40,14 @@ function uninstall_packages() {
   echo "Attempting to uninstall packages..."
   local packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose)
   for package in "${packages[@]}"; do
-    if ! sudo apt-get purge -y "$package"; then
-      echo "Error occurred during uninstallation of $package."
+    if ! sudo apt-get purge -y "${package}"; then
+      echo "Error occurred during uninstallation of ${package}."
       echo "Attempting to fix broken installs."
       sudo apt --fix-broken install
     fi
   done
 
-  if [ -f /etc/apt/sources.list.d/docker.list ]; then
+  if [[ -f /etc/apt/sources.list.d/docker.list ]]; then
     echo "Removing Docker repository..."
     sudo rm /etc/apt/sources.list.d/docker.list
   fi
@@ -62,11 +62,11 @@ function uninstall_packages() {
 #######################################
 function adjust_sysctl_for_port() {
   local port="$1"
-  local setting="net.ipv4.ip_unprivileged_port_start=$port"
+  local setting="net.ipv4.ip_unprivileged_port_start=${port}"
 
-  if ! grep -q "^$setting$" /etc/sysctl.conf; then
-    echo "Adjusting sysctl settings to expose port $port..."
-    echo "$setting" | sudo tee -a /etc/sysctl.conf > /dev/null && sudo sysctl -p
+  if ! grep -q "^${setting}$" /etc/sysctl.conf; then
+    echo "Adjusting sysctl settings to expose port ${port}..."
+    echo "${setting}" | sudo tee -a /etc/sysctl.conf >/dev/null && sudo sysctl -p
   fi
 }
 
@@ -79,40 +79,40 @@ function adjust_sysctl_for_port() {
 #   None
 #######################################
 function setup_user_with_prompt() {
-  if [ -z "$user_name" ]; then
+  if [[ -z "${user_name}" ]]; then
     echo "Error: user_name is not set."
     return 1
   fi
 
-  echo "Setting a new password for $user_name."
-  passwd "$user_name" || {
-    echo "Failed to set password for $user_name."
+  echo "Setting a new password for ${user_name}."
+  passwd "${user_name}" || {
+    echo "Failed to set password for ${user_name}."
     return 3
   }
 }
 
 # Unified User Setup Function
 function setup_user() {
-  echo "Setting up $user_name user..."
-  if id "$user_name" &> /dev/null; then
+  echo "Setting up ${user_name} user..."
+  if id "${user_name}" &>/dev/null; then
     local user_choice
-    echo "User $user_name already exists."
+    echo "User ${user_name} already exists."
     echo "1) Reset password"
     echo "2) Skip user setup"
     while true; do
       read -rp "Your choice (1-2): " user_choice
-      case $user_choice in
-        1 | 2) break ;;
-        *) echo "Please enter a valid choice (1 or 2)." ;;
+      case ${user_choice} in
+      1 | 2) break ;;
+      *) echo "Please enter a valid choice (1 or 2)." ;;
       esac
     done
-    case $user_choice in
-      1) setup_user_with_prompt ;;
-      2) echo "User setup skipped." ;;
-      *) echo "Invalid choice. Exiting." ;;
+    case ${user_choice} in
+    1) setup_user_with_prompt ;;
+    2) echo "User setup skipped." ;;
+    *) echo "Invalid choice. Exiting." ;;
     esac
   else
-    sudo adduser --disabled-password --gecos "" "$user_name"
+    sudo adduser --disabled-password --gecos "" "${user_name}"
     setup_user_with_prompt
   fi
 }
@@ -125,13 +125,13 @@ function setup_user() {
 #   None
 #######################################
 function remove_user() {
-  echo "Removing $user_name user..."
-  if pgrep -u "$user_name" > /dev/null; then
-    echo "There are active processes running under the $user_name user."
+  echo "Removing ${user_name} user..."
+  if pgrep -u "${user_name}" >/dev/null; then
+    echo "There are active processes running under the ${user_name} user."
     local response
     read -rp "Would you like to kill all processes and continue with user removal? (y/N) " response
-    if [[ $response =~ ^[Yy][Ee]?[Ss]?$ ]]; then
-      sudo pkill -9 -u "$user_name"
+    if [[ ${response} =~ ^[Yy][Ee]?[Ss]?$ ]]; then
+      sudo pkill -9 -u "${user_name}"
       sleep 2 # Allow some time for processes to be terminated
     else
       echo "Skipping user removal."
@@ -139,7 +139,7 @@ function remove_user() {
     fi
   fi
 
-  sudo deluser --remove-home "$user_name"
+  sudo deluser --remove-home "${user_name}"
 }
 
 #######################################
@@ -154,22 +154,22 @@ function remove_user() {
 function setup_nvm_node() {
   echo "Setting up NVM and Node.js..."
 
-  if id "$user_name" &> /dev/null; then
-    sudo mkdir -p /home/"$user_name"/.nvm
-    sudo chown "$user_name:$user_name" /home/"$user_name"/.nvm
+  if id "${user_name}" &>/dev/null; then
+    sudo mkdir -p /home/"${user_name}"/.nvm
+    sudo chown "${user_name}:${user_name}" /home/"${user_name}"/.nvm
 
-    sudo -Eu "$user_name" bash << EOF
-export NVM_DIR="/home/$user_name/.nvm"
-export npm_config_cache="/home/$user_name/.npm"
-curl -o- $nvm_install_url | bash
+    sudo -Eu "${user_name}" bash <<EOF
+export NVM_DIR="/home/${user_name}/.nvm"
+export npm_config_cache="/home/${user_name}/.npm"
+curl -o- ${nvm_install_url} | bash
 source "\$NVM_DIR/nvm.sh"
-nvm install $NODE_VERSION
-nvm use $NODE_VERSION
-nvm alias default $NODE_VERSION
+nvm install ${NODE_VERSION}
+nvm use ${NODE_VERSION}
+nvm alias default ${NODE_VERSION}
 npm install -g npm
 EOF
   else
-    echo "User $user_name does not exist. Exiting..."
+    echo "User ${user_name} does not exist. Exiting..."
     exit 1
   fi
 }
@@ -183,22 +183,22 @@ EOF
 #######################################
 function remove_nvm_node() {
   echo "Removing NVM and Node.js..."
-  if id "$user_name" &> /dev/null; then
-    local nvm_dir="/home/$user_name/.nvm"
-    local nvm_sh="$nvm_dir/nvm.sh"
+  if id "${user_name}" &>/dev/null; then
+    local nvm_dir="/home/${user_name}/.nvm"
+    local nvm_sh="${nvm_dir}/nvm.sh"
 
-    if [ -s "$nvm_sh" ]; then
+    if [[ -s "${nvm_sh}" ]]; then
       # Load NVM and uninstall Node versions
-      sudo -u "$user_name" bash -c "source $nvm_sh && nvm deactivate && nvm uninstall --lts && nvm uninstall --current"
+      sudo -u "${user_name}" bash -c "source ${nvm_sh} && nvm deactivate && nvm uninstall --lts && nvm uninstall --current"
 
       # Remove NVM directory
-      sudo rm -rf "$nvm_dir"
-      echo "NVM and Node.js removed for user $user_name."
+      sudo rm -rf "${nvm_dir}"
+      echo "NVM and Node.js removed for user ${user_name}."
     else
-      echo "NVM is not installed for $user_name. Skipping..."
+      echo "NVM is not installed for ${user_name}. Skipping..."
     fi
   else
-    echo "User $user_name does not exist. Exiting..."
+    echo "User ${user_name} does not exist. Exiting..."
     exit 1
   fi
 }
@@ -223,27 +223,27 @@ function installation_menu() {
   echo "8) Full Uninstallation (All)"
   read -rp "Your choice (1-8): " choice
 
-  case $choice in
-    1)
-      setup_user
-      install_packages
-      setup_nvm_node
-      ;;
-    2) setup_user ;;
-    3) install_packages ;;
-    4) setup_nvm_node ;;
-    5) uninstall_packages ;;
-    6) remove_user ;;
-    7) remove_nvm_node ;;
-    8)
-      remove_nvm_node
-      remove_user
-      uninstall_packages
-      ;;
-    *)
-      echo "Invalid choice. Exiting."
-      exit 1
-      ;;
+  case ${choice} in
+  1)
+    setup_user
+    install_packages
+    setup_nvm_node
+    ;;
+  2) setup_user ;;
+  3) install_packages ;;
+  4) setup_nvm_node ;;
+  5) uninstall_packages ;;
+  6) remove_user ;;
+  7) remove_nvm_node ;;
+  8)
+    remove_nvm_node
+    remove_user
+    uninstall_packages
+    ;;
+  *)
+    echo "Invalid choice. Exiting."
+    exit 1
+    ;;
   esac
 }
 
@@ -262,7 +262,7 @@ function installation_menu() {
 #######################################
 function main() {
   # Check for necessary privileges
-  if [[ $EUID -ne 0 ]]; then
+  if [[ ${EUID} -ne 0 ]]; then
     echo "This script must be run as root. Please use sudo."
     exit 1
   fi
