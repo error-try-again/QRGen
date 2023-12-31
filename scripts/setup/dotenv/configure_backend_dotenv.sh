@@ -14,8 +14,8 @@ set -euo pipefail
 #  None
 #######################################
 function configure_backend_dotenv() {
-  echo "Configuring backend .env file"
-  cat <<EOF >"${BACKEND_DOTENV_FILE}"
+  print_messages "Configuring backend .env file"
+  cat << EOF > "${BACKEND_DOTENV_FILE}"
 ORIGIN=${ORIGIN}
 PORT=${BACKEND_PORT}
 USE_SSL=${USE_SSL}
