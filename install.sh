@@ -141,10 +141,6 @@ function source_files() {
   # Test Mocks
   source ./scripts/tests/mocks/mock.sh
 
-  source ./scripts/tests/mocks/dockerfiles/run_dockerfile_backend_mock.sh
-  source ./scripts/tests/mocks/dockerfiles/run_dockerfile_frontend_mock.sh
-  source ./scripts/tests/mocks/dockerfiles/run_dockerfile_certbot_mock.sh
-
   source ./scripts/tests/init/setup_common_mock_parameters.sh
   source ./scripts/tests/init/setup_letsencrypt_mock_parameters.sh
   source ./scripts/tests/init/setup_self_signed_mock_parameters.sh
@@ -205,9 +201,6 @@ function main() {
 
   # Check if jq exists, essential for parsing the json installer profile.
   check_jq_exists
-
-  # Validate the installer profile configuration if it exists.
-  validate_installer_profile_configuration
 
   # Initialize the default command flags. E.g. --setup --help, --version, --debug, etc.
   initialize_command_flags
