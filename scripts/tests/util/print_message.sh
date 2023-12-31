@@ -22,7 +22,7 @@ function print_message() {
   report_message="| $(report_timestamp) | ${message}"
 
   if [[ -n ${secondary_message:-} ]]; then
-    report_message+=$'\n'"| ${secondary_message:-}"
+    report_message+=$'\n'"| $(report_timestamp) | ${secondary_message}"
   fi
 
   echo "${report_message}"
