@@ -17,7 +17,7 @@ function generate_file_paths() {
 
   local file_name="${1}"
   if [[ ! -f ${file_name}   ]]; then
-    echo "File not found: ${file_name} | generating..."
+    print_messages "File not found: ${file_name} | generating..."
     mkdir -p "$(dirname "${file_name}")"
     touch "${file_name}"
   fi
