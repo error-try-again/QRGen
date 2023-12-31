@@ -14,7 +14,7 @@ set -euo pipefail
 #######################################
 function prompt_for_google_api_key() {
   if [[ ${USE_GOOGLE_API_KEY} == "true" ]]; then
-    echo "Google API key already set. Skipping prompt."
+    print_messages "Google API key already set. Skipping prompt."
     return
   fi
   prompt_yes_no "Would you like to use a Google API key? (Will enable google reviews QR Generation)" USE_GOOGLE_API_KEY
