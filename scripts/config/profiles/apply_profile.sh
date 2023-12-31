@@ -41,12 +41,12 @@ function apply_profile() {
   local profile=$2
 
   if [[ $# -lt 2 ]]; then
-    print_message "Error: Not enough arguments"
-    print_message "Usage: apply_profile [json_file] [profile]"
+    print_messages "Error: Not enough arguments"
+    print_messages "Usage: apply_profile [json_file] [profile]"
     exit 1
   fi
 
-  print_message "Applying profile: ${profile}"
+  print_messages "Applying profile: ${profile}"
 
   # The 'jq' command is used to parse JSON data. The '-r' option outputs raw strings instead of JSON-encoded ones.
   # ".${profile} | keys | .[]" is a filter that finds the keys of the object at the path specified by '${profile}',
@@ -67,7 +67,7 @@ function apply_profile() {
     # This is crucial for the profile to be picked up by the installer.
     declare -g "${key}=${value}"
 
-    print_message "Applied ${key}=${value}"
+    print_messages "Applied ${key}=${value}"
   done
 }
 
@@ -85,7 +85,7 @@ function select_and_apply_profile() {
 
   validate_json_file "${json_file}"
 
-  print_message "Available profiles:"
+  print_messages "Available profiles:"
 
   # Read profiles into an array
   local profiles
@@ -109,7 +109,7 @@ function select_and_apply_profile() {
     echo "You selected: ${selected_profile}"
     apply_profile "${json_file}" "${selected_profile}"
   else
-    print_message "Invalid selection: ${selection}"
+    print_messages "Invalid selection: ${selection}"
     exit 1
   fi
 }
