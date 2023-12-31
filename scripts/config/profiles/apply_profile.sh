@@ -3,69 +3,67 @@
 set -euo pipefail
 
 #######################################
-# Retrieves a specific configuration value from a JSON file.
-# This function uses jq to parse a JSON file and extract the value corresponding to a given key within a specified profile.
-# Globals:
-#   JSON_INSTALL_PROFILES - Expected to be the path to a JSON file containing installation profiles.
+# Retrieves a configuration data from a JSON file with the help of a key
+# This function utilizes jq for JSON processing to extract the value of a specific key under a certain profile
 # Arguments:
-#   1: profile (string) - The profile name within the JSON file.
-#   2: key (string) - The key within the profile whose value should be retrieved.
-# Outputs:
-#   The value from the JSON file for the specified key within the given profile.
+#   json_file: The JSON file name.
+#   profile: The profile that the key falls under.
+#   key: The identifier for the value that needs to be extracted.
 #######################################
 function get_config_value() {
+  local json_file=$1
+  local profile=$2
+  local key=$3
 
-  if [[ $# -lt 2 ]]; then
+  if [[ $# -lt 3 ]]; then
     echo "Error: Not enough arguments"
-    echo "Usage: get_config_value [profile] [key]"
+    echo "Usage: get_config_value [json_file] [profile] [key]"
     exit 1
   fi
 
-  local profile=$1 # The profile within the JSON file.
-  local key=$2     # The specific key within the profile.
-
-  jq -r ".${profile}.${key}" "${JSON_INSTALL_PROFILES}" # Use jq to parse and return the value.
+  jq -r ".${profile}.${key}" "${json_file}"
 }
 
 #######################################
-# Applies a configuration profile by setting global variables.
-# This function iterates over keys in a given profile within the JSON configuration file,
-# setting each as a global variable to its corresponding value.
+# Applies a profile configuration by setting global variable pairs.
+# Cycles through all keys in a specific profile
+# within the JSON config file, setting each to a global variable mapped to its respective value.
 # Globals:
-#   JSON_INSTALL_PROFILES - Path to the JSON file containing installer profiles.
+#   ${key}=${value}
 # Arguments:
-#   1: profile (string) - The name of the profile to apply.
-# Outputs:
-#   Informational messages about the profile application process.
-# Note:
-#   It's crucial that JSON_INSTALL_PROFILES is correctly set to the path of the JSON configuration file before this function is called.
+#   1
+#   2
 #######################################
 function apply_profile() {
   shopt -s inherit_errexit
 
-  if [[ $# -lt 1 ]]; then
+  local json_file=$1
+  local profile=$2
+
+  if [[ $# -lt 2 ]]; then
     echo "Error: Not enough arguments"
-    echo "Usage: apply_profile [profile]"
+    echo "Usage: apply_profile [json_file] [profile]"
     exit 1
   fi
 
-  local profile=$1 # The name of the profile to apply.
   echo "Applying profile: ${profile}"
 
   # The 'jq' command is used to parse JSON data. The '-r' option outputs raw strings instead of JSON-encoded ones.
   # ".${profile} | keys | .[]" is a filter that finds the keys of the object at the path specified by '${profile}',
   # and outputs them one per line. These keys are then stored in the 'keys' variable.
-  # "${JSON_INSTALL_PROFILES}" is the JSON file being processed.
+  # "${json_file}" is the JSON file being processed.
   local keys
-  keys=$(jq -r ".${profile} | keys | .[]" "${JSON_INSTALL_PROFILES}")
+  keys=$(jq -r ".${profile} | keys | .[]" "${json_file}")
 
   # Iterate over each key in the profile.
   local key
   for key in ${keys}; do
     local value
 
+    echo "${json_file}"
+
     # Retrieve the value for the current key from the profile.
-    value=$(get_config_value "${profile}" "${key}")
+    value=$(get_config_value "${json_file}" "${profile}" "${key}")
 
     # Declare the key-value pair as a global variable.
     # This is crucial for the profile to be picked up by the installer.
@@ -75,20 +73,24 @@ function apply_profile() {
   done
 }
 
+
 #######################################
-# Lists all profiles from the JSON configuration file and prompts the user to select one to apply.
+# Displays all profiles from the JSON config file
+# and prompts the user to choose one to be applied.
 # Globals:
-#   JSON_INSTALL_PROFILES - Path to the JSON file containing installer profiles.
-# Outputs:
-#   Prompts and informational messages about the profile selection and application process.
+#   output
+#   profile
+# Arguments:
+#   json_file: The JSON file name.
 #######################################
 function select_and_apply_profile() {
+  local json_file=$1
   echo "Available profiles:"
 
   # Read profiles into an array
   local profiles
-  output=$(jq -r 'keys | .[]' "${JSON_INSTALL_PROFILES}")
-  readarray -t profiles <<<"${output}"
+  output=$(jq -r 'keys | .[]' "${json_file}")
+  readarray -t profiles <<< "${output}"
 
   # For each profile, print an index and the profile name to the console (starting at 1)
   local index=1
@@ -105,7 +107,7 @@ function select_and_apply_profile() {
   if [[ ${selection} =~ ^[0-9]+$ ]] && [[ "${selection}" -ge 1 ]] && [[ "${selection}" -le ${#profiles[@]} ]]; then
     local selected_profile=${profiles[${selection} - 1]}
     echo "You selected: ${selected_profile}"
-    apply_profile "${selected_profile}"
+    apply_profile "${json_file}" "${selected_profile}"
   else
     echo "Invalid selection. Please try again."
     exit 1
