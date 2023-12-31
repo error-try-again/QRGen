@@ -9,15 +9,15 @@ set -euo pipefail
 #######################################
 function uninstall() {
   test_docker_env
-  echo "Cleaning up..."
+  print_messages "Cleaning up..."
   purge
 
   # Directly delete the project root directory
   if [[ -d ${PROJECT_ROOT_DIR} ]]; then
-    echo "Deleting Project directory ${PROJECT_ROOT_DIR}..."
+    print_messages "Deleting Project directory ${PROJECT_ROOT_DIR}..."
     rm -rf "${PROJECT_ROOT_DIR}"
-    echo "Project directory ${PROJECT_ROOT_DIR} deleted."
+    print_messages "Project directory ${PROJECT_ROOT_DIR} deleted."
   fi
 
-  echo "Uninstallation complete."
+  print_messages "Uninstallation complete."
 }
