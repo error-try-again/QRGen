@@ -14,7 +14,7 @@ function reset_dotenv_defaults() {
 
   # Check if the .env file exists. If not, print an error and exit the function with status 1.
   if [[ ! -f ${envfile} ]]; then
-    echo "Error: .env file does not exist."
+    print_messages "Error: .env file does not exist."
     return 1
   fi
 
@@ -23,7 +23,7 @@ function reset_dotenv_defaults() {
   if # shellcheck source=./${envfile}
     ! source "${envfile}"
   then
-    echo "Error: Failed to source .env file."
+    print_messages "Error: Failed to source .env file."
     return 1
   fi
 
@@ -35,7 +35,7 @@ function reset_dotenv_defaults() {
   # and store them as a newline-separated string in current_env.
   # If the command fails, print an error and return 1.
   if ! current_env=$(env | cut -d= -f1 | grep '^[a-zA-Z_][a-zA-Z_0-9]*$'); then
-    echo "Error: Failed to extract current environment variables."
+    print_messages "Error: Failed to extract current environment variables."
     return 1
   fi
 
@@ -46,7 +46,7 @@ function reset_dotenv_defaults() {
   # and store them as a newline-separated string in default_env.
   # If the command fails, print an error and return 1.
   if ! default_env=$(cut -d= -f1 "${envfile}"); then
-    echo "Error: Failed to read variable names from .env."
+    print_messages "Error: Failed to read variable names from .env."
     return 1
   fi
 
@@ -61,22 +61,22 @@ function reset_dotenv_defaults() {
   # Unset any variables that are in the current environment but not in the .env file.
   # If unsetting fails for any variable, print a warning but continue with the others.
   # If the entire unsetting process fails, print an error and return 1.
-  comm -23 <(printf "%s\n" "${current_env[@]}") <(printf "%s\n" "${default_env[@]}") \
-    | while read -r var_to_unset; do
+  comm -23 <(printf "%s\n" "${current_env[@]}") <(printf "%s\n" "${default_env[@]}") |
+      while read -r var_to_unset; do
       case ${var_to_unset} in
         -*)
-          echo "Skipping invalid variable: ${var_to_unset}"
+          print_messages "Skipping invalid variable: ${var_to_unset}"
           continue
           ;;
         *)
           unset "${var_to_unset}" || {
-            echo "Warning: Failed to unset ${var_to_unset}"
+            print_messages "Warning: Failed to unset ${var_to_unset}"
             continue
-          }
+        }
           ;;
       esac
     done || {
-    echo "Error: Failed to process unsetting variables."
+    print_messages "Error: Failed to process unsetting variables."
     return 1
   }
 }

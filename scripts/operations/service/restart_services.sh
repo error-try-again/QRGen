@@ -10,15 +10,15 @@ set -euo pipefail
 #   1 ...
 #######################################
 function restart_services() {
-  echo "Restarting backend and frontend services..."
-  if [[ ${RELEASE_BRANCH} = "full-release" ]]; then
+  print_messages "Restarting backend and frontend services..."
+  if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
     if ! docker compose restart backend || ! docker compose restart frontend; then
-      echo "Failed to restart services."
+      print_messages "Failed to restart services."
       return 1
     fi
   else
     if ! docker compose restart frontend; then
-      echo "Failed to restart services."
+      print_messages "Failed to restart services."
       return 1
     fi
   fi
