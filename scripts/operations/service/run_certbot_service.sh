@@ -12,26 +12,26 @@ set -euo pipefail
 #  None
 #######################################
 function run_certbot_service() {
-  echo "Running Certbot service..."
+  print_messages "Running Certbot service..."
   build_certbot_service || {
-    echo "Building Certbot service failed. Exiting."
+    print_messages "Building Certbot service failed. Exiting."
     exit 1
   }
   run_certbot_dry_run || {
-    echo "Running Certbot dry run failed. Exiting."
+    print_messages "Running Certbot dry run failed. Exiting."
     exit 1
   }
   rebuild_and_rerun_certbot || {
-    echo "Rebuilding and rerunning Certbot failed. Exiting."
+    print_messages "Rebuilding and rerunning Certbot failed. Exiting."
     exit 1
   }
   wait_for_certbot_completion || {
-    echo "Waiting for Certbot to complete failed. Exiting."
+    print_messages "Waiting for Certbot to complete failed. Exiting."
     exit 1
   }
   check_certbot_success || {
-    echo "Checking for Certbot success failed. Exiting."
+    print_messages "Checking for Certbot success failed. Exiting."
     exit 1
   }
-  echo "Certbot process completed successfully."
+  print_messages "Certbot process completed successfully."
 }
