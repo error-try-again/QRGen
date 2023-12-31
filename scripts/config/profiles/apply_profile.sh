@@ -16,8 +16,8 @@ function get_config_value() {
   local key=$3
 
   if [[ $# -lt 3 ]]; then
-    echo "Error: Not enough arguments"
-    echo "Usage: get_config_value [json_file] [profile] [key]"
+    print_messages "Error: Not enough arguments"
+    print_messages "Usage: get_config_value [json_file] [profile] [key]"
     exit 1
   fi
 
@@ -106,7 +106,7 @@ function select_and_apply_profile() {
   # Validate selection and apply profile
   if [[ ${selection} =~ ^[0-9]+$ ]] && [[ ${selection} -ge 1   ]] && [[ ${selection} -le ${#profiles[@]}   ]]; then
     local selected_profile=${profiles[selection - 1]}
-    echo "You selected: ${selected_profile}"
+    print_messages "You selected: ${selected_profile}"
     apply_profile "${json_file}" "${selected_profile}"
   else
     print_messages "Invalid selection: ${selection}"
