@@ -14,7 +14,7 @@ function setup() {
   setup_docker_rootless
   ensure_port_is_available "${EXPOSED_NGINX_PORT}" "auto"
   if [[ ${PROMPT_BYPASS} == true ]]; then
-    echo "Skipping prompts..."
+    print_messages "Skipping prompts..."
   else
     select_and_apply_profile "${INSTALL_PROFILE}"
     prompt_for_release_install_mode
