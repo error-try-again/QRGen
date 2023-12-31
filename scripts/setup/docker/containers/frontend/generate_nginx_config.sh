@@ -111,7 +111,7 @@ function configure_ssl_mode() {
 #######################################
 function get_gzip() {
   if [[ -n ${USE_GZIP} ]]; then
-    cat <<-EOF
+    cat <<- EOF
 gzip on;
         gzip_comp_level 6;
         gzip_vary on;
@@ -120,7 +120,7 @@ gzip on;
         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 EOF
   else
-    cat <<-EOF
+    cat <<- EOF
 gzip off;
 EOF
   fi
@@ -132,7 +132,7 @@ EOF
 #  None
 #######################################
 function get_ssl_protocol_compatibility() {
-  cat <<-EOF
+  cat <<- EOF
         ssl_protocols TLSv1.2 TLSv1.3;
 EOF
 }
@@ -147,7 +147,7 @@ EOF
 #  None
 #######################################
 function get_ssl_additional_config() {
-  cat <<-EOF
+  cat <<- EOF
         ssl_prefer_server_ciphers on;
         ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:!DH+3DES:!ADH:!AECDH:!MD5:!ECDHE-RSA-AES256-SHA384:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES128-SHA:!RC2:!RC4:!DES:!EXPORT:!NULL:!SHA1';
         ssl_buffer_size 8k;
@@ -166,7 +166,7 @@ EOF
 #  None
 #######################################
 function tls_protocol_one_three_restrict() {
-  cat <<-EOF
+  cat <<- EOF
         ssl_protocols TLSv1.3;
 EOF
 }
@@ -261,7 +261,7 @@ function backup_existing_config() {
   file=$1
   if [[ -f ${file} ]]; then
     cp "${file}" "${file}.backup"
-    echo "Backup created at \"${file}.backup\""
+    print_messages "Backup created at \"${file}.backup\""
   fi
 }
 
@@ -277,14 +277,14 @@ function backup_existing_config() {
 function write_endpoints() {
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
 
-    [[ -v BACKEND_SCHEME ]] || echo "Error: BACKEND_SCHEME is not set"
-    [[ -v BACKEND_PORT ]] || echo "Error: BACKEND_PORT is not set"
+    [[ -v BACKEND_SCHEME ]] || print_messages "Error: BACKEND_SCHEME is not set"
+    [[ -v BACKEND_PORT ]] || print_messages "Error: BACKEND_PORT is not set"
 
     local endpoint="/qr/"
     local proxy_pass="proxy_pass ${BACKEND_SCHEME}://${BACKEND_UPSTREAM_NAME}:${BACKEND_PORT};"
-    local proxy_set_header_host="proxy_set_header Host \$host;"
-    local proxy_set_header_x_real_ip="proxy_set_header X-Real-IP \$remote_addr;"
-    local proxy_set_header_x_forwarded_for="proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;"
+    local proxy_set_header_host='proxy_set_header Host $host;'
+    local proxy_set_header_x_real_ip='proxy_set_header X-Real-IP $remote_addr;'
+    local proxy_set_header_x_forwarded_for='proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'
 
     echo "location ${endpoint} {"
     echo "            ${proxy_pass}"
@@ -314,7 +314,7 @@ function write_nginx_config() {
   local write_endpoints_output
   write_endpoints_output=$(write_endpoints)
 
-  cat <<-EOF >"${NGINX_CONF_FILE}"
+  cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
 ${NGINX_PID}
 ${NGINX_ERROR_LOG}
@@ -357,5 +357,5 @@ http {
 }
 EOF
 
-  echo "NGINX configuration written to ${NGINX_CONF_FILE}"
+  print_messages "NGINX configuration written to ${NGINX_CONF_FILE}"
 }
