@@ -26,17 +26,17 @@ function prompt_for_google_api_key() {
         break
       elif [[ ${GOOGLE_MAPS_API_KEY} == "skip" ]]; then
         # User chose to skip entering the API key
-        echo "Google API key entry skipped."
+        print_messages "Google API key entry skipped."
         GOOGLE_MAPS_API_KEY="" # Clear the variable if skipping
         break
       else
         # The input was empty, and it's not a skip
-        echo "Error: Google API key cannot be empty. Type 'skip' to skip."
+        print_messages "Error: Google API key cannot be empty. Type 'skip' to skip."
       fi
     done
   else
     # User chose not to use a Google API key
-    echo "Google API key will not be used."
+    print_messages "Google API key will not be used."
     GOOGLE_MAPS_API_KEY="" # Ensure variable is empty
   fi
 }
