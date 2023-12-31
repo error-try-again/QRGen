@@ -47,7 +47,7 @@ function create_service_definition() {
   local depends=""
 
   # Parsing named arguments
-  while [[ "$#" -gt 0 ]]; do
+  while [[ $# -gt 0   ]]; do
     case $1 in
       --name)
               name=$2
