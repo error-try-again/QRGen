@@ -12,24 +12,24 @@ set -euo pipefail
 #  None
 #######################################
 function build_and_run_docker() {
-  echo "Building and running Docker services..."
+  print_messages "Building and running Docker services..."
   # Perform pre-flight, and run Docker services, e.g. backend, frontend, etc.
   common_build_operations || {
-    echo "Failed common build operations"
+    print_messages "Failed common build operations"
     exit 1
   }
   if [[ -n ${BUILD_CERTBOT_IMAGE} ]]; then
-    echo "Building Certbot service..."
+    print_messages "Building Certbot service..."
     run_certbot_service
   fi
   if [[ -n ${USE_AUTO_RENEW_SSL} ]]; then
-    echo "Using auto-renewal for SSL certificates."
+    print_messages "Using auto-renewal for SSL certificates."
     generate_certbot_renewal_job
   fi
 
   # Dump logs or any other post-run operations
   dump_logs || {
-    echo "Failed to dump logs"
+    print_messages "Failed to dump logs"
     exit 1
   }
 }
