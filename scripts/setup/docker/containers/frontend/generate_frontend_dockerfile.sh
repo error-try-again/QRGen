@@ -13,10 +13,11 @@ set -euo pipefail
 #  None
 #######################################
 function generate_frontend_dockerfile() {
+  print_messages "Configuring the frontend Docker environment..."
   local origin="origin/${RELEASE_BRANCH}"
   backup_existing_config "${FRONTEND_DOCKERFILE}"
-
-  cat << EOF > "${FRONTEND_DOCKERFILE}"
+  print_messages "[Info]" "Configuring frontend Dockerfile at ${FRONTEND_DOCKERFILE}"
+  cat <<EOF >"${FRONTEND_DOCKERFILE}"
 # Use the latest version of Node.js
 FROM node:${NODE_VERSION} as build
 

@@ -9,7 +9,7 @@ set -euo pipefail
 #######################################
 function create_directory() {
   local directory="$1"
-  if [[ ! -d ${directory}   ]]; then
+  if [[ ! -d ${directory} ]]; then
     mkdir -p "${directory}"
     print_messages "${directory} created."
   else

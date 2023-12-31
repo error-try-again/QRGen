@@ -10,6 +10,7 @@
 #  None
 #######################################
 function generate_docker_compose() {
+print_messages "Configuring Docker Compose..."
   initialize_variables
   backup_existing_config "${DOCKER_COMPOSE_FILE}"
   if [[ ${USE_LETSENCRYPT} == "true" ]]; then

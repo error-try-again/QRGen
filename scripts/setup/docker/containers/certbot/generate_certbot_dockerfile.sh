@@ -19,6 +19,7 @@ set -euo pipefail
 #  None
 #######################################
 function generate_certbot_dockerfile() {
+  print_messages "Configuring the Docker Certbot Image..."
 
   BASE_IMAGE="${CERTBOT_BASE_IMAGE} as certbot"
   ENTRYPOINT='[ "certbot" ]'
@@ -74,6 +75,6 @@ RUN apk add --no-cache --virtual .build-deps \\
     && rm -rf \"${HOME}\"/.cargo"
 
   backup_existing_config "${CERTBOT_DOCKERFILE}"
-  echo -e "${DOCKERFILE_TEMPLATE}" > "${CERTBOT_DOCKERFILE}"
+echo -e "${DOCKERFILE_TEMPLATE}" >"${CERTBOT_DOCKERFILE}"
   echo "Dockerfile for certbot configured successfully at ${CERTBOT_DOCKERFILE}"
 }
