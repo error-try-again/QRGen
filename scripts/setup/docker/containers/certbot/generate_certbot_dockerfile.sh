@@ -21,7 +21,7 @@ set -euo pipefail
 function generate_certbot_dockerfile() {
 
   BASE_IMAGE="${CERTBOT_BASE_IMAGE} as certbot"
-  ENTRYPOINT="[ \"certbot\" ]"
+  ENTRYPOINT='[ "certbot" ]'
   EXPOSE="80 443"
   VOLUMES="/etc/letsencrypt /var/lib/letsencrypt"
   WORKDIR="/opt/certbot"
@@ -74,6 +74,6 @@ RUN apk add --no-cache --virtual .build-deps \\
     && rm -rf \"${HOME}\"/.cargo"
 
   backup_existing_config "${CERTBOT_DOCKERFILE}"
-  echo -e "${DOCKERFILE_TEMPLATE}" >"${CERTBOT_DOCKERFILE}"
+  echo -e "${DOCKERFILE_TEMPLATE}" > "${CERTBOT_DOCKERFILE}"
   echo "Dockerfile for certbot configured successfully at ${CERTBOT_DOCKERFILE}"
 }
