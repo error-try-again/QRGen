@@ -8,5 +8,7 @@ set -euo pipefail
 #  None
 #######################################
 function automatic_production_reload_selection() {
-  apply_profile "prod_reload_config"
+  # Validate the installer profile configuration if it exists.
+  validate_installer_profile_configuration "${INSTALL_PROFILE}"
+  apply_profile "${INSTALL_PROFILE}" "prod_reload_config"
 }
