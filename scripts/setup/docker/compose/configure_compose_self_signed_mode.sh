@@ -23,7 +23,7 @@ set -euo pipefail
 #  None
 #######################################
 function configure_compose_self_signed_mode() {
-  echo "Configuring Docker Compose for self-signed certificates..."
+  print_messages "Configuring Docker Compose for self-signed certificates..."
 
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
     backend_ports=$(join_with_commas \
