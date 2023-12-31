@@ -14,6 +14,8 @@ set -euo pipefail
 function add_to_definition() {
     local type=$1
     local values=$2
+local definition
+
     if [[ -n ${values} ]]; then
       definition+=$'\n'
       definition+="    ${type}:"
