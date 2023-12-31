@@ -16,10 +16,10 @@ function prompt_for_letsencrypt_install_type() {
   print_messages "4: Run custom setup for Let's Encrypt SSL (Advanced)"
   prompt_numeric "Please enter your choice (1/2/3/4): " AUTO_SETUP_CHOICE
   case ${AUTO_SETUP_CHOICE} in
-    1) automatic_staging_selection ;;
-    2) automatic_production_selection ;;
-    3) automatic_production_reload_selection ;;
-    4) prompt_for_custom_letsencrypt_install ;;
-    *) print_messages "Invalid choice, please enter 1, 2, 3, or 4." ;;
+1) automatic_staging_selection ;;
+2) automatic_production_selection ;;
+3) automatic_production_reload_selection ;;
+4) prompt_for_custom_letsencrypt_install ;;
+*) print_messages "Invalid choice, please enter 1, 2, 3, or 4." ;;
 esac
 }

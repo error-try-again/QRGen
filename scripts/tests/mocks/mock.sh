@@ -11,17 +11,17 @@ set -euo pipefail
 #   3 - file:   let the script run with a specific file (e.g., le.conf, ss.conf)
 #######################################
 function setup_and_run_mock() {
-  local service=$1
-  local config=$2
-  local file=$3
-  print_messages "Running ${service} ${config} mocks..."
-  reset_dotenv_defaults && setup_common_mock_parameters
-  if [[ ${config} == "letsencrypt" ]]; then
-    setup_letsencrypt_mock_parameters
-  elif [[ ${config} == "self_signed" ]]; then
-    setup_self_signed_mock_parameters
-  fi
-  run_service_mock "${service}" "${config}" "${file}"
+	local service=$1
+	local config=$2
+	local file=$3
+	print_messages "Running ${service} ${config} mocks..."
+	reset_dotenv_defaults && setup_common_mock_parameters
+	if [[ ${config} == "letsencrypt" ]]; then
+		setup_letsencrypt_mock_parameters
+	elif [[ ${config} == "self_signed" ]]; then
+		setup_self_signed_mock_parameters
+	fi
+	run_service_mock "${service}" "${config}" "${file}"
 }
 
 #######################################
@@ -29,9 +29,9 @@ function setup_and_run_mock() {
 # Arguments: None
 #######################################
 function run_nginx_mocks() {
-  setup_and_run_mock "nginx" "letsencrypt" "le.conf"
-  setup_and_run_mock "nginx" "self-signed" "ss.conf"
-  setup_and_run_mock "nginx" "dev" "dev.conf"
+	setup_and_run_mock "nginx" "letsencrypt" "le.conf"
+	setup_and_run_mock "nginx" "self-signed" "ss.conf"
+	setup_and_run_mock "nginx" "dev" "dev.conf"
 }
 
 #######################################
@@ -39,9 +39,9 @@ function run_nginx_mocks() {
 # Arguments: None
 #######################################
 function run_docker_compose_mocks() {
-  setup_and_run_mock "docker-compose" "letsencrypt" "le.yml"
-  setup_and_run_mock "docker-compose" "self-signed" "ss.yml"
-  setup_and_run_mock "docker-compose" "dev" "dev.yml"
+	setup_and_run_mock "docker-compose" "letsencrypt" "le.yml"
+	setup_and_run_mock "docker-compose" "self-signed" "ss.yml"
+	setup_and_run_mock "docker-compose" "dev" "dev.yml"
 }
 
 #######################################
@@ -49,9 +49,9 @@ function run_docker_compose_mocks() {
 # Arguments:  None
 #######################################
 function run_docker_file_mocks() {
-  setup_and_run_mock "dockerfile" "certbot" "certbot.Dockerfile"
-  setup_and_run_mock "dockerfile" "frontend" "frontend.Dockerfile"
-  setup_and_run_mock "dockerfile" "backend" "backend.Dockerfile"
+	setup_and_run_mock "dockerfile" "certbot" "certbot.Dockerfile"
+	setup_and_run_mock "dockerfile" "frontend" "frontend.Dockerfile"
+	setup_and_run_mock "dockerfile" "backend" "backend.Dockerfile"
 }
 
 #######################################
@@ -59,20 +59,20 @@ function run_docker_file_mocks() {
 # Arguments:  None
 #######################################
 function mock() {
-  print_messages "Running Mocks..."
+	print_messages "Running Mocks..."
 
-  # Setup common configuration parameters
-  setup_common_mock_parameters
+	# Setup common configuration parameters
+	setup_common_mock_parameters
 
-  # Run the upstream mock server
-  mock_upstream_server
+	# Run the upstream mock server
+	mock_upstream_server
 
-  run_nginx_mocks
-  run_docker_compose_mocks
-  run_docker_file_mocks
-  gracefully_terminate_mock_server
+	run_nginx_mocks
+	run_docker_compose_mocks
+	run_docker_file_mocks
+	gracefully_terminate_mock_server
 
-  print_messages "Mocks complete"
+	print_messages "Mocks complete"
 }
 
 #######################################

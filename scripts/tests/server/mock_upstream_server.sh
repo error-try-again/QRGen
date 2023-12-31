@@ -17,11 +17,11 @@ function check_port_and_kill_process_if_needed() {
   local process_ids
   process_ids=$(lsof -Pi :"${PORT}" -sTCP:LISTEN -t || true)
 
-  if [[ -n ${process_ids}   ]]; then
+  if [[ -n ${process_ids} ]]; then
     print_messages "Port ${PORT} is in use. Found the following processes:"
     local pid
     for pid in ${process_ids}; do
-      if [[ ${pid} =~ ^[0-9]+$   ]]; then
+      if [[ ${pid} =~ ^[0-9]+$ ]]; then
         local process_name
         process_name=$(ps -p "${pid}" -o comm=)
         print_messages "PID: ${pid} - Process Name: ${process_name}"
@@ -69,7 +69,7 @@ function start_mock_server() {
 #   Error message if the server failed to start.
 #######################################
 function validate_server_start() {
-  if ! kill -0 "${MOCK_SERVER_PID}" 2> /dev/null; then
+  if ! kill -0 "${MOCK_SERVER_PID}" 2>/dev/null; then
     print_messages "Starting the mock server failed. Check connectivity or port availability." >&2
     exit 1
   fi

@@ -15,12 +15,12 @@ function join_with_commas() {
 
   # Loop through each mapping.
   for mapping in "${mappings[@]}"; do
-    if [[ ${first} == true  ]]; then # Check if this is the first mapping.
-      first=false                    # Set first to false after the first iteration.
+  if [[ ${first} == true ]]; then # Check if this is the first mapping.
+    first=false                   # Set first to false after the first iteration.
   else
-      result+="," # Append a comma before the next mapping if it's not the first one.
+    result+="," # Append a comma before the next mapping if it's not the first one.
   fi
-    result+="${mapping}" # Append the current mapping to the result string.
+  result+="${mapping}" # Append the current mapping to the result string.
 done
   echo "${result}" # Output the concatenated result.
 }
