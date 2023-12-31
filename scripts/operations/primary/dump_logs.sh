@@ -16,13 +16,13 @@ function dump_service_logs() {
   local datetime="$2"
   local separator="---------------------------------------"
 
-  echo "Dumping logs for service: ${service} at ${datetime}"
+  print_messages "Dumping logs for service: ${service} at ${datetime}"
   local logs
   logs=$(docker compose -f "${DOCKER_COMPOSE_FILE}" logs "${service}")
 
   local log_file="${PROJECT_LOGS_DIR}/${service}_${datetime// /_}.log"
-  echo "${logs}" >"${log_file}"
-  echo "Logs for ${service} saved to ${log_file}"
+  print_messages "${logs}" > "${log_file}"
+  print_messages "Logs for ${service} saved to ${log_file}"
   echo "${separator}"
 }
 
