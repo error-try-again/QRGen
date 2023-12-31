@@ -11,8 +11,8 @@ set -euo pipefail
 #######################################
 function handle_staging_flags() {
   if [[ -n ${USE_PRODUCTION_SSL:-no} ]]; then
-    echo "Certbot is running in production mode."
-    echo "Removing --staging flag from docker-compose.yml..."
+    print_messages "Certbot is running in production mode."
+    print_messages "Removing --staging flag from docker-compose.yml..."
     remove_staging_flag
-  fi
+fi
 }
