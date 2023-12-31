@@ -15,19 +15,19 @@ function prompt_yes_no() {
   while true; do
     read -rp "${prompt_message} [Y/n]: " choice
     case "${choice,,}" in # Convert to lowercase for easier matching
-    yes | y)
-      eval "${result_var}=true"
-      break
-      ;;
-    no | n)
-      eval "${result_var}=false"
-      break
-      ;;
-    "") # Default to 'yes' if the user just presses enter
-      eval "${result_var}=true"
-      break
-      ;;
-    *) echo "Invalid input. Please enter 'yes' or 'no'." ;;
-    esac
+      yes | y)
+        eval "${result_var}=true"
+        break
+        ;;
+      no | n)
+        eval "${result_var}=false"
+        break
+        ;;
+      "") # Default to 'yes' if the user just presses enter
+        eval "${result_var}=true"
+        break
+        ;;
+      *) print_messages "Invalid input. Please enter 'yes' or 'no'." ;;
+esac
   done
 }
