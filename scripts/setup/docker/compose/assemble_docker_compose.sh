@@ -39,14 +39,14 @@ function assemble_docker_compose_configuration() {
     "${volume_driver}")
 
   {
-    echo "version: '3.8'"
-    echo "services:"
+    print_messages "version: '3.8'"
+    print_messages "services:"
     echo "${backend_service_definition}"
     echo "${frontend_service_definition}"
     echo "${certbot_service_definition}"
     echo "${network_definition}"
     echo "${volume_definition}"
-  } >"${DOCKER_COMPOSE_FILE}"
+  } > "${DOCKER_COMPOSE_FILE}"
 
-  echo "Docker Compose configuration written to ${DOCKER_COMPOSE_FILE}"
+   "Docker Compose configuration written to ${DOCKER_COMPOSE_FILE}"
 }
