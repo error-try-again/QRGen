@@ -15,11 +15,11 @@ set -euo pipefail
 function gracefully_terminate_mock_server() {
   # Attempt to gracefully terminate the mock server
   if kill -0 "${MOCK_SERVER_PID}" &> /dev/null; then
-    print_message "Terminating mock server with PID ${MOCK_SERVER_PID}"
+    print_messages "Terminating mock server with PID ${MOCK_SERVER_PID}"
     kill -15 "${MOCK_SERVER_PID}"                     # Send the TERM signal to allow graceful termination
     sleep 1                                           # Give it a moment to close
     kill -9 "${MOCK_SERVER_PID}" 2> /dev/null || true # Force kill if still running
   else
-    print_message "Mock server process ${MOCK_SERVER_PID} not found."
+    print_messages "Mock server process ${MOCK_SERVER_PID} not found."
   fi
 }
