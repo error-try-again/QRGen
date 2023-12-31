@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Produces server-side configuration files essential for backend and frontend operations.
 function configure_server_files() {
-  echo "Creating server configuration files..."
+  print_messages "Creating server configuration files..."
   configure_backend_dotenv
   configure_frontend_dotenv
   echo "Configuring the Docker Express..."
