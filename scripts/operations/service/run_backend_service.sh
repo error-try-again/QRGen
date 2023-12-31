@@ -9,9 +9,9 @@ set -euo pipefail
 #######################################
 function docker_compose_backend_service() {
   local cache_option=$1
-  echo "Building and running Backend service ${cache_option}..."
+  print_messages "Building and running Backend service ${cache_option}..."
   if ! docker compose --progress=plain build "${cache_option}" backend; then
-    echo "Failed to build Backend service."
+    print_messages "Failed to build Backend service."
     exit 1
   fi
   docker compose up -d backend
