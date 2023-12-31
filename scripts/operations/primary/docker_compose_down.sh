@@ -12,7 +12,7 @@ set -euo pipefail
 function stop_containers() {
   test_docker_env
   if check_docker_compose; then
-    echo "Stopping containers using docker-compose..."
+    print_messages "Stopping containers using docker-compose..."
     docker compose -f "${DOCKER_COMPOSE_FILE}" down
   fi
 }
