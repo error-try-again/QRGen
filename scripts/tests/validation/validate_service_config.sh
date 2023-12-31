@@ -169,7 +169,7 @@ function handle_dockerfile_variants() {
       generate_and_log_config "${conf_file_path}" "${operational_log}" "${service_variant}" generate_certbot_dockerfile
       ;;
     *)
-      print_message "Failed to validate configuration file. Unknown service variant: ${service_variant}"
+      print_messages "Failed to validate configuration file. Unknown service variant: ${service_variant}"
       ;;
   esac
 }
