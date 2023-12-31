@@ -18,7 +18,7 @@ set -euo pipefail
 #######################################
 function prompt_for_domain_details() {
   if [[ ${SKIP_DOMAIN_PROMPT} == "true" ]]; then
-    print_message "Skipping domain prompt, please ensure that the following environment variables are set correctly:"
+    print_messages "Skipping domain prompt, please ensure that the following environment variables are set correctly:"
     print_messages "BACKEND_SCHEME: ${BACKEND_SCHEME}" "USE_CUSTOM_DOMAIN: ${USE_CUSTOM_DOMAIN}"
     print_messages "DOMAIN_NAME: ${DOMAIN_NAME}" "SUBDOMAIN: ${SUBDOMAIN}"
     print_messages "ORIGIN: ${ORIGIN}" "ORIGIN_PORT: ${ORIGIN_PORT}"
