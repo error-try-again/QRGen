@@ -12,7 +12,7 @@ set -euo pipefail
 #   1 ...
 #######################################
 function validate_project_root_dir() {
-  if [[ -n ${PROJECT_ROOT_DIR}   ]]; then
+  if [[ -n ${PROJECT_ROOT_DIR} ]]; then
     return 0
   else
     print_messages "PROJECT_ROOT_DIR is not set"

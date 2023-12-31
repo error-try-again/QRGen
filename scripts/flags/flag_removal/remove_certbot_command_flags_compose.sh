@@ -17,7 +17,7 @@ function remove_certbot_command_flags_compose() {
   temp_file="$(mktemp)"
 
   # Perform the modification
-  sed "/certbot:/,/command:/s/${flag_to_remove}//" "${DOCKER_COMPOSE_FILE}" > "${temp_file}"
+  sed "/certbot:/,/command:/s/${flag_to_remove}//" "${DOCKER_COMPOSE_FILE}" >"${temp_file}"
 
   # Output only the path to the temporary file
   echo "${temp_file}"
