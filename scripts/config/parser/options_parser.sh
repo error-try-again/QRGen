@@ -23,7 +23,7 @@ function assign_flag_value() {
   # Validate that flag_name adheres to expected naming conventions:
   # Starts with 'use_' or 'no_', followed by lowercase letters or underscores.
   if ! [[ ${flag_name} =~ ^(use_|no_)?[a-z_]+$ ]]; then
-    echo "Error: Unexpected flag '${flag_name}'"
+    print_messages "Error: Unexpected flag '${flag_name}'"
     exit 1
   fi
 
@@ -78,7 +78,7 @@ disable-docker-caching:,use-google-api-key:,google-maps-api-key:,release-branch:
   while true; do
     case "$1" in
     --help | -h)
-      echo "Usage instructions for the script..."
+      print_messages "Usage instructions for the script..."
       exit 0
       ;;
     --) # End of all options.
