@@ -11,7 +11,7 @@ set -euo pipefail
 #######################################
 function generate_file_paths() {
   if [[ $# -eq 0 ]]; then
-    echo "No arguments supplied"
+    print_messages "No arguments supplied"
     return 1
   fi
 
