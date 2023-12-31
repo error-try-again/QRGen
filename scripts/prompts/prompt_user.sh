@@ -14,7 +14,7 @@ readonly OPTIONS=("Run Setup" "Run Mock Configuration" "Uninstall" "Dump logs"
 # Print header function
 function print_header() {
   print_separator
-  echo "$1"
+  print_messages "$1"
   print_separator
 }
 
@@ -31,7 +31,7 @@ function prompt_user() {
         break
       fi
     else
-      echo "Invalid option. Please try again."
+      print_messages "Invalid option. Please try again."
     fi
   done
 }
