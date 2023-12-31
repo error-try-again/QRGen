@@ -216,9 +216,8 @@ function configure_security_headers() {
             # Adjust the policy directives based on your application's specific needs
             add_header Content-Security-Policy \"default-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.tile.openstreetmap.org; media-src 'none'; frame-src 'none'; font-src 'self'; connect-src 'self';\";"
 
-  if [[ ${USE_LETSENCRYPT} == "true" ]]; then
+  if [[ ${USE_HSTS} == "true" ]]; then
     security_headers+="
-
             # HTTP Strict Transport Security (HSTS) for 1 year, including subdomains
             add_header Strict-Transport-Security 'max-age=31536000; includeSubDomains' always;"
   fi
