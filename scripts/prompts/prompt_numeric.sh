@@ -15,7 +15,7 @@ prompt_numeric() {
   local input
   read -rp "${prompt_message}" input
   while ! [[ ${input} =~ ^[0-9]+$ ]]; do
-    echo "Please enter a valid number."
+    print_messages "Please enter a valid number."
     read -rp "${prompt_message}" input
   done
   eval "${var_name}"="'${input}'"
