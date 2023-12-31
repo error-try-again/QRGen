@@ -24,6 +24,6 @@ function setup() {
     prompt_for_gzip
   fi
   configure_server_files
-generate_nginx_config
+  generate_nginx_config
   build_and_run_docker
 }

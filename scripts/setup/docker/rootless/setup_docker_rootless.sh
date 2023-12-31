@@ -44,7 +44,6 @@ function setup_docker_rootless() {
   add_to_bashrc "DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock"
 
   # Manage Docker's systemd services.
-  systemctl --user status docker.service
   systemctl --user start docker.service
   systemctl --user enable docker.service
 }
