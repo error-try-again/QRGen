@@ -19,5 +19,5 @@ function backup_and_replace_file() {
 
   # Replace the original file with the modified version
   mv "${modified_file}" "${original_file}"
-  echo "File updated and original version backed up."
+  print_messages "File updated and original version backed up."
 }
