@@ -24,10 +24,10 @@ function remove_conflicting_containers() {
 
     # Check if a container with the generated name exists
     if docker ps -a --format '{{.Names}}' | grep -qw "${probable_container_name}"; then
-      echo "Removing existing container that may conflict: ${probable_container_name}"
+      print_messages "Removing existing container that may conflict: ${probable_container_name}"
       docker rm -f "${probable_container_name}"
     else
-      echo "No conflict for ${probable_container_name}"
+      print_messages "No conflict for ${probable_container_name}"
     fi
   done
 }
