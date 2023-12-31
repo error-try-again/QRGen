@@ -15,10 +15,10 @@ function check_flag_removal() {
   local flag=$2
 
   if grep --quiet -- "${flag}" "${file}"; then
-    echo "${flag} removal failed."
+    print_messages "${flag} removal failed."
     rm "${file}"
     exit 1
   else
-    echo "${flag} removed successfully."
+    print_messages "${flag} removed successfully."
   fi
 }
