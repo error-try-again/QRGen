@@ -57,7 +57,7 @@ function source_files() {
 
   # Operations - Validation
   source ./scripts/operations/validation/validate_and_load_dotenv.sh
-  source ./scripts/operations/validation/validate_installer_profile.sh
+  source ./scripts/operations/validation/validate_installer_profile_exists.sh
   source ./scripts/operations/validation/validate_project_root.sh
   source ./scripts/operations/validation/check_jq_exists.sh
 

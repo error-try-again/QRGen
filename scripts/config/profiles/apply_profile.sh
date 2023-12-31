@@ -40,6 +40,8 @@ function apply_profile() {
   local json_file=$1
   local profile=$2
 
+  validate_installer_profile_exists "${json_file}"
+
   if [[ $# -lt 2 ]]; then
     echo "Error: Not enough arguments"
     echo "Usage: apply_profile [json_file] [profile]"
@@ -72,7 +74,6 @@ function apply_profile() {
     echo "Applied ${key}=${value}"
   done
 }
-
 
 #######################################
 # Displays all profiles from the JSON config file
