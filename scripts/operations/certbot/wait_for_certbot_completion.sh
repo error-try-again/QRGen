@@ -24,24 +24,24 @@ function wait_for_certbot_completion() {
     if [[ -n ${certbot_container_id} ]]; then
 
       certbot_status=$(docker inspect -f '{{.State.Status}}' "${certbot_container_id}")
-      echo "Attempt ${attempt_count}"
-      echo "Certbot container status: ${certbot_status}"
+      print_messages "Attempt ${attempt_count}"
+      print_messages "Certbot container status: ${certbot_status}"
 
       if [[ ${certbot_status} == "exited" ]]; then
         return 0
       elif [[ ${certbot_status} != "running" ]]; then
-        echo "Certbot container is in an unexpected state: ${certbot_status}"
+        print_messages "Certbot container is in an unexpected state: ${certbot_status}"
         return 1
       fi
     else
-      echo "Certbot container is not running."
+      print_messages "Certbot container is not running."
       break
     fi
     sleep 5
     ((attempt_count++))
   done
   if ((attempt_count == max_attempts)); then
-    echo "Certbot process timed out."
+    print_messages "Certbot process timed out."
     return 1
   fi
 }
