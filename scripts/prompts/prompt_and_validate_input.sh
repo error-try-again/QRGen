@@ -20,7 +20,7 @@ function prompt_and_validate_input() {
       eval "${result_var}='${input_value}'"
       break
     else
-      echo "${error_message}"
+      print_messages "${error_message}"
     fi
   done
 }
