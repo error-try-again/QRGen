@@ -14,7 +14,7 @@ set -eo pipefail
 #  None
 #######################################
 function generate_self_signed_certificates() {
-  echo "Generating self-signed certificates for ${DOMAIN_NAME}..."
+  print_messages "Generating self-signed certificates for ${DOMAIN_NAME}..."
 
   export certs_path=${CERTS_DIR}/live/${DOMAIN_NAME}
   local fullchain_path="${certs_path}/fullchain.pem"
@@ -43,12 +43,12 @@ function check_and_generate_certificates() {
   local fullchain_path=$1
   local privkey_path=$2
 
-  if [[ ! -f "${fullchain_path}" ]] || prompt_for_dhparam_regeneration "${certs_path}"; then
+  if [[ ! -f ${fullchain_path}   ]] || prompt_for_dhparam_regeneration "${certs_path}"; then
     openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
       -keyout "${privkey_path}" \
       -out "${fullchain_path}" \
       -subj "/CN=${DOMAIN_NAME}"
-    echo "Self-signed certificates for ${DOMAIN_NAME} generated at ${certs_path}."
+    print_messages "Self-signed certificates for ${DOMAIN_NAME} generated at ${certs_path}."
   else
     echo "Certificates for ${DOMAIN_NAME} already exist at ${certs_path}."
   fi
@@ -64,7 +64,7 @@ function check_and_generate_certificates() {
 function generate_dh_parameters() {
   local dh_params_path=$1
 
-  if [[ ! -f "${dh_params_path}" ]]; then
+  if [[ ! -f ${dh_params_path}   ]]; then
     echo "DH parameters file not found at ${dh_params_path}. Generating new DH parameters."
 
     prompt_for_dhparam_strength
