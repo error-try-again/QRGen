@@ -40,15 +40,13 @@ function apply_profile() {
   local json_file=$1
   local profile=$2
 
-  validate_installer_profile_exists "${json_file}"
-
   if [[ $# -lt 2 ]]; then
-    echo "Error: Not enough arguments"
-    echo "Usage: apply_profile [json_file] [profile]"
+    print_message "Error: Not enough arguments"
+    print_message "Usage: apply_profile [json_file] [profile]"
     exit 1
   fi
 
-  echo "Applying profile: ${profile}"
+  print_message "Applying profile: ${profile}"
 
   # The 'jq' command is used to parse JSON data. The '-r' option outputs raw strings instead of JSON-encoded ones.
   # ".${profile} | keys | .[]" is a filter that finds the keys of the object at the path specified by '${profile}',
@@ -62,8 +60,6 @@ function apply_profile() {
   for key in ${keys}; do
     local value
 
-    echo "${json_file}"
-
     # Retrieve the value for the current key from the profile.
     value=$(get_config_value "${json_file}" "${profile}" "${key}")
 
@@ -71,7 +67,7 @@ function apply_profile() {
     # This is crucial for the profile to be picked up by the installer.
     declare -g "${key}=${value}"
 
-    echo "Applied ${key}=${value}"
+    print_message "Applied ${key}=${value}"
   done
 }
 
@@ -86,7 +82,10 @@ function apply_profile() {
 #######################################
 function select_and_apply_profile() {
   local json_file=$1
-  echo "Available profiles:"
+
+  validate_json_file "${json_file}"
+
+  print_message "Available profiles:"
 
   # Read profiles into an array
   local profiles
@@ -105,12 +104,12 @@ function select_and_apply_profile() {
   read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
 
   # Validate selection and apply profile
-  if [[ ${selection} =~ ^[0-9]+$ ]] && [[ "${selection}" -ge 1 ]] && [[ "${selection}" -le ${#profiles[@]} ]]; then
-    local selected_profile=${profiles[${selection} - 1]}
+  if [[ ${selection} =~ ^[0-9]+$ ]] && [[ ${selection} -ge 1   ]] && [[ ${selection} -le ${#profiles[@]}   ]]; then
+    local selected_profile=${profiles[selection - 1]}
     echo "You selected: ${selected_profile}"
     apply_profile "${json_file}" "${selected_profile}"
   else
-    echo "Invalid selection. Please try again."
+    print_message "Invalid selection: ${selection}"
     exit 1
   fi
 }
