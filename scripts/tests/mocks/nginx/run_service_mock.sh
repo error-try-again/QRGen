@@ -23,7 +23,7 @@ function run_service_mock() {
 
   mkdir -p "${test_output_dir}/${service_stack}/${service_variant}"
 
-  message="| $(report_timestamp) | Building config - [${service_stack}] - [${service_variant}]"
+message="Building config - [${service_stack}] - [${service_variant}]"
   print_messages "${message}"
 
   generate_configuration_file "${service_stack}" "${service_variant}" "${conf_file_path}" "${operational_log}"
