@@ -15,7 +15,7 @@ set -euo pipefail
 #  None
 #######################################
 function generate_backend_dockerfile() {
-  print_messages "Configuring the Docker Express..."
+print_messages "Configuring the Docker Backend at ${BACKEND_DOCKERFILE}"
   local origin="origin"/"${RELEASE_BRANCH}"
   backup_existing_config "${BACKEND_DOCKERFILE}"
   cat <<EOF >"${BACKEND_DOCKERFILE}"

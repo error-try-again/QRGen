@@ -14,16 +14,15 @@ set -euo pipefail
 function dump_service_logs() {
   local service="$1"
   local datetime="$2"
-  local separator="---------------------------------------"
 
   print_messages "Dumping logs for service: ${service} at ${datetime}"
+
   local logs
   logs=$(docker compose -f "${DOCKER_COMPOSE_FILE}" logs "${service}")
-
   local log_file="${PROJECT_LOGS_DIR}/${service}_${datetime// /_}.log"
-print_messages "${logs}" >"${log_file}"
+echo "${logs}" >"${log_file}"
+
   print_messages "Logs for ${service} saved to ${log_file}"
-  echo "${separator}"
 }
 
 #######################################
