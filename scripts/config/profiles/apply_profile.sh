@@ -90,7 +90,7 @@ function select_and_apply_profile() {
   # Read profiles into an array
   local profiles
   output=$(jq -r 'keys | .[]' "${json_file}")
-  readarray -t profiles <<< "${output}"
+  readarray -t profiles <<<"${output}"
 
   # For each profile, print an index and the profile name to the console (starting at 1)
   local index=1
@@ -99,17 +99,19 @@ function select_and_apply_profile() {
     ((index++))
   done
 
+  # Validate selection and apply profile
+  while true; do
   # Prompt the user to choose a profile
   local selection
   read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
 
-  # Validate selection and apply profile
-  if [[ ${selection} =~ ^[0-9]+$ ]] && [[ ${selection} -ge 1   ]] && [[ ${selection} -le ${#profiles[@]}   ]]; then
+  if [[ ${selection} =~ ^[0-9]+$ ]] && [[ ${selection} -ge 1 ]] && [[ ${selection} -le ${#profiles[@]} ]]; then
     local selected_profile=${profiles[selection - 1]}
     print_messages "You selected: ${selected_profile}"
     apply_profile "${json_file}" "${selected_profile}"
+    break
   else
     print_messages "Invalid selection: ${selection}"
-    exit 1
   fi
+done
 }
