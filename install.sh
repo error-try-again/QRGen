@@ -57,7 +57,7 @@ function source_files() {
 
   # Operations - Validation
   source ./scripts/operations/validation/validate_and_load_dotenv.sh
-  source ./scripts/operations/validation/validate_installer_profile_exists.sh
+  source ./scripts/operations/validation/validate_json_file.sh
   source ./scripts/operations/validation/validate_project_root.sh
   source ./scripts/operations/validation/check_jq_exists.sh
 
@@ -160,8 +160,7 @@ function source_files() {
   source ./scripts/tests/util/append_timestamps_to_log.sh
   source ./scripts/tests/util/report_timestamp.sh
   source ./scripts/tests/util/print_message.sh
-  source ./scripts/tests/util/print_multi_message.sh
-  source ./scripts/tests/util/print_multi_separated_message.sh
+  source ./scripts/tests/util/print_messages.sh
   source ./scripts/tests/util/print_separator.sh
   source ./scripts/tests/init/reset_dotenv_defaults.sh
 
