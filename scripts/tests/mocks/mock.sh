@@ -59,7 +59,7 @@ function run_docker_file_mocks() {
 # Arguments:  None
 #######################################
 function mock() {
-  print_message "Running Mocks..."
+  print_messages "Running Mocks..."
 
   # Setup common configuration parameters
   setup_common_mock_parameters
@@ -72,7 +72,7 @@ function mock() {
   run_docker_file_mocks
   gracefully_terminate_mock_server
 
-  print_message "Mocks complete"
+  print_messages "Mocks complete"
 }
 
 #######################################
