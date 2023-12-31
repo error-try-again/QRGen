@@ -22,7 +22,7 @@ function log_mock_error() {
     if [[ ${message} == *${error}* ]]; then
       local date
       date=$(date +"%Y-%m-%d %H:%M:%S")
-      echo "${date}: ${message}" >>"${error_log}"
+      echo "${date}: ${message}" >> "${error_log}"
     fi
   done
 }
