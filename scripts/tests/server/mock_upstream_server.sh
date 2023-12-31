@@ -18,13 +18,13 @@ function check_port_and_kill_process_if_needed() {
   process_ids=$(lsof -Pi :"${PORT}" -sTCP:LISTEN -t || true)
 
   if [[ -n "${process_ids}" ]]; then
-    print_message "Port ${PORT} is in use. Found the following processes:"
+    print_messages "Port ${PORT} is in use. Found the following processes:"
     local pid
     for pid in ${process_ids}; do
       if [[ "${pid}" =~ ^[0-9]+$ ]]; then
         local process_name
         process_name=$(ps -p "${pid}" -o comm=)
-        print_message "PID: ${pid} - Process Name: ${process_name}"
+        print_messages "PID: ${pid} - Process Name: ${process_name}"
         echo "| Would you like to kill it? (y/n):" >&2
         local response
         read -n 1 -r response
@@ -33,15 +33,15 @@ function check_port_and_kill_process_if_needed() {
         if [[ ${response} =~ ^[Yy]$ ]]; then
           kill -9 "${pid}" && echo "Process ${pid} (${process_name}) has been killed."
         else
-          print_message "Process ${pid} not killed."
-          print_message "Please kill the process manually and try again."
+          print_messages "Process ${pid} not killed."
+          print_messages "Please kill the process manually and try again."
         fi
       else
-        print_message "Error: Found non-numeric process ID '${pid}' for port ${PORT}." >&2
+        print_messages "Error: Found non-numeric process ID '${pid}' for port ${PORT}." >&2
       fi
     done
   else
-    print_message "Port ${PORT} is available."
+    print_messages "Port ${PORT} is available."
   fi
 }
 
