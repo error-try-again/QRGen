@@ -39,9 +39,12 @@ function setup_docker_rootless() {
   # Ensure Docker environment variables are set.
   test_docker_env
 
-  add_to_bashrc "export PATH=/usr/bin:$PATH"
-  add_to_bashrc "export XDG_RUNTIME_DIR=/run/user/$(id -u)"
-  add_to_bashrc "DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock"
+  local uid
+  uid=$(id -u)
+
+  add_to_bashrc "export PATH=/usr/bin:${PATH}"
+  add_to_bashrc "export XDG_RUNTIME_DIR=/run/user/${uid}"
+  add_to_bashrc "DOCKER_HOST=unix:///run/user/${uid}/docker.sock"
 
   # Manage Docker's systemd services.
   systemctl --user start docker.service
