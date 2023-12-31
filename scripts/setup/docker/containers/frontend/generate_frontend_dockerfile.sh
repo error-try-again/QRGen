@@ -16,7 +16,7 @@ function generate_frontend_dockerfile() {
   local origin="origin/${RELEASE_BRANCH}"
   backup_existing_config "${FRONTEND_DOCKERFILE}"
 
-  cat <<EOF >"${FRONTEND_DOCKERFILE}"
+  cat << EOF > "${FRONTEND_DOCKERFILE}"
 # Use the latest version of Node.js
 FROM node:${NODE_VERSION} as build
 
@@ -57,5 +57,5 @@ EXPOSE ${EXPOSED_NGINX_PORT}
 CMD ["nginx", "-g", "daemon off;"]
 EOF
 
-  echo "Successfully configured frontend Dockerfile at ${FRONTEND_DOCKERFILE}"
+  print_messages "Successfully configured frontend Dockerfile at ${FRONTEND_DOCKERFILE}"
 }
