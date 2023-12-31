@@ -12,7 +12,7 @@ set -euo pipefail
 function validate_json_file() {
   json_file="${1}"
   if [[ ! -f ${json_file}   ]]; then
-    echo "Configuration file ${json_file} does not exist."
+    print_messages "Configuration file ${json_file} does not exist."
     exit 1
   fi
 }
