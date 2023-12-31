@@ -18,16 +18,15 @@ function run_service_mock() {
   local conf_file_path
   local message
 
-  separator="---------------------------------------"
   conf_file_path="${test_output_dir}/${service_stack}/${service_variant}/${config_file_name}"
   operational_log="${test_output_dir}/${service_stack}/${service_variant}/ops_log_$(report_timestamp).log"
 
   mkdir -p "${test_output_dir}/${service_stack}/${service_variant}"
 
-  echo "${separator}"
+  print_separator
   message="| $(report_timestamp) | Building config - [${service_stack}] - [${service_variant}]"
   echo "${message}"
-  echo "${separator}"
+  print_separator
 
   generate_configuration_file "${service_stack}" "${service_variant}" "${conf_file_path}" "${operational_log}"
 }

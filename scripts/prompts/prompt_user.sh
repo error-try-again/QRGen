@@ -4,7 +4,6 @@
 set -euo pipefail
 
 # Constants for UI
-readonly HEADER_LINE="----------------------------------------------"
 readonly WELCOME_MESSAGE="Welcome to the QRGen setup script!"
 readonly THANK_YOU_MESSAGE="Thanks for using the QRGen setup script!"
 readonly SELECT_PROMPT='Select: '
@@ -14,9 +13,9 @@ readonly OPTIONS=("Run Setup" "Run Mock Configuration" "Uninstall" "Dump logs"
 
 # Print header function
 function print_header() {
-  echo "${HEADER_LINE}"
+  print_separator
   echo "$1"
-  echo "${HEADER_LINE}"
+  print_separator
 }
 
 # Main menu function
