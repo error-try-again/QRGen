@@ -10,13 +10,13 @@ set -euo pipefail
 #   None
 #######################################
 function install_packages() {
-  echo "Removing conflicting packages..."
+  print_messages "Removing conflicting packages..."
   local remove_packages=(docker.io docker-doc docker-compose podman-docker containerd runc)
   for package in "${remove_packages[@]}"; do
     sudo apt-get remove -y "${package}"
   done
 
-  echo "Installing required packages..."
+  print_messages "Installing required packages..."
   sudo apt-get update -y
   sudo apt-get install -y ca-certificates netcat curl gnupg uidmap inotify-tools
 
