@@ -16,7 +16,7 @@ set -euo pipefail
 #  None
 #######################################
 function configure_http() {
-  echo "Configuring Docker Compose for HTTP..."
+  print_messages "Configuring Docker Compose for HTTP..."
 
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
     backend_ports=$(join_with_commas \
