@@ -115,7 +115,7 @@ function setup_certbot() {
 #  None
 #######################################
 function configure_compose_letsencrypt_mode() {
-  echo "Configuring Docker Compose for Let's Encrypt..."
+  print_messages "Configuring Docker Compose for Let's Encrypt..."
   setup_backend
   setup_frontend
   setup_certbot
