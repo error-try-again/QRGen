@@ -16,7 +16,7 @@ function assert_or_error() {
   shift
   command="$*"
   ${command} || {
-    echo "Error: ${message}"
+    print_messages "Error: ${message}"
     exit 1
   }
 }
