@@ -12,16 +12,16 @@ set -euo pipefail
 #  None
 #######################################
 function prompt_for_dhparam_strength() {
-  if [[ -n "${DH_PARAM_SIZE:-}" ]]; then
+  if [[ -n ${DH_PARAM_SIZE:-}   ]]; then
     print_messages "DH_PARAM_SIZE is already set to ${DH_PARAM_SIZE}. Skipping prompt."
     return
   fi
   print_messages "1: Use 2048-bit DH parameters (Faster)"
-  echo "2: Use 4096-bit DH parameters (More secure)"
+  print_messages "2: Use 4096-bit DH parameters (More secure)"
   prompt_numeric "Please enter your choice (1/2): " DH_PARAM_CHOICE
   case ${DH_PARAM_CHOICE} in
-  1) DH_PARAM_SIZE=2048 ;;
-  2) DH_PARAM_SIZE=4096 ;;
-  *) echo "Invalid choice. Please enter 1 or 2." ;;
-  esac
+    1) DH_PARAM_SIZE=2048 ;;
+    2) DH_PARAM_SIZE=4096 ;;
+    *) print_messages "Invalid choice. Please enter 1 or 2." ;;
+esac
 }
