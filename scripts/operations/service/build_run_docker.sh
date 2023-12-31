@@ -18,11 +18,11 @@ function build_and_run_docker() {
     print_messages "Failed common build operations"
     exit 1
   }
-  if [[ -n ${BUILD_CERTBOT_IMAGE} ]]; then
+  if [[ ${BUILD_CERTBOT_IMAGE} == "true" ]]; then
     print_messages "Building Certbot service..."
     run_certbot_service
   fi
-  if [[ -n ${USE_AUTO_RENEW_SSL} ]]; then
+  if [[ ${BUILD_CERTBOT_IMAGE} == "true" ]]; then
     print_messages "Using auto-renewal for SSL certificates."
     generate_certbot_renewal_job
   fi
