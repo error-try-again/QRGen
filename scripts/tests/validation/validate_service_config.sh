@@ -39,11 +39,11 @@ function validate_file() {
   directory=$(dirname "${conf_file_path}")
   log_file="${directory}/validation_log_$(report_timestamp).log"
 
-  print_multi_message "Validation log can be found at: ${log_file}" "Running command: ${command}"
+  print_messages "Validation log can be found at: ${log_file}" "Running command: ${command}"
   if ! ${command} &> "${log_file}"; then
-    print_multi_message "Validation failed for file ${conf_file_path}" "Complete validation log can be found at ${log_file}"
+    print_messages "Validation failed for file ${conf_file_path}" "Complete validation log can be found at ${log_file}"
   else
-    print_multi_message "Validation succeeded for file ${conf_file_path}" "Complete validation log can be found at ${log_file}"
+    print_messages "Validation succeeded for file ${conf_file_path}" "Complete validation log can be found at ${log_file}"
   fi
 }
 
@@ -86,7 +86,7 @@ function generate_and_log_config() {
   local generate_func=$4
 
   if ${generate_func} &> "${operational_log}"; then
-    print_multi_message "[${service_variant}] configuration generated and saved to: ${conf_file_path}" "Complete operational log can be found at: ${operational_log}"
+    print_messages "[${service_variant}] configuration generated and saved to: ${conf_file_path}" "Complete operational log can be found at: ${operational_log}"
   fi
 
   # Append the timestamps to the operations log file
@@ -133,7 +133,7 @@ function generate_configuration_file() {
       handle_dockerfile_variants "${service_variant}" "${conf_file_path}" "${operational_log}"
       ;;
     *)
-      print_multi_message "Failed to validate configuration file. Unknown service stack: ${service_stack}" "Complete operational log can be found at: ${operational_log}"
+      print_messages "Failed to validate configuration file. Unknown service stack: ${service_stack}" "Complete operational log can be found at: ${operational_log}"
       return 1
       ;;
   esac

@@ -14,7 +14,7 @@ function setup_and_run_mock() {
   local service=$1
   local config=$2
   local file=$3
-  print_multi_separated_message "Running ${service} ${config} mocks..."
+  print_messages "Running ${service} ${config} mocks..."
   reset_dotenv_defaults && setup_common_mock_parameters
   if [[ ${config} == "letsencrypt" ]]; then
     setup_letsencrypt_mock_parameters
@@ -59,7 +59,7 @@ function run_docker_file_mocks() {
 # Arguments:  None
 #######################################
 function mock() {
-  print_multi_separated_message "Running Mocks..."
+  print_message "Running Mocks..."
 
   # Setup common configuration parameters
   setup_common_mock_parameters
@@ -72,7 +72,7 @@ function mock() {
   run_docker_file_mocks
   gracefully_terminate_mock_server
 
-  print_multi_separated_message "Mocks complete"
+  print_message "Mocks complete"
 }
 
 #######################################
@@ -97,7 +97,7 @@ function run_service_mock() {
   mkdir -p "${test_output_dir}/${service_stack}/${service_variant}"
 
   print_separator
-  print_multi_message "Building config - [${service_stack}] - [${service_variant}]"
+  print_messages "Building config - [${service_stack}] - [${service_variant}]"
   generate_configuration_file "${service_stack}" "${service_variant}" "${conf_file_path}" "${operational_log}"
   print_separator
 }
