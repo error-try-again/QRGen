@@ -45,10 +45,10 @@ function configure_compose_self_signed_mode() {
     "${EXPOSED_NGINX_PORT}:${INTERNAL_NGINX_PORT}" \
     "${NGINX_SSL_PORT}:${NGINX_SSL_PORT}")
 
-frontend_volumes=$(join_with_commas \
-  "volumes" \
-  "./nginx.conf:/etc/nginx/nginx.conf:ro" \
-  "${LETSENCRYPT_VOLUME_MAPPING}" \
-  "${LETSENCRYPT_LOGS_VOLUME_MAPPING}" \
-  "${CERTS_DH_VOLUME_MAPPING}")
+  frontend_volumes=$(join_with_commas \
+    "volumes" \
+    "./nginx.conf:/etc/nginx/nginx.conf:ro" \
+    "${LETSENCRYPT_VOLUME_MAPPING}" \
+    "${LETSENCRYPT_LOGS_VOLUME_MAPPING}" \
+    "${CERTS_DH_VOLUME_MAPPING}")
 }

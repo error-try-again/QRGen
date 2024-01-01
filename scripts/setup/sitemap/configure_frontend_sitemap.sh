@@ -21,7 +21,7 @@ function configure_frontend_sitemap() {
   regularity="weekly"
   priority="0.8"
 
-  cat <<EOF >"${SITEMAP_XML}"
+  cat << EOF > "${SITEMAP_XML}"
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
    <url>

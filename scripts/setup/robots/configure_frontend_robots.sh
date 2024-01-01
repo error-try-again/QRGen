@@ -11,7 +11,7 @@ set -euo pipefail
 #######################################
 function configure_frontend_robots() {
   print_messages "Configuring default robots.txt..."
-  cat <<-EOF >"${ROBOTS_FILE}"
+  cat <<- EOF > "${ROBOTS_FILE}"
 User-agent: *
 Disallow:
 EOF

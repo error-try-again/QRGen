@@ -5,7 +5,7 @@ set -euo pipefail
 # Function: display_help
 # Displays detailed usage information and list of available options.
 function display_help() {
-  cat <<EOF
+  cat << EOF
 Usage: $0 [OPTIONS]
 A comprehensive script for managing and deploying web environments.
 

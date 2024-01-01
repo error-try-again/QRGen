@@ -46,7 +46,7 @@ function assemble_docker_compose_configuration() {
     echo "${certbot_service_definition}"
     echo "${network_definition}"
     echo "${volume_definition}"
-  } >"${DOCKER_COMPOSE_FILE}"
+  } > "${DOCKER_COMPOSE_FILE}"
 
-print_messages "Docker Compose configuration written to ${DOCKER_COMPOSE_FILE}"
+  print_messages "Docker Compose configuration written to ${DOCKER_COMPOSE_FILE}"
 }

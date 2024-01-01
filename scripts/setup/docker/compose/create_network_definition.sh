@@ -19,5 +19,5 @@ function create_network_definition() {
   definition+=$'\n'
   definition+="    driver: ${network_driver}"
 
-echo "${definition}"
+  echo "${definition}"
 }

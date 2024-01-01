@@ -21,7 +21,7 @@ function is_port_in_use() {
   fi
 
   # Check if the port is in use. Using netcat (nc) as it is more commonly available.
-  if nc -z 127.0.0.1 "${port}" >/dev/null 2>&1; then
+  if nc -z 127.0.0.1 "${port}" > /dev/null 2>&1; then
     return 0 # Port is in use
   else
     return 1 # Port is not in use

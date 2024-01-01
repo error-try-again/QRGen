@@ -69,7 +69,7 @@ function start_mock_server() {
 #   Error message if the server failed to start.
 #######################################
 function validate_server_start() {
-  if ! kill -0 "${MOCK_SERVER_PID}" 2>/dev/null; then
+  if ! kill -0 "${MOCK_SERVER_PID}" 2> /dev/null; then
     print_messages "Starting the mock server failed. Check connectivity or port availability." >&2
     exit 1
   fi

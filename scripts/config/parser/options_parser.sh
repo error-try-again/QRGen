@@ -76,26 +76,26 @@ disable-docker-caching:,use-google-api-key:,google-maps-api-key:,release-branch:
   eval set -- "${parsed_options}"
   while true; do
     case "$1" in
-    --help | -h)
-      print_messages "Usage instructions for the script..."
-      exit 0
-      ;;
-    --)
-      shift
-      break
-      ;;
-    *)
-      # Default case: handle long option or its argument.
-      # If the second parameter looks like another option or if it's empty, consider it a boolean flag.
-      # Otherwise, treat it as an argument for an option.
-      if [[ $2 =~ ^-.* || -z $2 ]]; then
-        assign_flag_value "$1"
-      else
-        assign_flag_value "$1" "$2"
-        shift # Move past the argument as it's been handled.
-      fi
-      ;;
-    esac
+      --help | -h)
+        print_messages "Usage instructions for the script..."
+        exit 0
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        # Default case: handle long option or its argument.
+        # If the second parameter looks like another option or if it's empty, consider it a boolean flag.
+        # Otherwise, treat it as an argument for an option.
+        if [[ $2 =~ ^-.* || -z $2 ]]; then
+          assign_flag_value "$1"
+    else
+          assign_flag_value "$1" "$2"
+          shift # Move past the argument as it's been handled.
+    fi
+        ;;
+esac
     shift # Move to the next parameter or option.
   done
 }

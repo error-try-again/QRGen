@@ -76,7 +76,7 @@ function mock() {
   run_docker_file_mocks
   gracefully_terminate_mock_server
 
-print_messages "Mocks complete"
+  print_messages "Mocks complete"
 }
 
 #######################################

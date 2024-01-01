@@ -112,7 +112,7 @@ function configure_ssl_mode() {
 #######################################
 function get_gzip() {
   if [[ -n ${USE_GZIP} ]]; then
-    cat <<-EOF
+    cat <<- EOF
 gzip on;
         gzip_comp_level 6;
         gzip_vary on;
@@ -121,7 +121,7 @@ gzip on;
         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 EOF
   else
-    cat <<-EOF
+    cat <<- EOF
 gzip off;
 EOF
   fi
@@ -133,7 +133,7 @@ EOF
 #  None
 #######################################
 function get_ssl_protocol_compatibility() {
-  cat <<-EOF
+  cat <<- EOF
         ssl_protocols TLSv1.2 TLSv1.3;
 EOF
 }
@@ -148,7 +148,7 @@ EOF
 #  None
 #######################################
 function get_ssl_additional_config() {
-  cat <<-EOF
+  cat <<- EOF
         ssl_prefer_server_ciphers on;
         ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:!DH+3DES:!ADH:!AECDH:!MD5:!ECDHE-RSA-AES256-SHA384:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES128-SHA:!RC2:!RC4:!DES:!EXPORT:!NULL:!SHA1';
         ssl_buffer_size 8k;
@@ -167,7 +167,7 @@ EOF
 #  None
 #######################################
 function tls_protocol_one_three_restrict() {
-  cat <<-EOF
+  cat <<- EOF
         ssl_protocols TLSv1.3;
 EOF
 }
@@ -311,11 +311,11 @@ function write_endpoints() {
 #  None
 #######################################
 function write_nginx_config() {
-shopt -s inherit_errexit
+  shopt -s inherit_errexit
   local write_endpoints_output
   write_endpoints_output=$(write_endpoints)
 
-  cat <<-EOF >"${NGINX_CONF_FILE}"
+  cat <<- EOF > "${NGINX_CONF_FILE}"
 worker_processes auto;
 ${NGINX_PID}
 ${NGINX_ERROR_LOG}
