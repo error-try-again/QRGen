@@ -19,6 +19,8 @@ function source_files() {
   source ./scripts/config/profiles/automatic_production_reload_selection.sh
   source ./scripts/config/profiles/automatic_production_selection.sh
   source ./scripts/config/profiles/automatic_staging_selection.sh
+  source ./scripts/config/profiles/select_and_apply_profile.sh
+  source ./scripts/config/profiles/extract_configuration_value.sh
 
   # Flags scripts
   source ./scripts/flags/construct_certbot_flags.sh
@@ -30,6 +32,16 @@ function source_files() {
   source ./scripts/flags/flag_removal/check_flag_removal.sh
   source ./scripts/flags/flag_removal/remove_dry_run_flag.sh
   source ./scripts/flags/flag_removal/remove_staging_flag.sh
+
+  # Operations - Certbot
+  source ./scripts/operations/certbot/generate_certbot_renewal.sh
+  source ./scripts/operations/certbot/build_certbot_service.sh
+  source ./scripts/operations/certbot/wait_for_certbot_completion.sh
+  source ./scripts/operations/certbot/check_certbot_success.sh
+
+  # Operations - Certificates
+  source ./scripts/operations/certificates/generate_self_signed_certificates.sh
+  source ./scripts/operations/certificates/handle_certs.sh
 
   # Operations - Networking
   source ./scripts/operations/networking/ensure_port_is_available.sh
@@ -54,6 +66,13 @@ function source_files() {
   source ./scripts/operations/service/run_certbot_dry_run.sh
   source ./scripts/operations/service/run_certbot_service.sh
   source ./scripts/operations/service/run_frontend_service.sh
+
+  # Operations - Util Scripts
+  source ./scripts/operations/util/create_directory.sh
+  source ./scripts/operations/util/configure_server_files.sh
+  source ./scripts/operations/util/setup_project_directories.sh
+  source ./scripts/operations/util/backup_replace_file.sh
+  source ./scripts/operations/util/generate_file_path.sh
 
   # Operations - Validation
   source ./scripts/operations/validation/validate_and_load_dotenv.sh
@@ -83,6 +102,10 @@ function source_files() {
   source ./scripts/prompts/prompt_for_letsencrypt.sh
   source ./scripts/prompts/prompt_tls_selection.sh
 
+  # Setup - Common
+  source ./scripts/setup/docker/common/check_docker_compose.sh
+  source ./scripts/setup/docker/common/test_docker_env.sh
+
   # Setup - Docker Compose Configuration Scripts
   source ./scripts/setup/docker/compose/generate_docker_compose.sh
   source ./scripts/setup/docker/compose/generate_certonly_command.sh
@@ -96,74 +119,57 @@ function source_files() {
   source ./scripts/setup/docker/compose/initialize_compose_variables.sh
   source ./scripts/setup/docker/compose/join_with_commas.sh
 
+  # Setup - Docker Rootless
+  source ./scripts/setup/docker/rootless/setup_docker_rootless.sh
+
   # Setup - Dockerfile Configuration Scripts
   source ./scripts/setup/docker/containers/backend/generate_backend_dockerfile.sh
   source ./scripts/setup/docker/containers/certbot/generate_certbot_dockerfile.sh
   source ./scripts/setup/docker/containers/frontend/generate_frontend_dockerfile.sh
-
-  # Setup - Certbot
-  source ./scripts/operations/certbot/generate_certbot_renewal.sh
-  source ./scripts/operations/certbot/build_certbot_service.sh
-  source ./scripts/operations/certbot/wait_for_certbot_completion.sh
-  source ./scripts/operations/certbot/check_certbot_success.sh
-
-  # Setup - Common
-  source ./scripts/setup/docker/common/check_docker_compose.sh
-  source ./scripts/setup/docker/common/test_docker_env.sh
-
-  # Setup - Docker Rootless
-  source ./scripts/setup/docker/rootless/setup_docker_rootless.sh
+  source ./scripts/setup/docker/containers/frontend/generate_nginx_config.sh
 
   # Setup - Dotenv Configure
   source ./scripts/setup/dotenv/configure_backend_dotenv.sh
   source ./scripts/setup/dotenv/configure_frontend_dotenv.sh
 
-  # Setup - Util Scripts
-  source ./scripts/operations/util/create_directory.sh
-  source ./scripts/operations/util/configure_server_files.sh
-  source ./scripts/operations/util/setup_project_directories.sh
-  source ./scripts/operations/util/backup_replace_file.sh
-  source ./scripts/operations/util/generate_file_path.sh
-
-  # Setup - Nginx
-  source ./scripts/setup/docker/containers/frontend/generate_nginx_config.sh
-
-  # Setup - Self-signed
-  source ./scripts/operations/certificates/generate_self_signed_certificates.sh
-  source ./scripts/operations/certificates/handle_certs.sh
+  # Setup - Robots
+  source ./scripts/setup/robots/configure_frontend_robots.sh
 
   # Setup - Sitemap
   source ./scripts/setup/sitemap/configure_frontend_sitemap.sh
 
-  # Setup - Robots
-  source ./scripts/setup/robots/configure_frontend_robots.sh
-
   # Test Mocks
   source ./scripts/tests/mocks/mock.sh
 
-  source ./scripts/tests/init/setup_common_mock_parameters.sh
-  source ./scripts/tests/init/setup_letsencrypt_mock_parameters.sh
-  source ./scripts/tests/init/setup_self_signed_mock_parameters.sh
-
-  source ./scripts/tests/logging/log_mock_error.sh
-
-  source ./scripts/tests/server/mock_upstream_server.sh
-  source ./scripts/tests/server/gracefully_terminate_mock_server.sh
-
-  source ./scripts/tests/validation/validate_service_config.sh
-
+  # Test Asserts
   source ./scripts/tests/asserts/assert_nginx_has_port.sh
   source ./scripts/tests/asserts/assert_compose_has_port.sh
 
-  source ./scripts/tests/mocks/nginx/run_service_mock.sh
+  # Test Init
+  source ./scripts/tests/init/setup_common_mock_parameters.sh
+  source ./scripts/tests/init/setup_letsencrypt_mock_parameters.sh
+  source ./scripts/tests/init/setup_self_signed_mock_parameters.sh
+  source ./scripts/tests/init/reset_dotenv_defaults.sh
 
+  # Test Logging
+  source ./scripts/tests/logging/log_mock_error.sh
+
+  # Test Server
+  source ./scripts/tests/server/mock_upstream_server.sh
+  source ./scripts/tests/server/gracefully_terminate_mock_server.sh
+
+  # Test Util
   source ./scripts/tests/util/append_timestamps_to_log.sh
   source ./scripts/tests/util/report_timestamp.sh
   source ./scripts/tests/util/print_message.sh
   source ./scripts/tests/util/print_messages.sh
   source ./scripts/tests/util/print_separator.sh
-  source ./scripts/tests/init/reset_dotenv_defaults.sh
 
+  # Test Validation
+  source ./scripts/tests/validation/validate_service_config.sh
+
+  # Test Mocks - Nginx
+  source ./scripts/tests/mocks/nginx/run_service_mock.sh
 }
 
 #######################################
@@ -182,7 +188,6 @@ function quit() {
 #  None
 #######################################
 function main() {
-
   # Ensures that the script is not sourced. This is to prevent the script from being run in the wrong environment.
   [[ ${BASH_SOURCE[0]} != "$0" ]] && echo "This install.sh script must be run, not sourced." && exit 1
 
@@ -208,4 +213,4 @@ function main() {
   dispatch_command "$@"
 }
 
-main "$@"
+time main "$@"
