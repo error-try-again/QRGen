@@ -1,5 +1,6 @@
 {
-  "production_install": {
+  "production_install_config": {
+    "AUTO_SETUP_CHOICE": true,
     "BACKEND_SCHEME": "https",
     "BUILD_CERTBOT_IMAGE": true,
     "DH_PARAM_SIZE": 2048,
@@ -23,7 +24,6 @@
     "REGENERATE_SSL_CERTS": false,
     "RELEASE_BRANCH": "full-release",
     "RSA_KEY_SIZE_FLAG": "--rsa-key-size 4096",
-    "AUTO_SETUP_CHOICE": true,
     "STRICT_PERMISSIONS_FLAG": "--strict-permissions",
     "SUBDOMAIN": "void",
     "TOS_FLAG": "--agree-tos",
@@ -45,10 +45,10 @@
     "USE_TLS13": true,
     "USE_UIR": true
   },
-  "prod_reload_config": {
-    "DISABLE_DOCKER_CACHING": true,
+  "production_reload_config": {
     "BUILD_CERTBOT_IMAGE": false,
     "DH_PARAM_SIZE": 2048,
+    "DISABLE_DOCKER_CACHING": true,
     "LETSENCRYPT_EMAIL": "skip",
     "USE_AUTO_RENEW_SSL": true,
     "USE_DRY_RUN": true,
@@ -64,22 +64,30 @@
     "USE_UIR": true
   },
   "ssl_dev_config": {
-    "BUILD_CERTBOT_IMAGE": false,
+    "BACKEND_SCHEME": "https",
+    "AUTO_SETUP_CHOICE": true,
     "DH_PARAM_SIZE": 2048,
     "DISABLE_DOCKER_CACHING": true,
     "GOOGLE_MAPS_API_KEY": "",
     "REGENERATE_SSL_CERTS": true,
     "RELEASE_BRANCH": "full-release",
-    "AUTO_SETUP_CHOICE": true,
-    "USE_CUSTOM_DOMAIN": false,
     "USE_GOOGLE_API_KEY": true,
     "USE_GZIP": true,
     "USE_HSTS": true,
-    "USE_LETSENCRYPT": false,
-    "USE_MUST_STAPLE": false,
     "USE_OCSP_STAPLING": true,
+    "USE_SELF_SIGNED_CERTS": true,
     "USE_SSL": true,
-    "USE_TLS12": false,
+    "USE_TLS12": true,
     "USE_TLS13": true
+  },
+  "http_dev_config": {
+    "AUTO_SETUP_CHOICE": true,
+    "DH_PARAM_SIZE": 2048,
+    "DISABLE_DOCKER_CACHING": true,
+    "GOOGLE_MAPS_API_KEY": "",
+    "RELEASE_BRANCH": "full-release",
+    "USE_CUSTOM_DOMAIN": false,
+    "USE_GOOGLE_API_KEY": true,
+    "USE_GZIP": true
   }
 }
