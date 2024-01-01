@@ -18,7 +18,7 @@ function add_to_definition() {
   if [[ -n ${values} ]]; then
     definition_part+=$'\n'"    ${type}:"
     local items
-    IFS=',' read -ra items <<<"${values}"
+    IFS=',' read -ra items <<< "${values}"
     local item
     for item in "${items[@]}"; do
       if [[ -n ${item} ]]; then
@@ -52,46 +52,46 @@ function create_service_definition() {
   # Parsing named arguments
   while [[ $# -gt 0 ]]; do
     case $1 in
-    --name)
-      name=$2
-      shift 2
-      ;;
-    --build-context)
-      build_context=$2
-      shift 2
-      ;;
-    --dockerfile)
-      dockerfile=$2
-      shift 2
-      ;;
-    --command)
-      command=$2
-      shift 2
-      ;;
-    --ports)
-      ports=$2
-      shift 2
-      ;;
-    --volumes)
-      volumes=$2
-      shift 2
-      ;;
-    --networks)
-      networks=$2
-      shift 2
-      ;;
-    --restart)
-      restart=$2
-      shift 2
-      ;;
-    --depends-on)
-      depends=$2
-      shift 2
-      ;;
-    *) # Unknown option
-      echo "Warning: Ignored unknown option: $1"
-      shift
-      ;;
+      --name)
+        name=$2
+        shift 2
+        ;;
+      --build-context)
+        build_context=$2
+        shift 2
+        ;;
+      --dockerfile)
+        dockerfile=$2
+        shift 2
+        ;;
+      --command)
+        command=$2
+        shift 2
+        ;;
+      --ports)
+        ports=$2
+        shift 2
+        ;;
+      --volumes)
+        volumes=$2
+        shift 2
+        ;;
+      --networks)
+        networks=$2
+        shift 2
+        ;;
+      --restart)
+        restart=$2
+        shift 2
+        ;;
+      --depends-on)
+        depends=$2
+        shift 2
+        ;;
+      *) # Unknown option
+        print_message "Warning: Ignored unknown option: $1"
+        shift
+        ;;
     esac
   done
 
@@ -117,5 +117,5 @@ function create_service_definition() {
     definition+="$(add_to_definition "depends_on" "${depends}")"
   fi
 
-echo "${definition}"
+  echo "${definition}"
 }
