@@ -14,7 +14,6 @@ function run_service_mock() {
   local service_variant=$2
   local config_file_name=$3
   local operational_log
-  local separator
   local conf_file_path
   local message
 
