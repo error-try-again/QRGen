@@ -9,7 +9,6 @@ set -euo pipefail
 # into a single Docker Compose YAML file, which is then written to disk.
 #######################################
 function assemble_docker_compose_configuration() {
-
   backend_service_definition=$(create_service_definition \
     --name "${backend_name}" \
     --build-context "${backend_context}" \

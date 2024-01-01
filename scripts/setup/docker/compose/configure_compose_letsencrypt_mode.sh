@@ -22,6 +22,10 @@ function setup_backend() {
     backend_ports=$(join_with_commas \
       "ports" \
       "${BACKEND_PORT}:${BACKEND_PORT}")
+
+    # export to ensure that the variable is available in the assemble script
+    export backend_ports
+
     backend_volumes=$(join_with_commas \
       "volumes" \
       "${CERTS_DIR}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
@@ -49,11 +53,16 @@ function setup_backend() {
 #######################################
 function setup_frontend() {
   INTERNAL_NGINX_PORT=${EXPOSED_NGINX_PORT}
+
   frontend_ports=$(join_with_commas \
     "ports" \
     "${EXPOSED_NGINX_PORT}:${INTERNAL_NGINX_PORT}" \
     "${NGINX_SSL_PORT}:${NGINX_SSL_PORT}" \
     "${CHALLENGE_PORT}:${CHALLENGE_PORT}")
+
+  # export to ensure that the variable is available in the assemble script
+  export frontend_ports
+
   frontend_volumes=$(join_with_commas \
     "volumes" \
     "./frontend:/usr/share/nginx/html:rw" \
@@ -86,7 +95,6 @@ function setup_frontend() {
 #  None
 #######################################
 function setup_certbot() {
-
   certbot_volumes=$(join_with_commas \
     "volumes" \
     "${LETSENCRYPT_VOLUME_MAPPING}" \
