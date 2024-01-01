@@ -84,7 +84,6 @@ function select_and_apply_profile() {
   local json_file=$1
 
   validate_json_file "${json_file}"
-
   print_messages "Available profiles:"
 
   # Read profiles into an array
@@ -104,7 +103,6 @@ function select_and_apply_profile() {
   # Prompt the user to choose a profile
   local selection
   read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
-
   if [[ ${selection} =~ ^[0-9]+$ ]] && [[ ${selection} -ge 1 ]] && [[ ${selection} -le ${#profiles[@]} ]]; then
     local selected_profile=${profiles[selection - 1]}
     print_messages "You selected: ${selected_profile}"
