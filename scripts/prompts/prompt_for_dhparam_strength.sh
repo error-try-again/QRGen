@@ -13,7 +13,7 @@ set -euo pipefail
 #######################################
 function prompt_for_dhparam_strength() {
   if [[ -n ${DH_PARAM_SIZE:-} ]]; then
-    print_messages "DH_PARAM_SIZE is already set to ${DH_PARAM_SIZE}. Skipping prompt."
+    print_messages "DH Parameters size is already set to ${DH_PARAM_SIZE}. Skipping prompt."
     return
   fi
   print_messages "1: Use 2048-bit DH parameters (Faster)"

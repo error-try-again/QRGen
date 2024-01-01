@@ -10,8 +10,8 @@ set -euo pipefail
 #  None
 #######################################
 function prompt_for_domain_and_letsencrypt() {
-	prompt_for_domain_details
-	decide_on_ssl_or_self_signed
+  prompt_for_domain_details
+  decide_on_ssl_or_self_signed
 }
 
 #######################################
