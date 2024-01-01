@@ -37,7 +37,7 @@ function add_to_definition() {
 #   The service definition.
 #######################################
 function create_service_definition() {
-shopt -s inherit_errexit
+  shopt -s inherit_errexit
 
   local name=""
   local build_context=""

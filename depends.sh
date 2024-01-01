@@ -25,7 +25,7 @@ function install_packages() {
   sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-$(. /etc/os-release && echo "${VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$(. /etc/os-release && echo "${VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
   sudo apt-get update -y
   sudo apt-get install -y jq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -66,7 +66,7 @@ function adjust_sysctl_for_port() {
 
   if ! grep -q "^${setting}$" /etc/sysctl.conf; then
     echo "Adjusting sysctl settings to expose port ${port}..."
-    echo "${setting}" | sudo tee -a /etc/sysctl.conf > /dev/null && sudo sysctl -p
+    echo "${setting}" | sudo tee -a /etc/sysctl.conf >/dev/null && sudo sysctl -p
   fi
 }
 
@@ -79,7 +79,7 @@ function adjust_sysctl_for_port() {
 #   None
 #######################################
 function setup_user_with_prompt() {
-  if [[ -z ${user_name}   ]]; then
+  if [[ -z ${user_name} ]]; then
     echo "Error: user_name is not set."
     return 1
   fi
@@ -94,7 +94,7 @@ function setup_user_with_prompt() {
 # Unified User Setup Function
 function setup_user() {
   echo "Setting up ${user_name} user..."
-  if id "${user_name}" &> /dev/null; then
+  if id "${user_name}" &>/dev/null; then
     local user_choice
     echo "User ${user_name} already exists."
     echo "1) Reset password"
@@ -102,14 +102,14 @@ function setup_user() {
     while true; do
       read -rp "Your choice (1-2): " user_choice
       case ${user_choice} in
-        1 | 2) break ;;
-        *) echo "Please enter a valid choice (1 or 2)." ;;
+      1 | 2) break ;;
+      *) echo "Please enter a valid choice (1 or 2)." ;;
       esac
     done
     case ${user_choice} in
-      1) setup_user_with_prompt ;;
-      2) echo "User setup skipped." ;;
-      *) echo "Invalid choice. Exiting." ;;
+    1) setup_user_with_prompt ;;
+    2) echo "User setup skipped." ;;
+    *) echo "Invalid choice. Exiting." ;;
     esac
   else
     sudo adduser --disabled-password --gecos "" "${user_name}"
@@ -126,7 +126,7 @@ function setup_user() {
 #######################################
 function remove_user() {
   echo "Removing ${user_name} user..."
-  if pgrep -u "${user_name}" > /dev/null; then
+  if pgrep -u "${user_name}" >/dev/null; then
     echo "There are active processes running under the ${user_name} user."
     local response
     read -rp "Would you like to kill all processes and continue with user removal? (y/N) " response
@@ -154,11 +154,11 @@ function remove_user() {
 function setup_nvm_node() {
   echo "Setting up NVM and Node.js..."
 
-  if id "${user_name}" &> /dev/null; then
+  if id "${user_name}" &>/dev/null; then
     sudo mkdir -p /home/"${user_name}"/.nvm
     sudo chown "${user_name}:${user_name}" /home/"${user_name}"/.nvm
 
-    sudo -Eu "${user_name}" bash << EOF
+    sudo -Eu "${user_name}" bash <<EOF
 export NVM_DIR="/home/${user_name}/.nvm"
 export npm_config_cache="/home/${user_name}/.npm"
 curl -o- ${nvm_install_url} | bash
@@ -183,11 +183,11 @@ EOF
 #######################################
 function remove_nvm_node() {
   echo "Removing NVM and Node.js..."
-  if id "${user_name}" &> /dev/null; then
+  if id "${user_name}" &>/dev/null; then
     local nvm_dir="/home/${user_name}/.nvm"
     local nvm_sh="${nvm_dir}/nvm.sh"
 
-    if [[ -s ${nvm_sh}   ]]; then
+    if [[ -s ${nvm_sh} ]]; then
       # Load NVM and uninstall Node versions
       sudo -u "${user_name}" bash -c "source ${nvm_sh} && nvm deactivate && nvm uninstall --lts && nvm uninstall --current"
 
@@ -224,26 +224,26 @@ function installation_menu() {
   read -rp "Your choice (1-8): " choice
 
   case ${choice} in
-    1)
-      setup_user
-      install_packages
-      setup_nvm_node
-      ;;
-    2) setup_user ;;
-    3) install_packages ;;
-    4) setup_nvm_node ;;
-    5) uninstall_packages ;;
-    6) remove_user ;;
-    7) remove_nvm_node ;;
-    8)
-      remove_nvm_node
-      remove_user
-      uninstall_packages
-      ;;
-    *)
-      echo "Invalid choice. Exiting."
-      exit 1
-      ;;
+1)
+  setup_user
+  install_packages
+  setup_nvm_node
+  ;;
+2) setup_user ;;
+3) install_packages ;;
+4) setup_nvm_node ;;
+5) uninstall_packages ;;
+6) remove_user ;;
+7) remove_nvm_node ;;
+8)
+  remove_nvm_node
+  remove_user
+  uninstall_packages
+  ;;
+*)
+  echo "Invalid choice. Exiting."
+  exit 1
+  ;;
 esac
 }
 
