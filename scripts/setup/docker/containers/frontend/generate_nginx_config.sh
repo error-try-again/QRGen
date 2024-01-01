@@ -87,6 +87,7 @@ function configure_https() {
 #  None
 #######################################
 function configure_ssl_mode() {
+  shopt -s inherit_errexit
   if [[ -n ${USE_TLS12} && -n ${USE_TLS13} ]]; then
     ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
@@ -310,7 +311,7 @@ function write_endpoints() {
 #  None
 #######################################
 function write_nginx_config() {
-
+shopt -s inherit_errexit
   local write_endpoints_output
   write_endpoints_output=$(write_endpoints)
 
