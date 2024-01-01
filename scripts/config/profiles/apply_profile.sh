@@ -1,28 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2034
 
 set -euo pipefail
-
-#######################################
-# Retrieves a configuration data from a JSON file with the help of a key
-# This function utilizes jq for JSON processing to extract the value of a specific key under a certain profile
-# Arguments:
-#   json_file: The JSON file name.
-#   profile: The profile that the key falls under.
-#   key: The identifier for the value that needs to be extracted.
-#######################################
-function get_config_value() {
-  local json_file=$1
-  local profile=$2
-  local key=$3
-
-  if [[ $# -lt 3 ]]; then
-    print_messages "Error: Not enough arguments"
-    print_messages "Usage: get_config_value [json_file] [profile] [key]"
-    exit 1
-  fi
-
-  jq -r ".${profile}.${key}" "${json_file}"
-}
 
 #######################################
 # Applies a profile configuration by setting global variable pairs.
@@ -61,55 +40,14 @@ function apply_profile() {
     local value
 
     # Retrieve the value for the current key from the profile.
-    value=$(get_config_value "${json_file}" "${profile}" "${key}")
+    value=$(extract_configuration_value "${json_file}" "${profile}" "${key}")
 
-    # Declare the key-value pair as a global variable.
+    # Declare the key-value pair as a global variable, since the key should reference an ENV variable.
     # This is crucial for the profile to be picked up by the installer.
+    # Shellcheck will complain about this since it cannot statically analyze the variable name - which is why SC2034 is disabled.
+    # bashsupport disable=BP2001
     declare -g "${key}=${value}"
 
     print_messages "Applied ${key}=${value}"
-  done
-}
-
-#######################################
-# Displays all profiles from the JSON config file
-# and prompts the user to choose one to be applied.
-# Globals:
-#   output
-#   profile
-# Arguments:
-#   json_file: The JSON file name.
-#######################################
-function select_and_apply_profile() {
-  local json_file=$1
-
-  validate_json_file "${json_file}"
-  print_messages "Available profiles:"
-
-  # Read profiles into an array
-  local profiles
-  output=$(jq -r 'keys | .[]' "${json_file}")
-  readarray -t profiles <<<"${output}"
-
-  # For each profile, print an index and the profile name to the console (starting at 1)
-  local index=1
-  for profile in "${profiles[@]}"; do
-    echo "${index}) ${profile}"
-    ((index++))
-  done
-
-  # Validate selection and apply profile
-  while true; do
-  # Prompt the user to choose a profile
-  local selection
-  read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
-  if [[ ${selection} =~ ^[0-9]+$ ]] && [[ ${selection} -ge 1 ]] && [[ ${selection} -le ${#profiles[@]} ]]; then
-    local selected_profile=${profiles[selection - 1]}
-    print_messages "You selected: ${selected_profile}"
-    apply_profile "${json_file}" "${selected_profile}"
-    break
-  else
-    print_messages "Invalid selection: ${selection}"
-  fi
 done
 }
