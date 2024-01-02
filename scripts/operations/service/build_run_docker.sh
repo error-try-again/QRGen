@@ -23,6 +23,7 @@ function build_and_run_docker() {
   if [[ ${BUILD_CERTBOT_IMAGE} == "true" ]]; then
     print_messages "Building Certbot service..."
     run_certbot_service
+fi
   if [[ ${BUILD_CERTBOT_IMAGE} == "true" ]]; then
     print_messages "Using auto-renewal for SSL certificates."
     generate_certbot_renewal_job
