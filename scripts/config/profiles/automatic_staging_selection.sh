@@ -8,5 +8,5 @@ set -euo pipefail
 #  None
 #######################################
 function automatic_staging_selection() {
-  apply_profile "${INSTALL_PROFILE}" "staging_config"
+  apply_profile "${LETSENCRYPT_AUTO_PROFILE}" "staging_config"
 }
