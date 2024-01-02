@@ -7,6 +7,7 @@ function handle_auto_install() {
   prompt_for_auto_install
   if [[ ${AUTO_INSTALL} == true ]]; then
       select_and_apply_profile "${INSTALL_PROFILE}"
+      construct_certbot_flags
   else
     prompt_for_release_install_mode
     prompt_disable_docker_build_cache

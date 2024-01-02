@@ -21,7 +21,7 @@
     "ORIGIN_URL": "https://void.qr-gen.net",
     "OVERWRITE_SELF_SIGNED_CERTS_FLAG": "--overwrite-cert-dirs",
     "PRODUCTION_CERTS_FLAG": "--staging",
-    "REGENERATE_SSL_CERTS": false,
+    "REGENERATE_SSL_CERTS": true,
     "RELEASE_BRANCH": "full-release",
     "RSA_KEY_SIZE_FLAG": "--rsa-key-size 4096",
     "STRICT_PERMISSIONS_FLAG": "--strict-permissions",

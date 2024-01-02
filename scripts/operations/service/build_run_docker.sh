@@ -13,16 +13,17 @@ set -euo pipefail
 #######################################
 function build_and_run_docker() {
   print_messages "Building and running Docker services..."
+
   # Perform pre-flight, and run Docker services, e.g. backend, frontend, etc.
   common_build_operations || {
     print_messages "Failed common build operations"
     exit 1
   }
+
   if [[ ${BUILD_CERTBOT_IMAGE} == "true" ]]; then
     print_messages "Building Certbot service..."
     run_certbot_service
-  fi
-  if [[ ${BUILD_CERTBOT_IMAGE} == "true" ]]; then
+fi  if [[ ${BUILD_CERTBOT_IMAGE} == "true" ]]; then
     print_messages "Using auto-renewal for SSL certificates."
     generate_certbot_renewal_job
   fi

@@ -142,7 +142,7 @@ EOF
 # SSL additional configuration, covering cipher suites, session cache, and other
 # security-related features. This configuration is recommended for a modern secure
 # Globals:
-#   DH_PARAMS_PATH
+#   DH_PARAMS_FILE
 #   ssl_paths
 # Arguments:
 #  None
@@ -152,7 +152,7 @@ function get_ssl_additional_config() {
         ssl_prefer_server_ciphers on;
         ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:!DH+3DES:!ADH:!AECDH:!MD5:!ECDHE-RSA-AES256-SHA384:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES128-SHA:!RC2:!RC4:!DES:!EXPORT:!NULL:!SHA1';
         ssl_buffer_size 8k;
-        ssl_dhparam ${DH_PARAMS_PATH};
+        ssl_dhparam ${DH_PARAMS_FILE};
         ssl_ecdh_curve secp384r1;
         ssl_stapling on;
         ssl_stapling_verify on;
