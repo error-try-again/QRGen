@@ -16,21 +16,10 @@ function prompt_and_validate_input() {
   local input_value
   while true; do
     read -rp "${prompt_message}" input_value
-    if "is_input_valid" "${input_value}"; then
-      eval "${result_var}='${input_value}'"
+    if [[ -n ${input_value} ]]; then
       break
-    else
+  else
       print_messages "${error_message}"
-    fi
-  done
-}
-
-#######################################
-# Checks if the inputted value is valid.
-# Arguments:
-#   1
-#######################################
-function is_input_valid() {
-  local inputted_value="$1"
-  [[ -n ${inputted_value} ]]
+  fi
+done
 }
