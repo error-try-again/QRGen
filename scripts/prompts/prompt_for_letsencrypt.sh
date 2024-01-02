@@ -27,13 +27,13 @@ set -euo pipefail
 function prompt_for_letsencrypt() {
   if [[ ${USE_LETSENCRYPT} == "true" ]] || [[ ${AUTO_INSTALL} == "true" ]]; then
     return
-  else
+else
     prompt_yes_no "Would you like to use Let's Encrypt?" USE_LETSENCRYPT
     if [[ ${USE_LETSENCRYPT} == "false" ]]; then
       return
-    else
+  else
       prompt_for_letsencrypt_install_type
       prompt_tls_selection
-    fi
   fi
+fi
 }

@@ -9,7 +9,7 @@ set -euo pipefail
 #######################################
 function docker_compose_backend_service() {
   local cache_option=$1
-  print_messages "Building and running Backend service ${cache_option}..."
+  print_messages "Building and running Backend service with ${cache_option}..."
   if ! docker compose --progress=plain build "${cache_option}" backend; then
     print_messages "Failed to build Backend service."
     exit 1
