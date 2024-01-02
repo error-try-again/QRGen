@@ -40,14 +40,12 @@ function dispatch_command() {
   # If no command is executed, then run the user prompt
   for command in "${!command_function_map[@]}"; do
     if [[ ${command} == true ]]; then
-      PROMPT_BYPASS=true
       eval "${command_function_map[${command}]}"
       command_executed=true
       break
     fi
   done
   if [[ ${command_executed} == false ]]; then
-    PROMPT_BYPASS=false
     prompt_user
   fi
 }

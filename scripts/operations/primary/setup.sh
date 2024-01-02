@@ -2,19 +2,6 @@
 
 set -euo pipefail
 
-#######################################
-# description
-# Arguments:
-#   1
-#######################################
-function handle_skip_prompts() {
-  local bypass
-  bypass=$1
-  if [[ ${bypass} == true ]]; then
-      print_messages "Skipping prompts..."
-  fi
-}
-
 # Handle auto install
 function handle_auto_install() {
   prompt_for_auto_install
@@ -40,7 +27,6 @@ function setup() {
     setup_project_directories
     setup_docker_rootless
     ensure_port_is_available "${EXPOSED_NGINX_PORT}" "auto"
-    handle_skip_prompts "${PROMPT_BYPASS}"
     handle_auto_install
     configure_server_files
     generate_nginx_config
