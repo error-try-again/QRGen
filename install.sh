@@ -24,6 +24,7 @@ function source_files() {
 
   # Flags scripts
   source ./scripts/flags/construct_certbot_flags.sh
+  source ./scripts/flags/enable_auto_install.sh
   source ./scripts/flags/enable_ssl.sh
 
   # Flag Removal scripts
@@ -86,6 +87,7 @@ function source_files() {
   source ./scripts/prompts/prompt_and_validate_input.sh
   source ./scripts/prompts/prompt_user_selection_switch.sh
   source ./scripts/prompts/prompt_numeric.sh
+  source ./scripts/prompts/prompt_for_auto_install.sh
   source ./scripts/prompts/prompt_for_dhparam_regen.sh
   source ./scripts/prompts/prompt_for_dhparam_strength.sh
   source ./scripts/prompts/prompt_for_domain_and_letsencrypt.sh
