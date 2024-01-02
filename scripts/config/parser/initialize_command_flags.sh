@@ -23,4 +23,5 @@ function initialize_command_flags() {
   stop_containers=false
   purge=false
   quit=false
+  help=false
 }
