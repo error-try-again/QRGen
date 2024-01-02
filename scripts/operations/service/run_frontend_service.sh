@@ -18,7 +18,7 @@ function run_frontend_service() {
       exit 1
     fi
     print_messages "Running Frontend service..."
-      docker compose up -d frontend
+    docker compose up -d frontend 2>&1 | grep -Po 'port \K\d+' | xargs -I {} lsof -i :{} -S
   else
     print_messages "Building frontend service..."
     if ! docker compose --progress=plain build frontend; then
@@ -26,6 +26,6 @@ function run_frontend_service() {
       exit 1
     fi
     print_messages "Running Frontend service..."
-    docker compose up -d frontend
+    docker compose up -d frontend 2>&1 | grep -Po 'port \K\d+' | xargs -I {} lsof -i :{} -S
   fi
 }
