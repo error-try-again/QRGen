@@ -1,6 +1,6 @@
 {
   "production_install_config": {
-    "AUTO_SETUP_CHOICE": true,
+    "AUTO_INSTALL": true,
     "BACKEND_SCHEME": "https",
     "BUILD_CERTBOT_IMAGE": true,
     "DH_PARAM_SIZE": 2048,
@@ -46,6 +46,7 @@
     "USE_UIR": true
   },
   "production_reload_config": {
+    "AUTO_INSTALL": true,
     "BUILD_CERTBOT_IMAGE": false,
     "DH_PARAM_SIZE": 2048,
     "DISABLE_DOCKER_CACHING": true,
@@ -65,7 +66,7 @@
   },
   "ssl_dev_config": {
     "BACKEND_SCHEME": "https",
-    "AUTO_SETUP_CHOICE": true,
+    "AUTO_INSTALL": true,
     "DH_PARAM_SIZE": 2048,
     "DISABLE_DOCKER_CACHING": true,
     "GOOGLE_MAPS_API_KEY": "",
@@ -81,7 +82,7 @@
     "USE_TLS13": true
   },
   "http_dev_config": {
-    "AUTO_SETUP_CHOICE": true,
+    "AUTO_INSTALL": true,
     "DH_PARAM_SIZE": 2048,
     "DISABLE_DOCKER_CACHING": true,
     "GOOGLE_MAPS_API_KEY": "",

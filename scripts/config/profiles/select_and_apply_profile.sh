@@ -35,13 +35,14 @@ function select_and_apply_profile() {
     # Prompt the user to choose a profile
     local selection
     read -rp "Select a profile to apply [1-${#profiles[@]}]: " selection
+    # Sanity check the selection is a number and within the range of the array length
     if [[ ${selection} =~ ^[0-9]+$ ]] && [[ ${selection} -ge 1 ]] && [[ ${selection} -le ${#profiles[@]} ]]; then
       local selected_profile=${profiles[selection - 1]}
       print_messages "You selected: ${selected_profile}"
       apply_profile "${json_file}" "${selected_profile}"
       break
-    else
+  else
       print_messages "Invalid selection: ${selection}"
-    fi
-  done
+  fi
+done
 }

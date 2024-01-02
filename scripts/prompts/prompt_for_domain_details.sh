@@ -17,7 +17,7 @@ set -euo pipefail
 #  None
 #######################################
 function prompt_for_domain_details() {
-  if [[ ${AUTO_SETUP_CHOICE} == "true" ]]; then
+  if [[ ${AUTO_INSTALL} == "true" ]]; then
     print_messages "Skipping domain prompt, please ensure that the following environment variables are set correctly:"
     print_messages "BACKEND_SCHEME: ${BACKEND_SCHEME}" \
       "USE_CUSTOM_DOMAIN: ${USE_CUSTOM_DOMAIN}" \

@@ -5,7 +5,7 @@ set -euo pipefail
 #######################################
 # Prompts for SSL options.
 # Globals:
-#   AUTO_SETUP_CHOICE
+#   AUTO_INSTALL
 #   SSL_CHOICE
 # Arguments:
 #  None
@@ -14,7 +14,7 @@ function prompt_for_ssl() {
   if [[ ${USE_SSL} == "true" && ${BACKEND_SCHEME} == "https" ]]; then
     print_messages "SSL is already enabled. Skipping SSL prompt."
     return
-elif   [[ ${AUTO_SETUP_CHOICE} == "true" ]]; then
+elif   [[ ${AUTO_INSTALL} == "true" ]]; then
     print_messages "Auto setup is enabled. Skipping SSL prompt."
     return
 else
