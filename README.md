@@ -84,6 +84,18 @@ _Tech_
 - NGINX proxy provides multi-service integrations.  
 - Provides QR Generation web APIs (POST /qr/generate) or (POST /qr/batch)
 
+_Performance_
+
+*Page Insights Scores*
+![Page Insights Mobile Scores](examples%2FDemo%2Fpage-insights.png "Page Insights Mobile Screenshot")
+![Page Insights Desktop Scores](examples%2FDemo%2Fpage-insights-desktop.png "Page Insights Desktop Screenshot")
+
+*Lighthouse Scores*
+![Lighthouse Scores](examples%2FDemo%2Flighthouse.png)
+
+*SSL Labs scores*
+![SSL Labs Scores](examples%2FDemo%2Fssl-labs.png "SSL Labs Score Screenshot")
+
 ## High level project overview
 
     Bash:
@@ -137,10 +149,10 @@ script._
 cd ~ && cd QRGen && machinectl shell docker-primary@ $HOME/QRGen/install.sh
 ```
 ```bash
-Welcome to the QR Code Generator setup script!
+Welcome to the QRGen setup script!
 1) Run Setup				6) Update Project
 2) Run Mock Configuration		7) Stop Project Docker Containers
-3) Uninstall				8) Prune All Docker Builds - Dangerous
+3) Uninstall				8) Purge Current Builds - Dangerous
 4) Reload/Refresh			9) Quit
 5) Dump logs
 # Select 1)
