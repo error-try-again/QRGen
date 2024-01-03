@@ -13,5 +13,6 @@ function prompt_for_self_signed_certificates() {
   # Guard for automated installs
   if [[ -n "${USE_SELF_SIGNED_CERTS}" && "${USE_SELF_SIGNED_CERTS}" == "true" ]]; then
     return
-fi  prompt_yes_no "Would you like to enable self-signed certificates?" USE_SELF_SIGNED_CERTS
+  fi
+  prompt_yes_no "Would you like to enable self-signed certificates?" USE_SELF_SIGNED_CERTS
 }
