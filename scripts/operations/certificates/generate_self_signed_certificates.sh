@@ -12,14 +12,11 @@ set -eo pipefail
 #  None
 #######################################
 function handle_self_signed_certificates() {
-  print_messages "Generating self-signed certificates for ${DOMAIN_NAME}..."
   local certs_path="${CERTS_DIR}/live/${DOMAIN_NAME}"
   local fullchain_path="${certs_path}/fullchain.pem"
   local privkey_path="${certs_path}/privkey.pem"
-
   create_directory "${certs_path}"
   create_directory "${CERTS_DH_DIR}"
-
   check_and_generate_certificates "${fullchain_path}" "${privkey_path}"
   handle_dh_param_generation "${CERTS_DH_DIR}/dhparam.pem"
 }
@@ -36,12 +33,10 @@ function handle_self_signed_certificates() {
 function check_and_generate_certificates() {
   local fullchain_path="$1"
   local privkey_path="$2"
-
-  # If the certificates don't exist, or if the user wants to regenerate them, generate them.
   if [[ ! -f "${fullchain_path}" ]] || [[ ! -f "${privkey_path}" ]] || [[ ${REGENERATE_SSL_CERTS} == "true" ]]; then
     generate_self_signed_certificates "${privkey_path}" "${fullchain_path}"
   else
-    print_messages "Certificates for ${DOMAIN_NAME} already exist at ${fullchain_path} and ${privkey_path}." "Skipping certificate generation."
+    print_messages "Certificates for ${DOMAIN_NAME} already exist."
   fi
 }
 
@@ -54,13 +49,9 @@ function check_and_generate_certificates() {
 #######################################
 function generate_dh_parameters() {
   local DH_PARAMS_FILE="$1"
-
   print_messages "Generating a Diffie-Hellman (DH) key exchange parameters file with ${DH_PARAM_SIZE} bits..."
   openssl dhparam -out "${DH_PARAMS_FILE}" "${DH_PARAM_SIZE}"
   print_messages "DH parameters generated at ${DH_PARAMS_FILE}."
-
-  # Set REGENERATE_SSL_CERTS to false so hat we don't prompt the user to regenerate the DH params again.
-  REGENERATE_SSL_CERTS="false"
 }
 
 #######################################
@@ -74,7 +65,6 @@ function generate_dh_parameters() {
 function generate_self_signed_certificates() {
   local privkey_path="$1"
   local fullchain_path="$2"
-
   print_messages "Generating self-signed certificates for ${DOMAIN_NAME}..."
   openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
     -keyout "${privkey_path}" \
@@ -98,21 +88,17 @@ function generate_self_signed_certificates() {
 #######################################
 function handle_dh_param_generation() {
   local DH_PARAMS_FILE="$1"
-
-  if [[ ! -f "${DH_PARAMS_FILE}" ]]; then
-    print_messages "DH parameters file not found at ${DH_PARAMS_FILE}. Generating new DH parameters..."
-    prompt_for_dhparam_strength
-    generate_dh_parameters "${DH_PARAMS_FILE}"
-  fi
-
-  if [[ "${REGENERATE_SSL_CERTS}" == "true" ]]; then
-    generate_dh_parameters "${DH_PARAMS_FILE}"
-  fi
-
-  if [[ "${REGENERATE_SSL_CERTS}" == "false"  ]]; then
-    prompt_for_dh_param_regeneration
-  else
-    print_messages "Hmm.. Couldn't determine if DH parameters need to be generated. Skipping."
+  # Regenerate only if file doesn't exist or explicit regeneration is requested
+  if [[ ! -f "${DH_PARAMS_FILE}" ]] || [[ ${REGENERATE_DH_PARAMS} == "true" ]]; then
+    if [[ ${REGENERATE_DH_PARAMS} != "true" ]]; then
+      prompt_for_dh_param_regeneration
+    fi
+    if [[ ${REGENERATE_DH_PARAMS} == "true" ]]; then
+      prompt_for_dhparam_strength
+      generate_dh_parameters "${DH_PARAMS_FILE}"
+    else
+      print_messages "Using existing DH parameters."
+    fi
   fi
 }
 
@@ -127,15 +113,11 @@ function handle_dh_param_generation() {
 #   1 otherwise
 #######################################
 function prompt_for_dh_param_regeneration() {
-  if [[ "${REGENERATE_SSL_CERTS}" == "true" ]]; then
-    print_messages "Regenerating DH parameters because SSL certificates are being regenerated."
-    return 0
-  fi
-  read -rp "Do you want to regenerate the dh parameters? [y/N]: " response
+  read -rp "Do you want to regenerate the DH parameters? [y/N]: " response
   if [[ "${response}" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-      prompt_for_dhparam_strength
-      generate_dh_parameters "${DH_PARAMS_FILE}"
+    REGENERATE_DH_PARAMS="true"
   else
+    REGENERATE_DH_PARAMS="false"
     print_messages "Skipping DH parameters generation."
   fi
 }
