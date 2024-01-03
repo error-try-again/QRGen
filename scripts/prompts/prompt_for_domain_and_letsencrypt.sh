@@ -23,7 +23,7 @@ function prompt_for_domain_and_letsencrypt() {
 #  None
 #######################################
 function decide_on_ssl_or_self_signed() {
-  if [[ -n ${USE_CUSTOM_DOMAIN} ]]; then
+  if [[ -n ${USE_CUSTOM_DOMAIN} ]] && [[ ${USE_CUSTOM_DOMAIN} == "true" ]]; then
     prompt_for_ssl
     prompt_for_letsencrypt
     construct_certbot_flags

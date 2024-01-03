@@ -81,8 +81,8 @@ function reset_dotenv_defaults() {
   # Unset any variables that are in the current environment but not in the .env file.
   # If unsetting fails for any variable, print a warning but continue with the others.
   # If the entire unsetting process fails, print an error and return 1.
-  comm -23 <(printf "%s\n" "${current_env[@]}") <(printf "%s\n" "${default_env[@]}") |
-    while read -r var_to_unset; do
+  comm -23 <(printf "%s\n" "${current_env[@]}") <(printf "%s\n" "${default_env[@]}") \
+                                                                                     | while read -r var_to_unset; do
       case ${var_to_unset} in
         -*)
           print_messages "Skipping invalid variable: ${var_to_unset}"

@@ -25,7 +25,7 @@ function docker_compose_backend_service() {
 #  None
 #######################################
 function run_backend_service() {
-  if [[ -n ${DISABLE_DOCKER_CACHING} ]]; then
+  if [[ -n ${DISABLE_DOCKER_CACHING} ]] && [[ ${DISABLE_DOCKER_CACHING} == 'true' ]]; then
     docker_compose_backend_service '--no-cache'
   else
     docker_compose_backend_service ''
