@@ -4,7 +4,7 @@
     "AUTO_INSTALL": true,
     "BACKEND_SCHEME": "https",
     "BUILD_CERTBOT_IMAGE": true,
-    "DH_PARAM_SIZE": 4098,
+    "DH_PARAM_SIZE": 4096,
     "DISABLE_DOCKER_CACHING": true,
     "DOMAIN_NAME": "qr-gen.net",
     "EMAIL_FLAG": "--register-unsafely-without-email",
