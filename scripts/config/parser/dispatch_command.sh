@@ -24,16 +24,17 @@ function dispatch_command() {
 
   # Associative array to map the command flag to the corresponding function to execute.
   local -A command_function_map=(
-         ["${setup}"]=setup
-         ["${mock}"]=mock
-         ["${uninstall}"]=uninstall
-         ["${dump_logs}"]=dump_logs
-         ["${update_project}"]=update_project
-         ["${stop_containers}"]=stop_containers
-         ["${purge}"]=purge
-         ["${quit}"]=quit
-         ["${help}"]=display_help
-) local command_executed=false
+           ["${setup}"]=setup
+           ["${mock}"]=mock
+           ["${uninstall}"]=uninstall
+           ["${dump_logs}"]=dump_logs
+           ["${update_project}"]=update_project
+           ["${stop_containers}"]=stop_containers
+           ["${purge}"]=purge
+           ["${quit}"]=quit
+           ["${help}"]=display_help
+  )
+  local command_executed=false
   local command
 
   # Iterate over the keys of the associative array and check if the key is true
