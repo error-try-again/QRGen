@@ -58,6 +58,9 @@ function generate_dh_parameters() {
   print_messages "Generating a Diffie-Hellman (DH) key exchange parameters file with ${DH_PARAM_SIZE} bits..."
   openssl dhparam -out "${DH_PARAMS_FILE}" "${DH_PARAM_SIZE}"
   print_messages "DH parameters generated at ${DH_PARAMS_FILE}."
+
+  # Set REGENERATE_SSL_CERTS to false so hat we don't prompt the user to regenerate the DH params again.
+  REGENERATE_SSL_CERTS="false"
 }
 
 #######################################
@@ -104,7 +107,6 @@ function handle_dh_param_generation() {
 
   if [[ "${REGENERATE_SSL_CERTS}" == "true" ]]; then
     generate_dh_parameters "${DH_PARAMS_FILE}"
-    generate_self_signed_certificates
   fi
 
   if [[ "${REGENERATE_SSL_CERTS}" == "false"  ]]; then
@@ -125,6 +127,11 @@ function handle_dh_param_generation() {
 #   1 otherwise
 #######################################
 function prompt_for_dh_param_regeneration() {
+  if [[ "${REGENERATE_SSL_CERTS}" == "true" ]]; then
+    print_messages "Regenerating DH parameters because SSL certificates are being regenerated."
+    return 0
+fi
+
   read -rp "Do you want to regenerate the dh parameters? [y/N]: " response
   if [[ "${response}" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       prompt_for_dhparam_strength
