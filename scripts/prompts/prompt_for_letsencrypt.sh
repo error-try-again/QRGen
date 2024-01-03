@@ -25,15 +25,17 @@ set -euo pipefail
 #   <unknown> ...
 #######################################
 function prompt_for_letsencrypt() {
+  # Guard against auto install
   if [[ ${USE_LETSENCRYPT} == "true" ]] || [[ ${AUTO_INSTALL} == "true" ]]; then
     return
-else
-    prompt_yes_no "Would you like to use Let's Encrypt?" USE_LETSENCRYPT
-    if [[ ${USE_LETSENCRYPT} == "false" ]]; then
+  fi
+
+  prompt_yes_no "Would you like to use Let's Encrypt?" USE_LETSENCRYPT
+  if [[ ${USE_LETSENCRYPT} == "false" ]]; then
+      # Early return here as self-signed certs as managed by another part of the script
       return
   else
       prompt_for_letsencrypt_install_type
       prompt_tls_selection
   fi
-fi
 }
