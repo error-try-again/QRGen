@@ -42,7 +42,7 @@ function generate_nginx_config() {
 #  None
 #######################################
 function configure_subdomain() {
-  if [[ ${SUBDOMAIN} != "www" && -n ${SUBDOMAIN} ]]; then
+  if [[ -n ${SUBDOMAIN} ]] && [[ ${SUBDOMAIN} != "www" ]]; then
     server_name+=" ${SUBDOMAIN}.${DOMAIN_NAME}"
   fi
 }
@@ -88,7 +88,7 @@ function configure_https() {
 #######################################
 function configure_ssl_mode() {
   shopt -s inherit_errexit
-  if [[ -n ${USE_TLS12} && -n ${USE_TLS13} ]]; then
+  if [[ -n ${USE_TLS12} ]] && [[ -n ${USE_TLS13} ]] && [[ ${USE_TLS12} == "true" ]] && [[ ${USE_TLS13} == "true" ]]; then
     ssl_mode_block=$(get_gzip)
     ssl_mode_block+=$'\n'
     ssl_mode_block+=$(get_ssl_protocol_compatibility)
@@ -111,7 +111,7 @@ function configure_ssl_mode() {
 #  None
 #######################################
 function get_gzip() {
-  if [[ -n ${USE_GZIP} ]]; then
+  if [[ -n ${USE_GZIP} ]] && [[ ${USE_GZIP} == "true" ]]; then
     cat <<- EOF
 gzip on;
         gzip_comp_level 6;
