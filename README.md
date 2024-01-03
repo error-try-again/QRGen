@@ -41,11 +41,11 @@ worth checking back in a couple hours_
 
 ### Firefox Dark
 
-![Dark-Text1-Firefox.png](examples%2FDemo%2FDark-Text1-Firefox.png "Firefox Dark Example Screenshot")
+![Dark-Text1-Firefox.png](docs%2Fexamples%2FDemo%2FDark-Text1-Firefox.png "Firefox Dark Example Screenshot")
 
 ### Firefox Light
 
-![Demo1.png](examples%2FDemo%2FDemo1.png "Firefox Light Example Screenshot")
+![Demo1.png](docs%2Fexamples%2FDemo%2FDemo1.png "Firefox Light Example Screenshot")
 
 ## Features
 
@@ -87,14 +87,14 @@ _Tech_
 _Performance_
 
 *Page Insights Scores*
-![Page Insights Mobile Scores](examples%2FDemo%2Fpage-insights.png "Page Insights Mobile Screenshot")
-![Page Insights Desktop Scores](examples%2FDemo%2Fpage-insights-desktop.png "Page Insights Desktop Screenshot")
+![Page Insights Mobile Scores](docs%2Fexamples%2FDemo%2Fpage-insights.png "Page Insights Mobile Screenshot")
+![Page Insights Desktop Scores](docs%2Fexamples%2FDemo%2Fpage-insights-desktop.png "Page Insights Desktop Screenshot")
 
 *Lighthouse Scores*
-![Lighthouse Scores](examples%2FDemo%2Flighthouse.png)
+![Lighthouse Scores](docs%2Fexamples%2FDemo%2Flighthouse.png)
 
 *SSL Labs scores*
-![SSL Labs Scores](examples%2FDemo%2Fssl-labs.png "SSL Labs Score Screenshot")
+![SSL Labs Scores](docs%2Fexamples%2FDemo%2Fssl-labs.png "SSL Labs Score Screenshot")
 
 ## High level project overview
 
@@ -224,30 +224,32 @@ For a more detailed usage guide, [head over to the project documentation](https:
 
 ### Local Install
 
-![local-install-1.png](examples%2FLocal%2Flocal-install-1.png "Local Install Screenshot")
+![local-install-1.png](docs%2Fexamples%2FLocal%2Flocal-install-1.png "Local Install Screenshot")
 
 ### HTTP only
 
-![http-only.png](examples%2FLocal%2Fhttp-only.png "HTTP Only Screenshot")
+![http-only.png](docs%2Fexamples%2FLocal%2Fhttp-only.png "HTTP Only Screenshot")
 
 ### Staging environment
 
-![auto-setup-staging.png](examples%2FGeneral%2Fauto-setup-staging.png "Auto Setup Staging Screenshot")
+![auto-setup-staging.png](docs%2Fexamples%2FGeneral%2Fauto-setup-staging.png "Auto Setup Staging Screenshot")
 
 ### Production environment
 
-![select-production.png](examples%2FGeneral%2Fselect-production.png "Select Production Environment Screenshot")
-
+![select-production.png](docs%2Fexamples%2FGeneral%2Fselect-production.png "Select Production Environment Screenshot")
+!
 ### Self-signed SSL certificate
 
-![regen-self-signed.png](examples%2FGeneral%2Fregen-self-signed.png "Self-signed SSL Certificate Screenshot")
+![regen-self-signed.png](docs%2Fexamples%2FGeneral%2Fregen-self-signed.png "Self-signed SSL Certificate Screenshot")
 
 ### Pruning containers
 
-![prune-all.png](examples%2FGeneral%2Fprune-all.png "Prune All Containers Screenshot")
+![prune-all.png](docs%2Fexamples%2FGeneral%2Fprune-all.png "Prune All Containers Screenshot")
 
 ### Updating
-![updating.png](examples%2FGeneral%2Fupdating.png "Updating Screenshot")
+
+![updating.png](docs%2Fexamples%2FGeneral%2Fupdating.png "Updating Screenshot")
 
 ### Stopping containers
-![stop-containers.png](examples%2FGeneral%2Fstop-containers.png "Stopping Containers Screenshot")
+
+![stop-containers.png](docs%2Fexamples%2FGeneral%2Fstop-containers.png "Stopping Containers Screenshot")
