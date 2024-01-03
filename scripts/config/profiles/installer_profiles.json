@@ -1,5 +1,6 @@
 {
   "production_install_config": {
+    "USE_FORCE_RENEW": true,
     "AUTO_INSTALL": true,
     "BACKEND_SCHEME": "https",
     "BUILD_CERTBOT_IMAGE": true,
