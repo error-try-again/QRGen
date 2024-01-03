@@ -130,9 +130,7 @@ function prompt_for_dh_param_regeneration() {
   if [[ "${REGENERATE_SSL_CERTS}" == "true" ]]; then
     print_messages "Regenerating DH parameters because SSL certificates are being regenerated."
     return 0
-fi
-
-  read -rp "Do you want to regenerate the dh parameters? [y/N]: " response
+fi  read -rp "Do you want to regenerate the dh parameters? [y/N]: " response
   if [[ "${response}" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       prompt_for_dhparam_strength
       generate_dh_parameters "${DH_PARAMS_FILE}"
