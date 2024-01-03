@@ -40,6 +40,7 @@ function options_parser() {
       --help | -h)
         # Display help message and terminate script execution.
         display_help
+        quit
         ;;
       --setup)
         # Perform setup and terminate script execution.
