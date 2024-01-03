@@ -13,7 +13,7 @@ set -euo pipefail
 #######################################
 function run_certbot_service() {
   print_messages "Running Certbot service..."
-  build_certbot_service || {
+  handle_certbot_build_and_caching || {
     print_messages "Building Certbot service failed. Exiting."
     exit 1
   }

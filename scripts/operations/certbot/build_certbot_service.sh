@@ -7,7 +7,7 @@ set -euo pipefail
 # Arguments:
 #   1
 #######################################
-function docker_compose_certbot_service() {
+function build_certbot_service() {
   local cache_option
   cache_option="${1:-}"
   if [[ -n "${cache_option}" ]]; then
@@ -24,10 +24,10 @@ function docker_compose_certbot_service() {
 # Arguments:
 #  None
 #######################################
-function run_certbot_service() {
+function handle_certbot_build_and_caching() {
   if [[ -n ${DISABLE_DOCKER_CACHING} ]] && [[ ${DISABLE_DOCKER_CACHING} == 'true' ]]; then
-    docker_compose_certbot_service '--no-cache'
+    build_certbot_service '--no-cache'
   else
-    docker_compose_certbot_service
+    build_certbot_service
   fi
 }
