@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # bashsupport disable=BP5006
-set -eo pipefail#######################################
+set -eo pipefail
+
+#######################################
 # Handles openssl certificate generation, and dh parameters generation.
 # Looks at cert paths to determine if regeneration is needed.
 # Globals:
