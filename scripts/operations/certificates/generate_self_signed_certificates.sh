@@ -28,13 +28,18 @@ function handle_self_signed_certificates() {
 # Arguments:
 #   fullchain_path
 #   privkey_path
-#   certs_path
 #######################################
 function check_and_generate_certificates() {
   local fullchain_path="$1"
   local privkey_path="$2"
+
   if [[ ! -f "${fullchain_path}" ]] || [[ ! -f "${privkey_path}" ]] || [[ ${REGENERATE_SSL_CERTS} == "true" ]]; then
     generate_self_signed_certificates "${privkey_path}" "${fullchain_path}"
+  elif [[ -f "${fullchain_path}" ]] && [[ -f "${privkey_path}" ]]; then
+    prompt_for_certificate_regeneration
+    if [[ ${REGENERATE_SSL_CERTS} == "true" ]]; then
+      generate_self_signed_certificates "${privkey_path}" "${fullchain_path}"
+    fi
   else
     print_messages "Certificates for ${DOMAIN_NAME} already exist."
   fi
@@ -66,7 +71,7 @@ function generate_self_signed_certificates() {
   local privkey_path="$1"
   local fullchain_path="$2"
   print_messages "Generating self-signed certificates for ${DOMAIN_NAME}..."
-  openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
+  openssl req -x509 -nodes -days 365 -newkey rsa:"${RSA_KEY_SIZE}" \
     -keyout "${privkey_path}" \
     -out "${fullchain_path}" \
     -subj "/CN=${DOMAIN_NAME}"
@@ -88,17 +93,18 @@ function generate_self_signed_certificates() {
 #######################################
 function handle_dh_param_generation() {
   local DH_PARAMS_FILE="$1"
-  # Regenerate only if file doesn't exist or explicit regeneration is requested
+  # If the DH parameters file doesn't exist, or if the user wants to regenerate them, generate them.
   if [[ ! -f "${DH_PARAMS_FILE}" ]] || [[ ${REGENERATE_DH_PARAMS} == "true" ]]; then
-    if [[ ${REGENERATE_DH_PARAMS} != "true" ]]; then
-      prompt_for_dh_param_regeneration
-    fi
+    prompt_for_dhparam_strength
+    generate_dh_parameters "${DH_PARAMS_FILE}"
+  elif [[ -f "${DH_PARAMS_FILE}" ]]; then
+    prompt_for_dh_param_regeneration
     if [[ ${REGENERATE_DH_PARAMS} == "true" ]]; then
       prompt_for_dhparam_strength
       generate_dh_parameters "${DH_PARAMS_FILE}"
-    else
-      print_messages "Using existing DH parameters."
     fi
+  else
+    print_messages "DH parameters already exist."
   fi
 }
 
@@ -133,10 +139,11 @@ function prompt_for_dh_param_regeneration() {
 function prompt_for_certificate_regeneration() {
   read -rp "Do you want to regenerate the self-signed certificates? [y/N]: " response
   if [[ "${response}" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    return 0
-  else
-    return 1
-  fi
+    REGENERATE_SSL_CERTS="true"
+else
+    REGENERATE_SSL_CERTS="false"
+    print_messages "Skipping self-signed certificates generation."
+fi
 }
 
 #######################################
