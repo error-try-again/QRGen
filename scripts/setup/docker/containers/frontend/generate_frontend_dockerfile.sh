@@ -37,7 +37,7 @@ RUN git init && \
     git reset --hard "${origin}" && \
     git checkout "${RELEASE_BRANCH}" && \
     npm install && \
-    (if [ "${USE_GOOGLE_API_KEY}" = "yes" ]; then \
+    (if [ "${USE_GOOGLE_API_KEY}" = "true" ]; then \
         sed -i'' -e 's/export const googleSdkEnabled = false;/export const googleSdkEnabled = true;/' src/config.tsx; \
     fi)
 
