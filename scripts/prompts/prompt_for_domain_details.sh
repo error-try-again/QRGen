@@ -24,7 +24,8 @@ function prompt_for_domain_details() {
       "DOMAIN_NAME: ${DOMAIN_NAME}" "SUBDOMAIN: ${SUBDOMAIN}" \
       "ORIGIN: ${ORIGIN}" "ORIGIN_PORT: ${ORIGIN_PORT}"
     return
-fi  prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost)" USE_CUSTOM_DOMAIN
+  fi
+  prompt_yes_no "Would you like to specify a domain name other than the default (http://localhost)" USE_CUSTOM_DOMAIN
   if [[ ${USE_CUSTOM_DOMAIN} == "true" ]]; then
     DOMAIN_NAME=$(prompt_with_validation "Enter your domain name (e.g., example.com): " "Error: Domain name cannot be empty.")
     local origin_url="${BACKEND_SCHEME}://${DOMAIN_NAME}"
