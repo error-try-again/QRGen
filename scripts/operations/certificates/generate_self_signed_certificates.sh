@@ -119,6 +119,10 @@ function handle_dh_param_generation() {
 #   1 otherwise
 #######################################
 function prompt_for_dh_param_regeneration() {
+  # If auto install is enabled, don't prompt the user.
+  if [[ ${AUTO_INSTALL} == "true" ]]; then
+    return
+  fi
   read -rp "Do you want to regenerate the DH parameters? [y/N]: " response
   if [[ "${response}" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     REGENERATE_DH_PARAMS="true"
@@ -137,6 +141,10 @@ function prompt_for_dh_param_regeneration() {
 #   1 ...
 #######################################
 function prompt_for_certificate_regeneration() {
+  # If auto install is enabled, don't prompt the user.
+  if [[ ${AUTO_INSTALL} == "true" ]]; then
+    return
+  fi
   read -rp "Do you want to regenerate the self-signed certificates? [y/N]: " response
   if [[ "${response}" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     REGENERATE_SSL_CERTS="true"
