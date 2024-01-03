@@ -11,9 +11,9 @@ function docker_compose_backend_service() {
   local cache_option
   cache_option="${1:-}"
   if [[ -n "${cache_option}" ]]; then
-    docker compose --progress=plain build "${cache_option}" backend;
+    docker compose --progress=plain build "${cache_option}" backend
   else
-    docker compose --progress=plain build backend;
+    docker compose --progress=plain build backend
   fi
 }
 

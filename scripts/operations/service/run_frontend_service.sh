@@ -11,9 +11,9 @@ function docker_compose_frontend_service() {
   local cache_option
   cache_option="${1:-}"
   if [[ -n "${cache_option}" ]]; then
-    docker compose --progress=plain build "${cache_option}" frontend;
+    docker compose --progress=plain build "${cache_option}" frontend
   else
-    docker compose --progress=plain build frontend;
+    docker compose --progress=plain build frontend
   fi
   docker compose up -d frontend
 }

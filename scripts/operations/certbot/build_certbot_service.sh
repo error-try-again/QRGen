@@ -11,9 +11,9 @@ function build_certbot_service() {
   local cache_option
   cache_option="${1:-}"
   if [[ -n "${cache_option}" ]]; then
-    docker compose --progress=plain build "${cache_option}" certbot;
+    docker compose --progress=plain build "${cache_option}" certbot
   else
-    docker compose --progress=plain build certbot;
+    docker compose --progress=plain build certbot
   fi
 }
 
