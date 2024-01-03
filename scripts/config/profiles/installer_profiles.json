@@ -63,7 +63,7 @@
     "BACKEND_SCHEME": "https",
     "AUTO_INSTALL": true,
     "DH_PARAM_SIZE": 2048,
-    "DISABLE_DOCKER_CACHING": true,
+    "DISABLE_DOCKER_CACHING": false,
     "GOOGLE_MAPS_API_KEY": "",
     "REGENERATE_SSL_CERTS": false,
     "REGENERATE_DH_PARAMS": false,
