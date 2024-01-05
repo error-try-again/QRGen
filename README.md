@@ -83,6 +83,7 @@ _Tech_
 - Security features such as CORS, rate limiting, OCSP stapling, HSTS, and more.
 - NGINX proxy provides multi-service integrations.  
 - Provides QR Generation web APIs (POST /qr/generate) or (POST /qr/batch)
+- Installer script for easy setup and configuration with automatic and custom configuration options.
 
 _Performance_
 
@@ -192,8 +193,13 @@ _Create fresh user ssh key, run the project installation script_
 ssh-keygen
 ssh-copy-id -i ~/.ssh/<a-fresh-public-key> docker-primary@<hostip>
 
-# Use your fresh key to remote in & install the project
-ssh -t -i .ssh/<a-fresh-public-key> docker-primary@<hostip> "cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen && /home/docker-primary/QRGen/install.sh"
+# Use your fresh key to remote in & modify the main_install_profiles.json file to your liking (for auto-setup)
+# Or, run the installer manually and select your desired options through custom prompts
+ssh -t -i .ssh/<a-fresh-public-key> docker-primary@<hostip> 
+cd ~ && git clone https://github.com/error-try-again/QRGen.git && cd QRGen && nano main_install_profiles.json && ~/QRGen/install.sh
+```
+
+```bash
 # Select 1)
 ```
 
