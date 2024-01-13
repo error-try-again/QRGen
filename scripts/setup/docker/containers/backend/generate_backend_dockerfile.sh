@@ -44,7 +44,7 @@ RUN cd backend \
 COPY backend/.env /usr/app/.env
 
 # Set the backend express port
-EXPOSE ${BACKEND_PORT}
+EXPOSE ${EXPRESS_PORT}
 
 # Use ts-node to run the TypeScript server file from the correct directory
 CMD ["npx", "ts-node", "/usr/app/backend/src/server.ts"]

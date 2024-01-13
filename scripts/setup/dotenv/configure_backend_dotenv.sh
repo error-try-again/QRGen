@@ -17,7 +17,7 @@ function configure_backend_dotenv() {
   print_messages "Configuring backend .env file"
   cat << EOF > "${BACKEND_DOTENV_FILE}"
 ORIGIN=${ORIGIN}
-PORT=${BACKEND_PORT}
+PORT=${EXPRESS_PORT}
 USE_SSL=${USE_SSL}
 GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
 EOF

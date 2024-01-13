@@ -26,11 +26,8 @@ function configure_compose_self_signed_mode() {
   print_messages "Configuring Docker Compose for self-signed certificates..."
 
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
-    backend_ports=$(join_with_commas \
-      "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
-
-    backend_volumes=$(join_with_commas \
+    express_ports=$(join_with_commas "ports" "${EXPRESS_PORT}:${EXPRESS_PORT}")
+    express_volumes=$(join_with_commas \
       "volumes" \
       "${CERTS_DIR}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
       "${CERTS_DIR}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")

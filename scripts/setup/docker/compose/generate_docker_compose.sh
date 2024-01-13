@@ -16,7 +16,6 @@ function generate_docker_compose() {
   if [[ ${USE_LETSENCRYPT} == "true" ]]; then
     configure_compose_letsencrypt_mode
   elif [[ ${USE_SELF_SIGNED_CERTS} == "true" ]]; then
-    print_messages "Configuring Docker Compose for self-signed certificates..."
     configure_compose_self_signed_mode
   else
     configure_http

@@ -13,8 +13,8 @@ function assemble_docker_compose_configuration() {
     --name "${backend_name}" \
     --build-context "${backend_context}" \
     --dockerfile "${backend_dockerfile}" \
-    --ports "${backend_ports}" \
-    --volumes "${backend_volumes}" \
+    --ports "${express_ports}" \
+    --volumes "${express_volumes}" \
     --networks "${backend_networks}" \
     --restart "${backend_restart}" \
     --depends-on "${backend_depends_on}")

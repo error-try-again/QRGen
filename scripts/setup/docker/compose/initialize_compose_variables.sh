@@ -53,7 +53,7 @@ function initialize_variables() {
   export certbot_dockerfile="./certbot/Dockerfile"
 
   export frontend_ports=""
-  export backend_ports=""
+  export express_ports=""
 
   export backend_depends_on=""
   export frontend_depends_on="backend"
@@ -62,7 +62,7 @@ function initialize_variables() {
   export backend_restart="on-failure"
   export frontend_restart="on-failure"
 
-  export backend_volumes=""
+  export express_volumes=""
   export frontend_volumes=""
   export certbot_volumes=""
 

@@ -31,7 +31,7 @@ function setup_common_mock_parameters() {
   touch "${test_output_dir}/logs/error.log"
   touch "${test_output_dir}/run/nginx.pid"
 
-  BACKEND_PORT=12345
+  EXPRESS_PORT=12345
   BACKEND_UPSTREAM_NAME="localhost"
   NGINX_PID="pid ${PROJECT_ROOT_DIR}/nginx.pid;"
   NGINX_ERROR_LOG="error_log ${test_output_dir}/logs/error.log warn;"

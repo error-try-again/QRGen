@@ -54,6 +54,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge && \
     chmod -R 777 /usr/share/nginx/html/.well-known
+
 EXPOSE ${EXPOSED_NGINX_PORT}
 CMD ["nginx", "-g", "daemon off;"]
 EOF
