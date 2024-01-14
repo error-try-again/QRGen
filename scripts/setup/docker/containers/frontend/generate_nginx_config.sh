@@ -279,10 +279,10 @@ function write_endpoints() {
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
 
     [[ -v BACKEND_SCHEME ]] || print_messages "Error: BACKEND_SCHEME is not set"
-    [[ -v BACKEND_PORT ]] || print_messages "Error: BACKEND_PORT is not set"
+    [[ -v EXPRESS_PORT ]] || print_messages "Error: EXPRESS_PORT is not set"
 
     local endpoint="/qr/"
-    local proxy_pass="proxy_pass ${BACKEND_SCHEME}://${BACKEND_UPSTREAM_NAME}:${BACKEND_PORT};"
+    local proxy_pass="proxy_pass ${BACKEND_SCHEME}://${BACKEND_UPSTREAM_NAME}:${EXPRESS_PORT};"
     local proxy_set_header_host="proxy_set_header Host \$host;"
     local proxy_set_header_x_real_ip="proxy_set_header X-Real-IP \$remote_addr;"
     local proxy_set_header_x_forwarded_for="proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;"

@@ -19,14 +19,14 @@ set -euo pipefail
 #######################################
 function setup_backend() {
   if [[ ${RELEASE_BRANCH} == "full-release" ]]; then
-    backend_ports=$(join_with_commas \
+    express_ports=$(join_with_commas \
       "ports" \
-      "${BACKEND_PORT}:${BACKEND_PORT}")
+      "${EXPRESS_PORT}:${EXPRESS_PORT}")
 
     # export to ensure that the variable is available in the assemble script
-    export backend_ports
+    export express_ports
 
-    backend_volumes=$(join_with_commas \
+    express_volumes=$(join_with_commas \
       "volumes" \
       "${CERTS_DIR}/live/${DOMAIN_NAME}/privkey.pem:/etc/ssl/certs/privkey.pem:ro" \
       "${CERTS_DIR}/live/${DOMAIN_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro")
