@@ -12,7 +12,7 @@ set -euo pipefail
 # Arguments:
 #   json_file: The JSON file name.
 #######################################
-function select_and_apply_profile() {
+select_and_apply_profile() {
   local json_file=$1
 
   validate_json_file "${json_file}"
@@ -25,6 +25,7 @@ function select_and_apply_profile() {
 
   # For each profile, print an index and the profile name to the console (starting at 1)
   local index=1
+  local profile
   for profile in "${profiles[@]}"; do
     echo "${index}) ${profile}"
     ((index++))
@@ -41,8 +42,8 @@ function select_and_apply_profile() {
       print_messages "You selected: ${selected_profile}"
       apply_profile "${json_file}" "${selected_profile}"
       break
-  else
+    else
       print_messages "Invalid selection: ${selection}"
-  fi
-done
+    fi
+  done
 }
