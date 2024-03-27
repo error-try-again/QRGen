@@ -145,7 +145,7 @@ function remove_user() {
 #######################################
 # Sets up NVM and Node.js for the specified user.
 # Globals:
-#   NODE_VERSION
+#   node_version
 #   nvm_install_url
 #   user_name
 # Arguments:
@@ -163,9 +163,9 @@ export NVM_DIR="/home/${user_name}/.nvm"
 export npm_config_cache="/home/${user_name}/.npm"
 curl -o- ${nvm_install_url} | bash
 source "\$NVM_DIR/nvm.sh"
-nvm install ${NODE_VERSION}
-nvm use ${NODE_VERSION}
-nvm alias default ${NODE_VERSION}
+nvm install ${node_version}
+nvm use ${node_version}
+nvm alias default ${node_version}
 npm install -g npm
 EOF
   else
@@ -252,7 +252,7 @@ esac
 # Globals:
 #   LANG
 #   LC_ALL
-#   NODE_VERSION
+#   node_version
 #   TERM
 #   nvm_install_url
 #   user_name
@@ -274,7 +274,7 @@ function main() {
 
   user_name="${1:-docker-primary}"
   nvm_install_url="https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh"
-  NODE_VERSION="latest"
+  node_version="latest"
 
   installation_menu
 }

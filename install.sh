@@ -20,7 +20,6 @@ function source_files() {
   source ./scripts/config/profiles/automatic_production_selection.sh
   source ./scripts/config/profiles/automatic_staging_selection.sh
   source ./scripts/config/profiles/select_and_apply_profile.sh
-  source ./scripts/config/profiles/extract_configuration_value.sh
 
   # Flags scripts
   source ./scripts/flags/construct_certbot_flags.sh
@@ -193,6 +192,12 @@ function main() {
 
   # Trap the SIGINT signal (Ctrl+C) and call the quit function.
   trap quit SIGINT
+
+  local working_dir
+  working_dir="$(pwd)"
+
+  # Export working directory to ensure that the installer profile can be sourced from anywhere, as it is relative to the working directory.
+  declare -xrg working_dir
 
   # Ensures that the script can be run from anywhere as it changes the directory to the script's directory.
   cd "$(dirname "$0")"

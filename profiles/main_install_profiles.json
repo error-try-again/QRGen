@@ -1,0 +1,281 @@
+{
+  "services": {
+    "express_service": {
+      "name": "express_service",
+      "image": "node:latest",
+      "container_name": "express_service",
+      "context": ".",
+      "dockerfile": "./backend/Dockerfile",
+      "ports": [
+        "8080:8080"
+      ],
+      "networks": [
+        "qrgen"
+      ],
+      "restart": "on-failure",
+      "domains": [
+        "qr-gen.net"
+      ],
+      "locations": [
+        "/qr/"
+      ]
+    },
+    "nginx": {
+      "name": "nginx",
+      "image": "nginx:latest",
+      "container_name": "nginx",
+      "context": ".",
+      "dockerfile": "./frontend/Dockerfile",
+      "ports": [
+        "80:80",
+        "443:443"
+      ],
+      "volumes": {
+        "./nginx": "/etc/nginx",
+        "./nginx/conf.d": "/etc/nginx/conf.d",
+        "./nginx/ssl": "/etc/nginx/ssl",
+        "./nginx/logs": "/usr/share/nginx/logs",
+        "./certs": "/etc/letsencrypt/live/",
+        "./certs/live/dhparam": "/etc/ssl/certs/dhparam"
+      },
+      "networks": [
+        "qrgen"
+      ],
+      "depends_on": [
+        "express_service"
+      ],
+      "restart": "on-failure",
+      "domains": [
+        "qr-gen.net"
+      ]
+    }
+  },
+  "networks": {
+    "qrgen": {
+      "driver": "bridge"
+    }
+  },
+  "volumes": {
+    "shared": {
+      "driver": "local"
+    }
+  },
+  "environments": {
+    "production": {
+      "services": [
+        "nginx",
+        "express_service"
+      ],
+      "overrides": {
+        "express_service": {
+          "ports": [
+            "3001:3001"
+          ]
+        }
+      },
+      "networks": {
+        "qrgen": {
+          "driver": "bridge"
+        }
+      },
+      "volumes": {
+        "shared": {
+          "driver_opts": {
+            "o": "addr=host.docker.internal,nolock,soft,rw,override_option"
+          }
+        }
+      },
+      "flags": {
+        "auto_install_flag": true,
+        "backend_scheme": "https",
+        "build_certbot_image": true,
+        "diffie_hellman_parameter_bit_size": 2048,
+        "disable_docker_build_caching": true,
+        "docker_compose_file": "docker-compose.yml",
+        "email_flag": "--register-unsafely-without-email",
+        "google_maps_api_key": "",
+        "hsts_flag": "--hsts",
+        "letsencrypt_email": "skip",
+        "non_interactive_flag": "--non-interactive",
+        "no_eff_email_flag": "--no-eff-email",
+        "ocsp_stapling_flag": "--staple-ocsp",
+        "origin": "void.qr-gen.net",
+        "origin_port": "8080",
+        "origin_url": "https://void.qr-gen.net",
+        "productions_certs_flag": "--staging",
+        "regenerate_diffie_hellman_parameters": true,
+        "regenerate_ssl_certificates": true,
+        "release_branch": "full-release",
+        "rsa_key_size_flag": "--rsa-key-size 4096",
+        "terms_of_service_flag": "--agree-tos",
+        "use_auto_renew_ssl": true,
+        "use_custom_domain": true,
+        "use_dry_run": true,
+        "use_force_renew": true,
+        "use_google_api_key": true,
+        "use_gzip_flag": true,
+        "use_hsts": true,
+        "use_letsencrypt": true,
+        "use_must_staple": false,
+        "use_ocsp_stapling": true,
+        "use_overwrite_self_signed_certificates": true,
+        "use_production_ssl": true,
+        "use_ssl_flag": true,
+        "use_strict_file_permissions": false,
+        "use_tls_12_flag": false,
+        "use_tls_13_flag": true,
+        "use_uir": true
+      }
+    },
+    "reload_production": {
+      "services": [
+        "nginx",
+        "express_service"
+      ],
+      "overrides": {
+        "express_service": {
+          "ports": [
+            "3001:3001"
+          ],
+          "domains": [
+            "localhost"
+          ],
+          "locations": [
+            "/qr/"
+          ],
+          "networks": [
+            "qrgen"
+          ],
+          "restart": "on-failure",
+          "volumes": {
+            "./nginx": "/etc/nginx",
+            "./nginx/conf.d": "/etc/nginx/conf.d",
+            "./nginx/ssl": "/etc/nginx/ssl",
+            "./nginx/logs": "/usr/share/nginx/logs",
+            "./certs/live/localhost": "/etc/letsencrypt/live/localhost"
+          }
+        }
+      },
+      "flags": {
+        "auto_install_flag": true,
+        "build_certbot_image": false,
+        "diffie_hellman_parameter_bit_size": 2048,
+        "disable_docker_build_caching": true,
+        "letsencrypt_email": "skip",
+        "use_auto_renew_ssl": true,
+        "use_dry_run": true,
+        "use_hsts": true,
+        "use_letsencrypt": true,
+        "use_must_staple": false,
+        "use_ocsp_stapling": true,
+        "use_overwrite_self_signed_certificates": false,
+        "use_production_ssl": true,
+        "use_strict_file_permissions": false,
+        "use_tls_12_flag": false,
+        "use_tls_13_flag": true,
+        "use_uir": true
+      }
+    },
+    "self_signed": {
+      "services": [
+        "nginx",
+        "express_service"
+      ],
+      "overrides": {
+        "express_service": {
+          "ports": [
+            "3001:3001"
+          ],
+          "domains": [
+            "localhost"
+          ],
+          "volumes": {
+            "./certs/live/localhost": "/etc/ssl/certs/"
+          }
+        },
+        "nginx": {
+          "ports": [
+            "443:443"
+          ],
+          "domains": [
+            "localhost"
+          ],
+          "depends_on": [
+            "express_service"
+          ],
+          "volumes": {
+            "./nginx": "/etc/nginx",
+            "./nginx/conf.d": "/etc/nginx/conf.d",
+            "./nginx/ssl": "/etc/nginx/ssl",
+            "./nginx/logs": "/usr/share/nginx/logs",
+            "./certs/live/localhost": "/etc/letsencrypt/live/localhost",
+            "./certs/live/dhparam": "/etc/ssl/certs/dhparam"
+          }
+        }
+      },
+      "flags": {
+        "auto_install_flag": true,
+        "backend_scheme": "https",
+        "diffie_hellman_parameter_bit_size": 2048,
+        "disable_docker_build_caching": false,
+        "google_maps_api_key": "",
+        "regenerate_diffie_hellman_parameters": false,
+        "regenerate_ssl_certificates": false,
+        "release_branch": "full-release",
+        "use_google_api_key": true,
+        "use_gzip_flag": true,
+        "use_hsts": true,
+        "use_letsencrypt": false,
+        "use_ocsp_stapling": true,
+        "use_self_signed_certs": true,
+        "use_ssl_flag": true,
+        "use_tls_12_flag": false,
+        "use_tls_13_flag": true
+      }
+    },
+    "http": {
+      "services": [
+        "nginx",
+        "express_service"
+      ],
+      "overrides": {
+        "express_service": {
+          "ports": [
+            "3001:3001"
+          ],
+          "domains": [
+            "localhost"
+          ]
+        },
+        "nginx": {
+          "ports": [
+            "80:80"
+          ],
+          "domains": [
+            "localhost"
+          ]
+        }
+      },
+      "flags": {
+        "build_certbot_image": false,
+        "auto_install_flag": true,
+        "backend_scheme": "http",
+        "diffie_hellman_parameter_bit_size": 2048,
+        "disable_docker_build_caching": false,
+        "regenerate_diffie_hellman_parameters": false,
+        "regenerate_ssl_certificates": false,
+        "google_maps_api_key": "",
+        "release_branch": "full-release",
+        "use_custom_domain": false,
+        "use_google_api_key": true,
+        "use_gzip_flag": true,
+        "use_hsts": false,
+        "use_letsencrypt": false,
+        "use_self_signed_certs": false,
+        "use_ssl_flag": false,
+        "use_tls_12_flag": false,
+        "use_tls_13_flag": false
+      }
+    }
+  }
+}

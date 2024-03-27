@@ -7,7 +7,7 @@ This project aims to automate the setup of a scalable, self-hostable, full-stack
 service within a rootless Docker environment, with a focus on security & ease of use.
 The project has been written in TS (Express), TSX (Vite/React), Bash/Shell (Automation) and has several key layers. Each of which deserve their own companion documentation.
 To address the challenge of supporting multiple stack configurations, the project has gone through several iterations since its inception. 
-Currently, it is comprised of two separate git submodules that are initialized within the containers themselves at build time.
+Currently, it comprises two separate git submodules that are initialized within the containers themselves at build time.
 
 *Note: If you're looking for a version of this project that does not use submodules and instead copies sources from the host/docker-primary user, see the legacy branch.*
 
@@ -26,7 +26,7 @@ I hope that others find it useful too.
 *Continuous improvements and bug fixes are expected. Contributions, issues & pull requests welcome.*
 If you have a specific fix for the frontend or backend environments, please submit your pull request to the respective submodule/repo.
 
-A full write up and comprehensive documentation is
+A full write-up and comprehensive documentation is
 underway [here](https://insomniacvoid.dev/posts/qr-gen), but for now, here's a quick
 overview of the project.
 
@@ -35,7 +35,7 @@ overview of the project.
 [Link to Live Demo - Sydney, Australia](https://qr-gen.net/)
 
 _If the demo server is is down for maintenance, it's probably
-worth checking back in a couple hours_
+worth checking back in a couple of hours_
 
 # Desktop Examples
 
