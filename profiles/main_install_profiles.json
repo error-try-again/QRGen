@@ -154,6 +154,25 @@
             "./nginx/logs": "/usr/share/nginx/logs",
             "./certs/live/localhost": "/etc/letsencrypt/live/localhost"
           }
+        },
+        "nginx": {
+          "ports": [
+            "443:443"
+          ],
+          "domains": [
+            "localhost"
+          ],
+          "depends_on": [
+            "express_service"
+          ],
+          "volumes": {
+            "./nginx": "/etc/nginx",
+            "./nginx/conf.d": "/etc/nginx/conf.d",
+            "./nginx/ssl": "/etc/nginx/ssl",
+            "./nginx/logs": "/usr/share/nginx/logs",
+            "./certs/live/localhost": "/etc/letsencrypt/live/localhost",
+            "./certs/live/dhparam": "/etc/ssl/certs/dhparam"
+          }
         }
       },
       "flags": {
@@ -253,6 +272,9 @@
           ],
           "domains": [
             "localhost"
+          ],
+          "depends_on": [
+            "express_service"
           ]
         }
       },
@@ -261,7 +283,7 @@
         "auto_install_flag": true,
         "backend_scheme": "http",
         "diffie_hellman_parameter_bit_size": 2048,
-        "disable_docker_build_caching": false,
+        "disable_docker_build_caching": true,
         "regenerate_diffie_hellman_parameters": false,
         "regenerate_ssl_certificates": false,
         "google_maps_api_key": "",

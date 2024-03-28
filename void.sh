@@ -18,7 +18,7 @@ quit() {
 #  None
 #######################################
 source_configurations() {
-  source installer/util/config.sh
+  source installer/config.sh
   source_global_configurations
 }
 
@@ -28,42 +28,42 @@ source_configurations() {
 #  None
 #######################################
 source_project_files() {
-  source installer/util/report_timestamp.sh
-  source installer/util/create_directory_and_log.sh
-  source installer/util/setup_directory_structure.sh
-  source installer/util/print_message.sh
-  source installer/util/print_multiple_messages.sh
-  source installer/util/initialize_and_dispatch_command.sh
-  source installer/util/backup_existing_file.sh
-  source installer/util/backup_and_replace_file.sh
-  source installer/util/echo_indented.sh
-  source installer/util/join_array_with_commas.sh
-  source installer/util/insert_into_bashrc.sh
-  source installer/util/update_project.sh
-  source installer/util/profile_builder.sh
-  source installer/util/generate_robots.sh
-  source installer/util/generate_sitemap.sh
-  source installer/util/nginx.sh
-  source installer/util/main_operations.sh
-  source installer/util/flag_management.sh
-  source installer/util/manage_port_availability.sh
-  source installer/util/manage_ssl.sh
-  source installer/util/manage_docker.sh
-  source installer/util/manage_certbot.sh
-  source installer/util/manage_dockerfile_generation.sh
-  source installer/util/manage_compose_operating_mode.sh
-  source installer/util/validate_file_exists.sh
-  source installer/util/check_command_exists.sh
-  source installer/util/initialize_rootless_docker.sh
-  source installer/util/dump_logs.sh
+  source installer/util/helpers/report_timestamp.sh
+  source installer/util/helpers/create_directory_and_log.sh
+  source installer/util/ops/setup_directory_structure.sh
+  source installer/util/helpers/print_message.sh
+  source installer/util/helpers/print_multiple_messages.sh
+  source installer/util/ops/initialize_and_dispatch_command.sh
+  source installer/util/helpers/backup_existing_file.sh
+  source installer/util/helpers/backup_and_replace_file.sh
+  source installer/util/helpers/echo_indented.sh
+  source installer/util/helpers/insert_into_bashrc.sh
+  source installer/util/ops/update_project.sh
+  source installer/util/profile/profile_builder.sh
+  source installer/util/static_file_generation/generate_robots.sh
+  source installer/util/static_file_generation/generate_sitemap.sh
+  source installer/util/static_file_generation/core/generate_nginx.sh
+  source installer/util/ops/setup.sh
+  source installer/util/other/flag_management.sh
+  source installer/util/helpers/manage_port_availability.sh
+  source installer/util/other/manage_ssl.sh
+  source installer/util/ops/manage_docker.sh
+  source installer/util/other/manage_certbot.sh
+  source installer/util/static_file_generation/core/generate_compose.sh
+  source installer/util/helpers/validate_file_exists.sh
+  source installer/util/helpers/check_command_exists.sh
+  source installer/util/ops/initialize_rootless_docker.sh
+  source installer/util/ops/dump_logs.sh
+  source installer/util/ops/uninstall.sh
+  source installer/util/ops/purge.sh
+  source installer/util/ops/stop.sh
 
-  source installer/util/compose_definition_builder.sh
-  source installer/util/generate_frontend_dotenv.sh
-  source installer/util/generate_backend_dotenv.sh
+  source installer/util/static_file_generation/core/generate_dockerfiles.sh
+  source installer/util/static_file_generation/generate_frontend_dotenv.sh
 
-  source installer/util/handle_auto_install.sh
-  source installer/util/profile_selection_applicators.sh
-  source installer/util/generate_nginx_mime_types.sh
+  source installer/util/helpers/handle_auto_install.sh
+  source installer/util/helpers/profile_selection_applicators.sh
+  source installer/util/static_file_generation/generate_nginx_mime_types.sh
 
   source installer/prompts/prompts.sh
 }
